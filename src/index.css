@@ -1,0 +1,278 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global base styles */
+* { box-sizing: border-box; }
+html, body { font-family: 'Inter', system-ui, sans-serif; background: #faf9f5; color: #1b1c1a; }
+
+/* Prevent page-level horizontal scroll but allow inner table scroll */
+html { overflow-x: hidden; }
+.table-scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+
+/* ── Sidebar navigation ── */
+.sidebar-link { transition: all 0.15s; color: rgba(250,249,245,0.6); }
+.sidebar-link:hover { background: rgba(212,168,67,0.1); color: rgba(250,249,245,0.9); }
+.sidebar-link.active { background: rgba(212,168,67,0.15); border-right: 2px solid #d4a843; color: #eec058; }
+
+/* ── Inputs & selects — ghost style ── */
+input, select, textarea { font-family: 'Inter', system-ui, sans-serif; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #795900 !important; box-shadow: none; }
+
+/* ── Buttons ── */
+.btn-gold { background: linear-gradient(135deg,#795900 0%,#d4a843 100%); color: #fff; transition: opacity 0.15s; border: none; cursor: pointer; }
+.btn-gold:hover { opacity: 0.9; }
+.btn-navy { background: #131b2e; color: #fff; border: none; cursor: pointer; transition: opacity 0.15s; }
+.btn-navy:hover { opacity: 0.85; }
+
+/* ── Cards ── */
+.card { background: #ffffff; border-radius: 1rem; box-shadow: 0 12px 32px rgba(27,28,26,0.04); }
+.card-cream { background: #f5f4f0; border-radius: 1rem; }
+
+/* ── Badge ── */
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+
+/* ── Label style ── */
+.label-xs { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(27,28,26,0.4); font-family: 'Inter', sans-serif; }
+
+/* ── Section page headers ── */
+.page-title { font-family: 'Manrope', system-ui, sans-serif; font-size: 1.875rem; font-weight: 800; letter-spacing: -0.02em; color: #1b1c1a; line-height: 1.1; }
+.page-subtitle { font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(27,28,26,0.4); margin-top: 4px; }
+
+/* ── Global design system overrides ── */
+.bg-white.rounded-xl, .bg-white.rounded-2xl {
+  box-shadow: 0 8px 24px rgba(27,28,26,0.05) !important;
+  background: #ffffff !important;
+}
+
+/* Section headers inside cards */
+.text-xs.font-semibold.text-gray-400.uppercase,
+.text-xs.font-semibold.text-gray-500.uppercase {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+  color: rgba(27,28,26,0.4) !important;
+}
+
+/* Page titles — Manrope */
+h1.text-xl, h1.text-2xl, h1.text-xl.sm\:text-2xl, h1.text-2xl.sm\:text-3xl {
+  font-family: 'Manrope', system-ui, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  color: #1b1c1a !important;
+}
+
+/* Gold active pill / filter tabs */
+.pill-active { background: #ffffff; color: #795900; font-weight: 600; box-shadow: 0 4px 12px rgba(27,28,26,0.06); }
+.pill-inactive { color: rgba(27,28,26,0.5); background: transparent; }
+
+/* Ghost input style */
+.input-ghost {
+  border: none !important;
+  border-bottom: 2px solid rgba(210,197,177,0.3) !important;
+  border-radius: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.input-ghost:focus {
+  border-bottom-color: #795900 !important;
+  box-shadow: none !important;
+}
+
+/* Calculator result dark card */
+.calc-result-card {
+  background: #131b2e;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  color: white;
+  box-shadow: 0 20px 40px rgba(15,23,42,0.2);
+  position: relative;
+  overflow: hidden;
+}
+.calc-result-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(212,168,67,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* Catalogue product cards */
+.product-card { transition: transform 0.15s, box-shadow 0.15s; }
+.product-card:hover { transform: translateY(-1px); box-shadow: 0 16px 36px rgba(27,28,26,0.08) !important; }
+
+/* Status badge refinements */
+.badge-gold { background: rgba(212,168,67,0.15); color: #795900; border: 1px solid rgba(212,168,67,0.25); }
+.badge-indigo { background: rgba(73,75,214,0.1); color: #494bd6; border: 1px solid rgba(73,75,214,0.2); }
+.badge-green { background: rgba(22,163,74,0.1); color: #15803d; border: 1px solid rgba(22,163,74,0.2); }
+.badge-red { background: rgba(220,38,38,0.1); color: #dc2626; border: 1px solid rgba(220,38,38,0.15); }
+
+/* Subtle divider replacement — space only */
+.no-divider > * + * { border-top: none; }
+
+/* Nav tabs with underline active indicator */
+.nav-tab-active { color: #795900; border-bottom: 2px solid #d4a843; font-weight: 600; }
+.nav-tab-inactive { color: rgba(27,28,26,0.45); border-bottom: 2px solid transparent; }
+
+/* Scroll container for horizontal pill tabs */
+.pill-scroll { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
+.pill-scroll::-webkit-scrollbar { display: none; }
+
+/* Growth order card with left gold accent */
+.order-card-accent { border-left: 3px solid #d4a843; }
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: #f1f1f1; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.2s ease; }
+@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.slide-in { animation: slideIn 0.25s ease; }
+
+/* Mobile bottom nav */
+.bottom-nav { display: none; }
+@media (max-width: 768px) {
+  .desktop-sidebar { display: none !important; }
+  .bottom-nav { display: flex; }
+  .mobile-header { display: flex !important; }
+  .main-content { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .mobile-header { padding-top: env(safe-area-inset-top); }
+  /* On phones the refresh button needs to clear the 52px MobileHeader,
+     not sit on top of the wordmark and avatar. */
+  .refresh-btn { top: calc(64px + env(safe-area-inset-top)) !important; }
+}
+@media (min-width: 769px) {
+  .mobile-header { display: none !important; }
+}
+
+/* Card layout for mobile tables */
+@media (max-width: 640px) {
+  .table-to-cards thead { display: none; }
+  .table-to-cards tbody tr { display: block; background: white; border-radius: 12px; margin-bottom: 12px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: none; }
+  .table-to-cards tbody td { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border: none; font-size: 13px; }
+  .table-to-cards tbody td::before { content: attr(data-label); font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; margin-right: 8px; }
+  .table-to-cards tbody td:first-child { border-bottom: 1px solid #f3f4f6; padding-bottom: 8px; margin-bottom: 4px; }
+  .table-to-cards tbody td.no-label::before { display: none; }
+  .table-to-cards tbody td.no-label { justify-content: flex-end; }
+}
+
+/* Mobile form grid */
+@media (max-width: 640px) {
+  .form-grid-2 { grid-template-columns: 1fr !important; }
+  .form-grid-3 { grid-template-columns: 1fr !important; }
+  .stats-grid-4 { grid-template-columns: 1fr 1fr !important; }
+  .calc-grid-2 { grid-template-columns: 1fr !important; }
+}
+
+/* Collections mobile refinements */
+@media (max-width: 640px) {
+  .collections-stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .collections-stats-grid .card { padding: 12px !important; }
+  .collections-stats-grid .text-2xl { font-size: 1.25rem !important; }
+  .product-form-modal {
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+  .product-form-modal .card {
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    max-height: 100vh !important;
+    height: 100vh !important;
+  }
+  .product-form-images { grid-template-columns: repeat(3, 1fr) !important; }
+  .product-form-tabs { display: flex !important; }
+  .product-form-tabs button { flex: 1 !important; text-align: center !important; padding: 10px 4px !important; font-size: 12px !important; }
+  .pipeline-step { width: 28px !important; height: 28px !important; font-size: 12px !important; }
+  .piece-cost-grid { grid-template-columns: 1fr !important; }
+  .pricing-summary-grid { grid-template-columns: 1fr 1fr !important; }
+  .form-footer-actions { flex-direction: column !important; }
+  .form-footer-actions button { width: 100% !important; }
+  .colour-picker-dropdown { width: calc(100% + 24px) !important; left: -12px !important; right: auto !important; }
+  .collection-header-flex { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+  .collection-header-flex button { width: 100% !important; }
+  .collection-filter-pills { flex-wrap: wrap !important; gap: 8px !important; }
+  .collection-card { padding: 16px !important; }
+  .breadcrumb-button { min-height: 44px !important; padding: 12px 16px !important; }
+  .empty-state-card { padding: 24px !important; }
+}
+
+/* ── Responsive primitives (added for iPhone notch / PWA / mobile UX) ─ */
+
+/* Honour iOS safe-area on the root so the standalone PWA isn't drawn
+   under the dynamic-island / home indicator. */
+@supports (padding: env(safe-area-inset-top)) {
+  html, body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  /* Inside the PWA shell we want the content to feel edge-to-edge but
+     sticky-bottom controls still need to clear the home indicator. */
+  @media (display-mode: standalone) {
+    html, body { padding: 0; }
+    .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 12px); }
+    .pt-safe { padding-top:    max(env(safe-area-inset-top),    12px); }
+  }
+}
+
+/* Hide native scrollbars where horizontal scrolling is the intended
+   gesture (filter chip rows, kanban board, etc.). */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* Touch targets: anything with .tap should be at least 44x44 on phone.
+   Apply on icon-only buttons that would otherwise be ~24px. */
+@media (max-width: 768px) {
+  .tap { min-width: 44px; min-height: 44px; }
+}
+
+/* Sticky-bottom action bar for mobile-first forms (PaymentSplitModal,
+   ProductionDetail save bar, etc.). Sits above the home indicator on iOS. */
+.sticky-action-bar {
+  position: sticky;
+  bottom: 0;
+  background: #ffffffeb;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  padding-bottom: max(env(safe-area-inset-bottom), 12px);
+  padding-top: 10px;
+  border-top: 1px solid #efeeea;
+  z-index: 5;
+}
+
+/* Mobile sheet that slides up from the bottom on phone, becomes a
+   regular centered modal on tablet+. Use as the outer container. */
+@media (max-width: 640px) {
+  .mobile-sheet {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 92vh;
+  }
+  .mobile-sheet-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: #d2c5b1; margin: 8px auto 4px;
+  }
+}
+
+/* Block table-row-style grids from leaking off the screen on phones —
+   any element with class `responsive-grid-table` collapses to a single
+   column under 768px with row separators. Tabs convert their dense
+   grids by adding this class to their row containers. */
+@media (max-width: 768px) {
+  .responsive-grid-table { display: block !important; }
+  .responsive-grid-table > * { display: block; }
+}
+
+/* Prevent text inside chips/tags from being squashed in horizontal
+   scroll containers. */
+.chip-row > * { flex-shrink: 0; white-space: nowrap; }
+

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Your Hilo Page</title>
+<meta name="description" content="Your personal Hilo Design page — rate your experience, share photos, refer friends, and explore new arrivals.">
+<meta property="og:title" content="Your Hilo Design Page">
+<meta property="og:description" content="Rate, share, refer, and discover new arrivals from Hilo Design.">
+<link rel="icon" type="image/png" sizes="64x64" href="mango-xs.png">
+<link rel="apple-touch-icon" href="mango-sm.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#E8651A;--orange-deep:#D0560F;--orange-light:#F28C42;
+  --cream:#FDF6E8;--cream-warm:#F5E6D0;--cream-dark:#EDDDCA;
+  --peach:#FDDCB5;--peach-soft:rgba(248,180,120,.18);
+  --text:#2C1E10;--text-muted:#8A7560;--text-light:#B89E82;
+  --white:#fff;--green:#16a34a;--green-light:#f0fdf4;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans','Helvetica Neue',sans-serif;
+  --radius:20px;--radius-lg:28px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--cream);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;max-width:100vw}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+.stripe-bar{width:100%;height:14px;background:repeating-linear-gradient(-45deg,var(--orange),var(--orange) 10px,var(--cream) 10px,var(--cream) 20px);flex-shrink:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;position:sticky;top:0;z-index:100;background:rgba(253,246,232,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.topbar-logo{height:28px;width:auto;object-fit:contain}
+.page-wrap{width:100%;max-width:560px;margin:0 auto;padding:0 20px}
+
+/* Hero greeting */
+.greeting{text-align:center;padding:32px 0 0;position:relative}
+.greeting-hello{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;font-weight:500}
+.greeting-name{font-family:var(--serif);font-size:clamp(28px,7vw,40px);line-height:1.15;margin-bottom:6px}
+.greeting-name em{font-style:italic;color:var(--orange)}
+.greeting-sub{font-size:14px;color:var(--text-muted);line-height:1.6;max-width:380px;margin:0 auto 8px}
+.greeting-meta{font-size:12px;color:var(--text-light);margin-bottom:24px}
+.greeting-meta strong{color:var(--text);font-weight:600}
+
+/* Order card */
+.order-card{background:var(--white);border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;border:1px solid var(--cream-dark)}
+.order-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.order-card-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);font-weight:600}
+.order-card-date{font-size:12px;color:var(--text-muted)}
+.order-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--cream-dark)}
+.order-item:first-of-type{border-top:none}
+.order-item-img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--cream);flex-shrink:0}
+.order-item-info{flex:1;min-width:0}
+.order-item-title{font-size:14px;font-weight:600;color:var(--text)}
+.order-item-sub{font-size:11px;color:var(--text-muted)}
+.order-item-price{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap}
+
+/* Section cards */
+.section-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px;border:1px solid var(--cream-dark)}
+.section-header{padding:24px 24px 18px;position:relative}
+.section-header-orange{background:var(--orange);color:#fff}
+.section-header-green{background:var(--green);color:#fff}
+.section-eyebrow{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-bottom:4px;font-weight:500}
+.section-title{font-family:var(--serif);font-size:clamp(22px,5vw,28px);line-height:1.15}
+.section-title em{font-style:italic;color:var(--peach)}
+.section-title-dark em{font-style:italic;color:var(--orange)}
+.section-body{padding:24px}
+.section-body p{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:16px}
+
+/* Star rating */
+.stars{display:flex;gap:6px;justify-content:center;margin:16px 0}
+.star{font-size:36px;cursor:pointer;color:var(--cream-dark);transition:all .15s;background:none;border:none;padding:2px;line-height:1}
+.star.active,.star:hover{color:var(--orange);transform:scale(1.15)}
+.star.active{color:var(--orange)}
+
+/* Status badges */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;border-radius:999px}
+.badge-done{background:var(--green-light);color:var(--green)}
+.badge-pending{background:#fef3c7;color:#92400e}
+
+/* Fields */
+.field{margin-bottom:18px}
+.field-label{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.field-input{width:100%;padding:14px 16px;font-family:var(--sans);font-size:14px;color:var(--text);background:#fff;border:1px solid var(--cream-dark);border-radius:12px;outline:none;transition:all .2s}
+.field-input::placeholder{color:#C4B49E}
+.field-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,101,26,.08)}
+select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7560' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;cursor:pointer}
+textarea.field-input{resize:none;min-height:80px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Buttons */
+.btn{display:block;width:100%;padding:16px;font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:.04em;border:none;border-radius:14px;cursor:pointer;transition:all .25s;text-align:center}
+.btn-orange{background:var(--orange);color:#fff;box-shadow:0 4px 20px rgba(232,101,26,.22)}
+.btn-orange:hover{background:var(--orange-deep);box-shadow:0 6px 28px rgba(232,101,26,.32)}
+.btn-orange:disabled{opacity:.5;cursor:not-allowed}
+.btn-outline{background:transparent;color:var(--orange);border:2px solid var(--orange)}
+.btn-outline:hover{background:rgba(232,101,26,.06)}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 4px 20px rgba(22,163,74,.22)}
+.btn-white{background:#fff;color:var(--orange);border:1px solid var(--cream-dark);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+
+/* Upload zone */
+.upload-zone{border:2px dashed var(--cream-dark);border-radius:16px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--cream)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--orange);background:rgba(232,101,26,.04)}
+.upload-zone-icon{font-size:32px;margin-bottom:8px}
+.upload-zone-text{font-size:13px;color:var(--text-muted)}
+.upload-zone-text strong{color:var(--orange)}
+.upload-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.upload-preview img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+
+/* Product grid */
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--cream-dark)}
+.product-card{background:#fff;padding:16px 12px;text-align:center}
+.product-card img{width:100%;aspect-ratio:3/4;object-fit:contain;border-radius:10px;background:#fff;margin-bottom:10px}
+.product-name{font-family:var(--serif);font-size:14px;color:var(--text);margin-bottom:2px}
+.product-cat{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)}
+.product-price{font-size:14px;font-weight:600;color:var(--orange);margin-top:4px}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);z-index:999;background:var(--green);color:#fff;padding:14px 28px;border-radius:14px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.15);transition:transform .4s ease;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Watermark */
+.hilo-wm{position:absolute;pointer-events:none;opacity:.15}
+.hilo-wm img{width:100%;height:100%;object-fit:contain}
+
+/* Mango decor */
+.mango{position:absolute;pointer-events:none;z-index:2}
+.mango img{width:100%;height:100%;object-fit:contain}
+
+/* Loading */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--cream-dark);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--text-muted)}
+
+/* Error */
+.error-screen{text-align:center;padding:80px 20px}
+.error-icon{font-size:48px;margin-bottom:16px}
+.error-title{font-family:var(--serif);font-size:24px;margin-bottom:8px}
+.error-sub{font-size:14px;color:var(--text-muted);line-height:1.6}
+
+/* Footer */
+.footer{text-align:center;padding:32px 20px 12px}
+.footer-brand{display:flex;justify-content:center;margin-bottom:8px}
+.footer-brand img{height:24px;width:auto;object-fit:contain}
+.footer-links{display:flex;gap:20px;justify-content:center;margin-bottom:8px}
+.footer-links a{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.footer-links a:hover{color:var(--orange)}
+.footer-copy{font-size:10px;color:var(--text-light)}
+
+/* Success overlay */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(232,101,26,.96);z-index:1000;justify-content:center;align-items:center;flex-direction:column;gap:16px;padding:32px 20px;text-align:center}
+.success-overlay.show{display:flex}
+.success-icon{width:64px;height:64px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--orange);animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.success-h{font-family:var(--serif);font-size:clamp(26px,5.5vw,36px);color:#fff;line-height:1.2}
+.success-h em{font-style:italic}
+.success-p{font-size:14px;color:rgba(255,255,255,.85);line-height:1.55;max-width:340px}
+.success-btn{display:inline-block;padding:14px 28px;border-radius:999px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:none;background:#fff;color:var(--orange)}
+.success-btn:hover{background:var(--cream);transform:translateY(-1px)}
+
+/* Responsive */
+@media(min-width:640px){
+  .topbar{padding:16px 32px}
+  .topbar-logo{height:32px}
+  .page-wrap{max-width:600px;padding:0 32px}
+}
+@media(min-width:1024px){
+  .topbar{padding:18px 48px;max-width:1200px;margin:0 auto}
+  .page-wrap{max-width:640px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP STRIPE -->
+<div class="stripe-bar"></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="https://hilodesign.co"><img src="hilo-logo-orange.png" alt="HILO DESIGN" class="topbar-logo"></a>
+  <span id="topbarBadge" style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--orange)"></span>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOADING -->
+<div class="page-wrap" id="loadingView">
+  <div class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading your page...</div>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div class="page-wrap" id="errorView" style="display:none">
+  <div class="error-screen">
+    <div class="error-icon">🔒</div>
+    <div class="error-title">Page not found</div>
+    <div class="error-sub">This link may be invalid or expired.<br>Please contact your Hilo stylist.</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT (hidden until loaded) -->
+<div id="mainContent" style="display:none">
+  <div class="page-wrap">
+
+    <!-- GREETING -->
+    <div class="greeting" style="position:relative">
+      <div class="mango" style="top:0;right:-5px;width:50px;height:62px;opacity:.2;transform:rotate(25deg)">
+        <img src="mango-xs.png" alt="">
+      </div>
+      <div class="greeting-hello">Welcome back</div>
+      <div class="greeting-name" id="greetingName">Hello, <em>there</em>.</div>
+      <div class="greeting-sub">Thank you for being part of the Hilo family.</div>
+      <div class="greeting-meta" id="greetingMeta"></div>
+    </div>
+
+    <!-- RECENT ORDER -->
+    <div class="order-card" id="orderCard" style="display:none">
+      <div class="order-card-head">
+        <span class="order-card-label">Your Recent Order</span>
+        <span class="order-card-date" id="orderDate"></span>
+      </div>
+      <div id="orderItems"></div>
+    </div>
+
+    <!-- ═══ SECTION 1: RATE & REVIEW ═══ -->
+    <div class="section-card" id="reviewSection">
+      <div class="section-header section-header-orange" style="position:relative">
+        <div class="hilo-wm" style="top:12px;right:12px;width:50px;height:23px"><img src="hilo-logo-white.png" alt=""></div>
+        <div class="section-eyebrow">Your experience</div>
+        <div class="section-title">Rate &<br><em>Review.</em></div>
+      </div>
+      <div class="section-body">
+        <p>How was your Hilo experience? Your feedback helps us create better for you.</p>
+        <div class="stars" id="starContainer">
+          <button class="star" data-v="1" onclick="setRating(1)">★</button>
+          <button class="star" data-v="2" onclick="setRating(2)">★</button>
+          <button class="star" data-v="3" onclick="setRating(3)">★</button>
+          <button class="star" data-v="4" onclick="setRating(4)">★</button>
+          <button class="star" data-v="5" onclick="setRating(5)">★</button>
+        </div>
+        <div class="field">
+          <label class="field-label">Tell us more (optional)</label>
+          <textarea class="field-input" id="feedbackText" placeholder="What did you love? Anything we can improve?"></textarea>
+        </div>
+        <button class="btn btn-orange" id="submitReview" onclick="submitReview()" style="margin-bottom:12px">Submit Feedback</button>
+        <a id="googleReviewBtn" href="https://g.page/r/Cf5WtCx5v7JTEBE/review" target="_blank" class="btn btn-outline" style="display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01z"/></svg>
+          Also leave a Google Review
+        </a>
+        <div id="reviewDone" style="display:none;text-align:center;padding:12px 0">
+          <div class="badge badge-done" style="font-size:14px;padding:10px 20px">✓ Thank you for your review!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 2: SHARE PHOTOS ═══ -->
+    <div class="section-card" id="contentSection">
+      <div class="section-header" style="background:var(--text);color:#fff;position:relative">
+        <div class="hilo-wm" style="top:12px;right:12px;width:50px;height:23px"><img src="hilo-logo-white.png" alt=""></div>
+        <div class="section-eyebrow">Share your look</div>
+        <div class="section-title">Your Hilo,<br><em style="color:var(--peach)">your style.</em></div>
+      </div>
+      <div class="section-body">
+        <p>Share photos of you wearing your Hilo outfit. Feature on our page and earn an exclusive reward from our collection.</p>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-zone-icon">📸</div>
+          <div class="upload-zone-text"><strong>Tap to upload</strong> or drag photos here</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
+        <div class="upload-preview" id="uploadPreview"></div>
+        <button class="btn btn-orange" id="submitPhotos" onclick="submitPhotos()" style="margin-top:16px;display:none">Upload Photos</button>
+        <div id="contentDone" style="display:none;text-align:center;padding:12px 0">
+          <div class="badge badge-done" style="font-size:14px;padding:10px 20px">✓ Photos shared! Reward earned.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 3: REFER A FRIEND ═══ -->
+    <div class="stripe-bar"></div>
+    <div class="section-card" id="referSection" style="border:none;border-radius:0;margin-bottom:0">
+      <div class="section-header section-header-green" style="position:relative;border-radius:0">
+        <div class="mango" style="top:8px;right:8px;width:45px;height:56px;opacity:.15;transform:rotate(15deg)">
+          <img src="mango-xs.png" alt="" style="filter:brightness(10)">
+        </div>
+        <div class="section-eyebrow">Referral program</div>
+        <div class="section-title" style="color:#fff">Refer a friend,<br><em style="color:#bbf7d0">earn a gift.</em></div>
+      </div>
+      <div class="section-body" style="background:var(--cream)">
+        <p>Refer someone you know. When they shop with us, you earn a gift from our Summer Collection.</p>
+        <div class="field">
+          <label class="field-label">Friend's Name</label>
+          <input class="field-input" type="text" id="refName" placeholder="Their name">
+        </div>
+        <div class="field">
+          <label class="field-label">Friend's Phone</label>
+          <input class="field-input" type="tel" id="refPhone" placeholder="+91 98765 43210">
+        </div>
+        <div class="field">
+          <label class="field-label">How do you know them?</label>
+          <select class="field-input" id="refRelation">
+            <option value="friend">Friend</option>
+            <option value="family">Family</option>
+            <option value="colleague">Colleague</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button class="btn btn-green" onclick="submitReferral()">Send Referral</button>
+        <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-muted)">You can refer multiple friends</div>
+        <div id="referralsList" style="margin-top:16px"></div>
+      </div>
+    </div>
+    <div class="stripe-bar"></div>
+
+    <!-- ═══ SECTION 4: NEW ARRIVALS ═══ -->
+    <div style="height:24px"></div>
+    <div class="section-card" id="arrivalsSection">
+      <div class="section-header section-header-orange" style="position:relative">
+        <div class="hilo-wm" style="top:12px;right:12px;width:50px;height:23px"><img src="hilo-logo-white.png" alt=""></div>
+        <div class="section-eyebrow">New collection</div>
+        <div class="section-title">Fresh<br><em>Arrivals.</em></div>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+      <div style="background:var(--peach);padding:16px 20px;text-align:center">
+        <button class="btn btn-orange" onclick="expressInterest()" style="max-width:320px;margin:0 auto">💬 I'm Interested — Contact Me</button>
+      </div>
+    </div>
+
+    <div style="height:24px"></div>
+
+    <!-- WHATSAPP -->
+    <div style="background:var(--orange);padding:32px 24px;text-align:center;border-radius:var(--radius-lg);margin-bottom:24px;position:relative;overflow:hidden">
+      <div class="mango" style="top:8px;right:8px;width:40px;height:50px;opacity:.12;transform:rotate(15deg)"><img src="mango-xs.png" alt="" style="filter:brightness(10)"></div>
+      <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px">Get in touch</div>
+      <div style="font-family:var(--serif);font-size:24px;color:#fff;margin-bottom:6px">Questions? <em style="font-style:italic;color:var(--peach)">Say hello.</em></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:20px">Chat with your Hilo stylist</div>
+      <a id="whatsappLink" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--orange);font-family:var(--sans);font-size:15px;font-weight:700;padding:14px 28px;border-radius:999px;box-shadow:0 4px 20px rgba(0,0,0,.1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Chat on WhatsApp
+      </a>
+    </div>
+
+  </div><!-- page-wrap -->
+
+  <!-- FOOTER -->
+  <div class="stripe-bar"></div>
+  <div class="footer">
+    <div class="footer-brand"><img src="hilo-logo-orange.png" alt="HILO DESIGN"></div>
+    <div class="footer-links">
+      <a href="https://hilodesign.co">Shop</a>
+      <a href="https://instagram.com/hilodesign.co">Instagram</a>
+      <a href="https://wa.me/917075840854">WhatsApp</a>
+    </div>
+    <div class="footer-copy">&copy; 2026 Hilo Design. All rights reserved.</div>
+  </div>
+  <div class="stripe-bar"></div>
+</div><!-- mainContent -->
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon" id="successIcon">✓</div>
+  <div class="success-h" id="successH"></div>
+  <div class="success-p" id="successP"></div>
+  <button class="success-btn" onclick="closeSuccess()">← Back to Page</button>
+</div>
+
+<script>
+var SUPA_URL='https://xcijvmfzmogwhkxvigbn.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjaWp2bWZ6bW9nd2hreHZpZ2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjkzNTQsImV4cCI6MjA4OTYwNTM1NH0.Re5yHJtIdDg4a09J9rNg_QLqLrBKyNGD8hvjk9tqpLE';
+var GOOGLE_REVIEW='https://g.page/r/Cf5WtCx5v7JTEBE/review';
+var WA_PHONE='917075840854';
+
+var customer=null, buyer=null, rating=0, uploadFiles=[];
+
+// === Supabase helpers ===
+function supa(endpoint,opts){
+  opts=opts||{};
+  var headers={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+  if(opts.prefer) headers['Prefer']=opts.prefer;
+  return fetch(SUPA_URL+'/rest/v1/'+endpoint,{
+    method:opts.method||'GET',headers:headers,body:opts.body?JSON.stringify(opts.body):undefined
+  }).then(function(r){return r.json()});
+}
+function supaUpload(bucket,path,file){
+  return fetch(SUPA_URL+'/storage/v1/object/'+bucket+'/'+path,{
+    method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':file.type},
+    body:file
+  });
+}
+
+// === Init ===
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var token=params.get('t');
+  if(!token){showError();return}
+  loadCustomer(token);
+})();
+
+async function loadCustomer(token){
+  try{
+    // Get customer by page_token
+    var cRes=await supa('customers?page_token=eq.'+token+'&select=*');
+    if(!cRes||!cRes.length){showError();return}
+    customer=cRes[0];
+
+    // Get buyer
+    var bRes=await supa('buyers?id=eq.'+customer.buyer_id+'&select=*');
+    buyer=(bRes&&bRes[0])||{};
+
+    // Get recent orders via buyer name/email
+    var orders=[];
+    if(buyer.email){
+      var oRes=await supa('shopify_orders?customer_email=eq.'+encodeURIComponent(buyer.email)+'&select=order_number,created_at,total_price,channel&order=created_at.desc&limit=1');
+      if(oRes&&oRes.length) orders=oRes;
+    }
+    if(!orders.length&&buyer.name){
+      var oRes2=await supa('shopify_orders?customer_name=eq.'+encodeURIComponent(buyer.name)+'&select=order_number,created_at,total_price,channel&order=created_at.desc&limit=1');
+      if(oRes2&&oRes2.length) orders=oRes2;
+    }
+
+    // Get line items for latest order
+    var lineItems=[];
+    if(orders.length){
+      var liRes=await supa('order_line_items?order_id=eq.'+orders[0].id+'&select=sku,title,quantity,size');
+      // Actually order_line_items references order by order_id which is the shopify_orders.id
+      // Let's get by order number instead
+    }
+
+    // Get products for new arrivals
+    var products=await supa('design_products?status=eq.Active&select=style_code,product_title,category,image_url,selling_price&order=created_at.desc&limit=8');
+
+    // Get existing referrals
+    var referrals=await supa('customer_referrals?referrer_customer_id=eq.'+customer.id+'&select=*&order=created_at.desc');
+
+    renderPage(orders,lineItems,products||[],referrals||[]);
+  }catch(e){
+    console.error('Load error:',e);
+    showError();
+  }
+}
+
+function showError(){
+  document.getElementById('loadingView').style.display='none';
+  document.getElementById('errorView').style.display='block';
+}
+
+function renderPage(orders,lineItems,products,referrals){
+  var name=buyer.name||customer.name||'there';
+  var firstName=name.split(' ')[0];
+
+  // Update title
+  document.title='Your Hilo Page — '+name;
+
+  // Greeting
+  document.getElementById('greetingName').innerHTML='Hello, <em>'+firstName+'</em>.';
+  var meta=[];
+  if(customer.total_spend) meta.push('<strong>₹'+Number(customer.total_spend).toLocaleString('en-IN')+'</strong> lifetime');
+  if(customer.total_orders) meta.push(customer.total_orders+' order'+(customer.total_orders!==1?'s':''));
+  if(buyer.city) meta.push(buyer.city);
+  document.getElementById('greetingMeta').innerHTML=meta.join(' · ');
+
+  // Top badge
+  var tierBadges={royal:'👑 Royal',elite:'⭐ Elite',repeat:'Repeat Customer'};
+  document.getElementById('topbarBadge').textContent=tierBadges[customer.customer_type]||'';
+
+  // Recent order
+  if(orders.length){
+    var o=orders[0];
+    document.getElementById('orderCard').style.display='block';
+    var d=new Date(o.created_at);
+    document.getElementById('orderDate').textContent=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+' · '+(o.channel||'store');
+    // Show order total as single line item since we don't have line items yet
+    document.getElementById('orderItems').innerHTML='<div class="order-item"><div class="order-item-info"><div class="order-item-title">Order #'+o.order_number+'</div><div class="order-item-sub">'+(o.channel||'store')+'</div></div><div class="order-item-price">₹'+Number(o.total_price||0).toLocaleString('en-IN')+'</div></div>';
+  }
+
+  // Check if already reviewed
+  if(customer.review_received||customer.experience_rating){
+    document.getElementById('submitReview').style.display='none';
+    document.getElementById('feedbackText').style.display='none';
+    document.getElementById('starContainer').style.pointerEvents='none';
+    document.getElementById('reviewDone').style.display='block';
+    if(customer.experience_rating) setRating(customer.experience_rating,true);
+  }
+
+  // Check if content already shared
+  if(customer.content_received){
+    document.getElementById('contentDone').style.display='block';
+    document.getElementById('uploadZone').style.display='none';
+    document.getElementById('submitPhotos').style.display='none';
+  }
+
+  // Products grid
+  var grid=document.getElementById('productGrid');
+  if(products.length){
+    grid.innerHTML=products.map(function(p){
+      return '<div class="product-card"><img src="'+(p.image_url||'')+'" alt="'+p.product_title+'" onerror="this.style.display=\'none\'"><div class="product-name">'+p.product_title+'</div><div class="product-cat">'+p.category+'</div><div class="product-price">₹'+Number(p.selling_price||0).toLocaleString('en-IN')+'</div></div>';
+    }).join('');
+  }else{
+    document.getElementById('arrivalsSection').style.display='none';
+  }
+
+  // Referrals list
+  renderReferrals(referrals);
+
+  // WhatsApp link
+  document.getElementById('whatsappLink').href='https://wa.me/'+WA_PHONE+'?text='+encodeURIComponent('Hi! I\'m '+name+', reaching out from my Hilo page.');
+
+  // Show page
+  document.getElementById('loadingView').style.display='none';
+  document.getElementById('mainContent').style.display='block';
+
+  // Drag & drop
+  var zone=document.getElementById('uploadZone');
+  if(zone){
+    zone.addEventListener('dragover',function(e){e.preventDefault();zone.classList.add('dragover')});
+    zone.addEventListener('dragleave',function(){zone.classList.remove('dragover')});
+    zone.addEventListener('drop',function(e){e.preventDefault();zone.classList.remove('dragover');handleFiles(e.dataTransfer.files)});
+  }
+}
+
+// === Star Rating ===
+function setRating(v,silent){
+  rating=v;
+  document.querySelectorAll('.star').forEach(function(s){
+    s.classList.toggle('active',parseInt(s.getAttribute('data-v'))<=v);
+  });
+}
+
+// === Submit Review ===
+async function submitReview(){
+  if(rating===0){showToast('Please tap a star to rate');return}
+  var btn=document.getElementById('submitReview');
+  btn.disabled=true;btn.textContent='Sending...';
+  try{
+    var feedback=document.getElementById('feedbackText').value.trim();
+    // Save rating on customer
+    await supa('customers?id=eq.'+customer.id,{
+      method:'PATCH',
+      body:{experience_rating:rating,feedback_text:feedback||null,review_received:true,updated_at:new Date().toISOString()}
+    });
+    // Log engagement
+    await supa('customer_engagements',{
+      method:'POST',prefer:'return=representation',
+      body:{customer_id:customer.id,type:'review',trigger_type:'microsite',status:'completed',
+        experience_rating:rating,feedback_text:feedback||null,review_link_shared:true,
+        completed_at:new Date().toISOString()}
+    });
+    // Auto-create reward
+    await supa('customer_rewards',{
+      method:'POST',prefer:'return=representation',
+      body:{customer_id:customer.id,buyer_id:customer.buyer_id,reward_type:'review',
+        title:'Review Reward',description:'Reward for leaving a review',status:'earned'}
+    });
+    customer.experience_rating=rating;
+    customer.review_received=true;
+    btn.style.display='none';
+    document.getElementById('feedbackText').style.display='none';
+    document.getElementById('starContainer').style.pointerEvents='none';
+    document.getElementById('reviewDone').style.display='block';
+    showToast('Thank you for your review! ⭐');
+  }catch(e){
+    console.error(e);
+    btn.disabled=false;btn.textContent='Submit Feedback';
+    showToast('Something went wrong. Please try again.');
+  }
+}
+
+// === Photo Upload ===
+function handleFiles(files){
+  for(var i=0;i<files.length;i++){
+    if(files[i].type.startsWith('image/')) uploadFiles.push(files[i]);
+  }
+  renderPreviews();
+}
+
+function renderPreviews(){
+  var preview=document.getElementById('uploadPreview');
+  preview.innerHTML='';
+  uploadFiles.forEach(function(f){
+    var img=document.createElement('img');
+    img.src=URL.createObjectURL(f);
+    preview.appendChild(img);
+  });
+  document.getElementById('submitPhotos').style.display=uploadFiles.length>0?'block':'none';
+}
+
+async function submitPhotos(){
+  if(!uploadFiles.length) return;
+  var btn=document.getElementById('submitPhotos');
+  btn.disabled=true;btn.textContent='Uploading...';
+  try{
+    var bucket='customer-content';
+    // Create bucket if needed (ignore error)
+    await fetch(SUPA_URL+'/storage/v1/bucket',{
+      method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY},
+      body:JSON.stringify({id:bucket,name:bucket,public:true})
+    }).catch(function(){});
+
+    for(var i=0;i<uploadFiles.length;i++){
+      var f=uploadFiles[i];
+      var ext=f.name.split('.').pop().toLowerCase();
+      var fileName=customer.id+'_'+Date.now()+'_'+i+'.'+ext;
+      await supaUpload(bucket,fileName,f);
+      var publicUrl=SUPA_URL+'/storage/v1/object/public/'+bucket+'/'+fileName;
+      await supa('customer_content',{
+        method:'POST',prefer:'return=representation',
+        body:{customer_id:customer.id,buyer_id:customer.buyer_id,content_type:'photo',
+          title:'Customer photo',media_url:publicUrl,source:'microsite'}
+      });
+    }
+    // Mark content received + exclusive access
+    await supa('customers?id=eq.'+customer.id,{
+      method:'PATCH',
+      body:{content_received:true,exclusive_access:true,exclusive_access_granted_at:new Date().toISOString(),updated_at:new Date().toISOString()}
+    });
+    // Auto-create reward
+    await supa('customer_rewards',{
+      method:'POST',prefer:'return=representation',
+      body:{customer_id:customer.id,buyer_id:customer.buyer_id,reward_type:'content',
+        title:'Content Reward',description:'Reward for sharing photos',status:'earned'}
+    });
+    document.getElementById('uploadZone').style.display='none';
+    btn.style.display='none';
+    document.getElementById('uploadPreview').innerHTML='';
+    document.getElementById('contentDone').style.display='block';
+    uploadFiles=[];
+    showToast('Photos uploaded! You earned a reward 🎁');
+  }catch(e){
+    console.error(e);
+    btn.disabled=false;btn.textContent='Upload Photos';
+    showToast('Upload failed. Please try again.');
+  }
+}
+
+// === Referral ===
+async function submitReferral(){
+  var name=document.getElementById('refName').value.trim();
+  var phone=document.getElementById('refPhone').value.trim();
+  var relation=document.getElementById('refRelation').value;
+  if(!name){showToast('Please enter your friend\'s name');return}
+
+  try{
+    // Create referral record
+    await supa('customer_referrals',{
+      method:'POST',prefer:'return=representation',
+      body:{referrer_customer_id:customer.id,referrer_buyer_id:customer.buyer_id,
+        referred_name:name,referred_phone:phone||null,relationship:relation,status:'pending'}
+    });
+    // Create lead in CRM
+    await supa('leads',{
+      method:'POST',prefer:'return=representation',
+      body:{client_name:name,phone:phone||null,lead_source:'Existing Customer Referral',
+        channel:'Online Lead',status:'New',phase:'yet_to_qualify',
+        lead_date:new Date().toISOString().split('T')[0],
+        feedback_by_lead:'Referred by '+(buyer.name||customer.name||'customer')+' ('+((buyer.phone)||'')+')'}
+    });
+    // Update referral count
+    await supa('customers?id=eq.'+customer.id,{
+      method:'PATCH',
+      body:{referrals_made:(customer.referrals_made||0)+1,updated_at:new Date().toISOString()}
+    });
+    customer.referrals_made=(customer.referrals_made||0)+1;
+
+    // Add to list
+    var list=document.getElementById('referralsList');
+    list.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--green-light);border-radius:10px;margin-bottom:8px"><span style="font-size:16px">✓</span><span style="font-size:13px;color:var(--green);font-weight:600">'+name+' referred successfully!</span></div>'+list.innerHTML;
+
+    // Reset form
+    document.getElementById('refName').value='';
+    document.getElementById('refPhone').value='';
+    showToast('Referral sent! Thank you 🤝');
+  }catch(e){
+    console.error(e);
+    showToast('Something went wrong. Please try again.');
+  }
+}
+
+function renderReferrals(referrals){
+  if(!referrals||!referrals.length) return;
+  var html=referrals.map(function(r){
+    var statusBadge=r.status==='converted'?'<span class="badge badge-done">Converted 🎁</span>':'<span class="badge badge-pending">Pending</span>';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-radius:10px;margin-bottom:6px;border:1px solid var(--cream-dark)"><div><div style="font-size:13px;font-weight:600">'+r.referred_name+'</div><div style="font-size:11px;color:var(--text-muted)">'+r.relationship+' · '+new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'</div></div>'+statusBadge+'</div>';
+  }).join('');
+  document.getElementById('referralsList').innerHTML=html;
+}
+
+// === Express Interest (New Arrivals) ===
+async function expressInterest(){
+  try{
+    await supa('leads',{
+      method:'POST',prefer:'return=representation',
+      body:{client_name:buyer.name||customer.name,phone:buyer.phone||customer.phone||null,
+        email:buyer.email||null,lead_source:'Existing Client',channel:'Online Lead',
+        status:'New',phase:'yet_to_qualify',
+        lead_date:new Date().toISOString().split('T')[0],
+        feedback_by_lead:'Expressed interest via customer microsite page'}
+    });
+    showSuccess('Interest noted!','We\'ll have your stylist reach out to you soon about the new collection.');
+  }catch(e){
+    console.error(e);
+    showToast('Something went wrong. Please try again.');
+  }
+}
+
+// === Toast ===
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},3000);
+}
+
+// === Success overlay ===
+function showSuccess(title,sub){
+  document.getElementById('successH').innerHTML=title;
+  document.getElementById('successP').innerHTML=sub;
+  document.getElementById('successOverlay').classList.add('show');
+}
+function closeSuccess(){
+  document.getElementById('successOverlay').classList.remove('show');
+}
+</script>
+</body>
+</html>

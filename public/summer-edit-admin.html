@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer Story RSVPs — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--orange:#E8651A;--cream:#FDF6E8;--text:#2C1E10;--muted:#8A7560;--green:#16a34a;--amber:#d97706;--gray:#6b7280}
+body{font-family:'DM Sans',sans-serif;background:#f8f6f3;color:var(--text);min-height:100vh}
+.topbar{background:var(--orange);padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.topbar h1{color:#fff;font-family:'DM Serif Display',serif;font-size:20px;font-weight:400}
+.topbar .refresh{background:rgba(255,255,255,.2);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em}
+.topbar .refresh:hover{background:rgba(255,255,255,.3)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;padding:20px 24px}
+.stat{background:#fff;border-radius:14px;padding:18px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-num{font-family:'DM Serif Display',serif;font-size:32px;color:var(--orange);line-height:1}
+.stat-label{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:6px;font-weight:500}
+.filters{padding:0 24px 12px;display:flex;gap:8px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid #e5e0d8;background:#fff;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .15s}
+.filter-btn.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.table-wrap{padding:0 24px 40px;overflow-x:auto}
+table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);min-width:700px}
+th{background:#faf8f5;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 14px;text-align:left;border-bottom:1px solid #eee;white-space:nowrap}
+td{padding:12px 14px;font-size:13px;border-bottom:1px solid #f5f3f0;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fdfcfa}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.03em}
+.badge-yes{background:#dcfce7;color:#166534}
+.badge-no{background:#fee2e2;color:#991b1b}
+.badge-maybe{background:#fef3c7;color:#92400e}
+.time-ago{font-size:11px;color:var(--muted)}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+.export-bar{padding:0 24px 16px;display:flex;gap:8px}
+.export-btn{padding:8px 16px;border-radius:8px;border:1px solid #e5e0d8;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s}
+.export-btn:hover{border-color:var(--orange);color:var(--orange)}
+@media(max-width:600px){
+  .stats{grid-template-columns:1fr 1fr}
+  .table-wrap{padding:0 12px 40px}
+  td,th{padding:10px 10px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Summer Story — RSVPs</h1>
+  <button class="refresh" onclick="loadData()">&#8635; Refresh</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn" data-filter="yes" onclick="setFilter('yes',this)">Workshop Yes</button>
+  <button class="filter-btn" data-filter="not_sure" onclick="setFilter('not_sure',this)">Not Sure</button>
+  <button class="filter-btn" data-filter="no" onclick="setFilter('no',this)">No Workshop</button>
+</div>
+
+<div class="export-bar">
+  <button class="export-btn" onclick="exportCSV()">&#128196; Export CSV</button>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>WhatsApp</th>
+        <th>Email</th>
+        <th>Workshop</th>
+        <th>Guests</th>
+        <th>Notes</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+var SUPA_URL='https://xcijvmfzmogwhkxvigbn.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjaWp2bWZ6bW9nd2hreHZpZ2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjkzNTQsImV4cCI6MjA4OTYwNTM1NH0.Re5yHJtIdDg4a09J9rNg_QLqLrBKyNGD8hvjk9tqpLE';
+
+var allData=[];
+var currentFilter='all';
+
+async function loadData(){
+  try{
+    var res=await fetch(SUPA_URL+'/rest/v1/event_rsvps?select=*&order=created_at.desc',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    allData=await res.json();
+    renderStats();
+    renderTable();
+  }catch(e){
+    document.getElementById('tbody').innerHTML='<tr><td colspan="8" class="empty">Failed to load data. Check connection.</td></tr>';
+  }
+}
+
+function renderStats(){
+  var total=allData.length;
+  var workshopYes=allData.filter(r=>r.workshop_interest==='yes').length;
+  var totalGuests=allData.reduce((s,r)=>s+(r.guests||1),0);
+  var workshopGuests=allData.filter(r=>r.workshop_interest==='yes').reduce((s,r)=>s+(r.guests||1),0);
+  document.getElementById('stats').innerHTML=
+    '<div class="stat"><div class="stat-num">'+total+'</div><div class="stat-label">Total RSVPs</div></div>'+
+    '<div class="stat"><div class="stat-num">'+totalGuests+'</div><div class="stat-label">Total Guests</div></div>'+
+    '<div class="stat"><div class="stat-num">'+workshopYes+'</div><div class="stat-label">Workshop Yes</div></div>'+
+    '<div class="stat"><div class="stat-num">'+workshopGuests+'</div><div class="stat-label">Workshop Guests</div></div>';
+}
+
+function renderTable(){
+  var filtered=currentFilter==='all'?allData:allData.filter(r=>r.workshop_interest===currentFilter);
+  if(!filtered.length){
+    document.getElementById('tbody').innerHTML='<tr><td colspan="8" class="empty">No RSVPs found</td></tr>';
+    return;
+  }
+  var html='';
+  filtered.forEach(function(r,i){
+    var badge=r.workshop_interest==='yes'?'badge-yes':r.workshop_interest==='no'?'badge-no':'badge-maybe';
+    var label=r.workshop_interest==='yes'?'Yes':r.workshop_interest==='no'?'No':'Maybe';
+    var t=timeAgo(r.created_at);
+    html+='<tr>';
+    html+='<td style="color:var(--muted);font-size:11px">'+(i+1)+'</td>';
+    html+='<td><strong>'+esc(r.name)+'</strong></td>';
+    html+='<td><a href="https://wa.me/91'+esc(r.phone.replace(/\D/g,''))+'" target="_blank" style="color:var(--orange)">'+esc(r.phone)+'</a></td>';
+    html+='<td style="color:var(--muted)">'+esc(r.email||'—')+'</td>';
+    html+='<td><span class="badge '+badge+'">'+label+'</span></td>';
+    html+='<td style="text-align:center">'+(r.guests||1)+'</td>';
+    html+='<td style="color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.notes||'—')+'</td>';
+    html+='<td class="time-ago">'+t+'</td>';
+    html+='</tr>';
+  });
+  document.getElementById('tbody').innerHTML=html;
+}
+
+function setFilter(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function exportCSV(){
+  var rows=[['Name','Phone','Email','Workshop','Guests','Notes','Date']];
+  allData.forEach(function(r){
+    rows.push([r.name,r.phone,r.email||'',r.workshop_interest,r.guests||1,r.notes||'',r.created_at]);
+  });
+  var csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='summer-story-rsvps.csv';
+  a.click();
+}
+
+function timeAgo(d){
+  var s=Math.floor((Date.now()-new Date(d).getTime())/1000);
+  if(s<60)return 'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+loadData();
+// Auto-refresh every 30s
+setInterval(loadData,30000);
+</script>
+</body>
+</html>

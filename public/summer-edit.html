@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Summer Story — HILO DESIGN × Nilah Collective</title>
+<meta name="description" content="A curated afternoon of linen, block prints, art and summer. April 11 at Kissa Coffee House, Jubilee Hills.">
+<meta property="og:title" content="The Summer Story — HILO DESIGN × Nilah Collective">
+<meta property="og:description" content="Saturday, April 11 · 2 PM – 8:30 PM · Kissa Coffee House, Jubilee Hills. Free entry, invite only.">
+<link rel="icon" type="image/png" sizes="64x64" href="mango-xs.png">
+<link rel="apple-touch-icon" href="mango-sm.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+<!-- Vercel Web Analytics (for static HTML pages) -->
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<!-- Vercel Speed Insights -->
+<script defer src="/_vercel/speed-insights/script.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#E8651A;--orange-deep:#D0560F;--orange-light:#F28C42;
+  --cream:#FDF6E8;--cream-warm:#F5E6D0;--cream-dark:#EDDDCA;
+  --peach:#FDDCB5;--peach-soft:rgba(248,180,120,.18);
+  --text:#2C1E10;--text-muted:#8A7560;--text-light:#B89E82;
+  --white:#fff;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans','Helvetica Neue',sans-serif;
+  --radius:20px;--radius-lg:28px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--cream);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;max-width:100vw}
+img{display:block;width:100%;height:100%;object-fit:cover}
+a{text-decoration:none;color:inherit}
+
+/* === DIAGONAL STRIPE BORDER === */
+.stripe-bar{width:100%;height:14px;background:repeating-linear-gradient(
+  -45deg,var(--orange),var(--orange) 10px,var(--cream) 10px,var(--cream) 20px
+);flex-shrink:0}
+
+/* === MANGO DECORATION === */
+.mango-decor{position:absolute;pointer-events:none;z-index:2}
+.mango-decor img{width:100%;height:100%;object-fit:contain}
+
+/* === TOP BAR === */
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;position:sticky;top:0;z-index:100;background:rgba(253,246,232,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.topbar-logo{height:28px;width:auto;object-fit:contain}
+.topbar-rsvp{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#fff;padding:9px 18px;background:var(--orange);border-radius:999px;transition:all .2s}
+.topbar-rsvp:hover{background:var(--orange-deep);transform:translateY(-1px)}
+
+/* === FLOATING CTA (mobile-first, sticky on desktop) === */
+.floating-cta{
+  position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+  z-index:200;display:flex;align-items:center;gap:10px;
+  padding:15px 28px;border-radius:999px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--orange) 0%,var(--orange-deep) 100%);
+  color:#fff;font-family:var(--sans);font-size:15px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  box-shadow:0 10px 30px rgba(232,101,26,.45),0 2px 8px rgba(0,0,0,.08);
+  opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;
+  min-width:min(86vw,340px);justify-content:center;white-space:nowrap;
+  animation:ctaPulse 2.4s ease-in-out infinite;
+}
+.floating-cta.is-visible{opacity:1;pointer-events:auto}
+.floating-cta:hover{transform:translateX(-50%) translateY(-2px);box-shadow:0 14px 36px rgba(232,101,26,.55)}
+.floating-cta:active{transform:translateX(-50%) translateY(0)}
+.floating-cta .cta-dot{
+  width:10px;height:10px;border-radius:50%;background:#FFD98A;
+  box-shadow:0 0 0 0 rgba(255,217,138,.8);animation:ctaDot 1.6s ease-out infinite;flex-shrink:0;
+}
+.floating-cta .cta-arrow{font-size:18px;line-height:1;transition:transform .25s}
+.floating-cta:hover .cta-arrow{transform:translateX(3px)}
+.floating-cta .cta-sub{display:none;font-size:10px;font-weight:500;letter-spacing:.08em;opacity:.85;text-transform:uppercase}
+@keyframes ctaPulse{
+  0%,100%{box-shadow:0 10px 30px rgba(232,101,26,.45),0 2px 8px rgba(0,0,0,.08)}
+  50%{box-shadow:0 14px 40px rgba(232,101,26,.65),0 2px 8px rgba(0,0,0,.08)}
+}
+@keyframes ctaDot{
+  0%{box-shadow:0 0 0 0 rgba(255,217,138,.85)}
+  70%{box-shadow:0 0 0 10px rgba(255,217,138,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,217,138,0)}
+}
+.floating-cta.is-hidden-final{opacity:0 !important;pointer-events:none !important;animation:none}
+
+/* === HERO === */
+.hero{padding:32px 20px 0;text-align:center;position:relative;overflow:hidden}
+.hero-logo{max-width:280px;margin:0 auto 20px;position:relative}
+.hero-logo svg{width:100%;height:auto}
+.hero-sub{font-size:13px;color:var(--text-muted);line-height:1.7;max-width:340px;margin:24px auto;font-weight:400}
+.hero-byline{font-family:var(--sans);font-size:14px;color:var(--orange);font-weight:700;margin-bottom:4px;letter-spacing:.06em;text-transform:uppercase}
+.hero-curated{font-size:12px;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:24px}
+.hero-curated strong{color:var(--text);font-weight:600;background:var(--peach);padding:2px 8px;border-radius:4px}
+.hero-cta{display:inline-block;background:var(--orange);color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.04em;padding:14px 36px;border-radius:999px;border:none;cursor:pointer;transition:all .25s;box-shadow:0 4px 24px rgba(232,101,26,.25)}
+.hero-cta:hover{background:var(--orange-deep);transform:translateY(-2px);box-shadow:0 6px 32px rgba(232,101,26,.35)}
+
+/* === HERO IMAGE === */
+.hero-img-wrap{margin:32px 20px 0;border-radius:var(--radius-lg);overflow:hidden;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:3px;box-shadow:0 8px 40px rgba(0,0,0,.1)}
+.hero-img-wrap img{aspect-ratio:3/4;border-radius:0}
+.hero-img-caption{grid-column:1/-1;background:var(--orange);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.hero-img-tag{font-family:var(--serif);font-size:14px;color:rgba(255,255,255,.9);font-style:italic}
+.hero-img-pill{font-size:10px;color:rgba(255,255,255,.8);background:rgba(255,255,255,.15);padding:6px 14px;border-radius:999px;letter-spacing:.06em;font-weight:500}
+
+/* === ORANGE BANNER SECTION === */
+.orange-banner{background:var(--orange);padding:36px 24px;color:#fff;position:relative;overflow:hidden}
+.orange-banner::after{content:'';position:absolute;top:-50px;right:-30px;width:140px;height:140px;border-radius:50%;border:3px dashed rgba(255,255,255,.15)}
+.ob-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:8px;font-weight:500}
+.ob-title{font-family:var(--serif);font-size:clamp(30px,7vw,42px);line-height:1.1;margin-bottom:20px;position:relative}
+.ob-title em{font-style:italic;color:var(--peach)}
+.ob-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;position:relative}
+.ob-icon{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ob-label{font-size:14px;color:rgba(255,255,255,.85);line-height:1.5}
+.ob-label strong{color:#fff;font-weight:600}
+/* Hilo watermark */
+.hilo-watermark{position:absolute;pointer-events:none;opacity:.2}
+.hilo-watermark img{width:100%;height:100%;object-fit:contain}
+
+/* === CURATIONS GRID === */
+.curations{padding:0 20px 32px;position:relative}
+.curations-header{background:var(--orange);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:28px 24px 20px;color:#fff;position:relative;overflow:hidden}
+.curations-header::after{content:'';position:absolute;top:-30px;right:-20px;width:100px;height:100px;border-radius:50%;border:3px dashed rgba(255,255,255,.12)}
+.curations-eyebrow{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px}
+.curations-title{font-family:var(--serif);font-size:clamp(26px,5.5vw,34px);line-height:1.1}
+.curations-title em{font-style:italic;color:var(--peach)}
+.curations-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--cream-dark);overflow:hidden}
+.curation-card{background:#fff;padding:20px 14px 18px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.curation-card img{width:100%;aspect-ratio:3/4;object-fit:contain;border-radius:12px;background:#fff;flex:1;min-height:0}
+.curation-name{font-family:var(--serif);font-size:15px;color:var(--text);margin-top:14px;margin-bottom:2px;white-space:nowrap}
+.curation-sub{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+.curations-bottom{background:var(--peach);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:14px 20px;text-align:center}
+.curations-bottom-text{font-family:var(--serif);font-size:15px;color:var(--text);font-style:italic}
+@media(min-width:600px){
+  .curations-grid{grid-template-columns:repeat(4,1fr)}
+  .curation-name{font-size:16px}
+}
+
+/* === WORKSHOP CALLOUT === */
+.ws-section{padding:0 20px 32px;position:relative}
+.ws-card{background:var(--cream);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--cream-dark)}
+.ws-header{background:var(--orange);padding:28px 24px 20px;color:#fff;position:relative}
+.ws-header-eyebrow{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px}
+.ws-header-title{font-family:var(--serif);font-size:clamp(26px,5.5vw,34px);line-height:1.1}
+.ws-header-title em{font-style:italic;color:var(--peach)}
+.ws-body{padding:24px}
+.ws-desc{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:20px}
+.ws-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:4px}
+.ws-price{font-family:var(--serif);font-size:clamp(36px,8vw,48px);color:var(--orange);font-weight:400}
+.ws-price-sub{font-size:12px;color:var(--text-muted);line-height:1.5}
+
+/* === VENUE SECTION === */
+.venue-section{padding:0 20px 32px;position:relative}
+.venue-card{background:var(--orange);border-radius:var(--radius-lg);overflow:hidden;color:#fff;position:relative}
+.venue-photos{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.venue-photos img{aspect-ratio:4/3;border-radius:0}
+.venue-body{padding:28px 24px}
+.venue-title{font-family:var(--serif);font-size:22px;margin-bottom:4px}
+.venue-address{font-size:12px;color:rgba(255,255,255,.6);letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px}
+.venue-detail{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:14px;color:rgba(255,255,255,.85)}
+.venue-detail strong{color:#fff}
+.venue-detail-icon{font-size:16px}
+
+/* === FORM SECTION === */
+.form-section{padding:40px 20px;max-width:460px;margin:0 auto}
+.form-title{font-family:var(--serif);font-size:clamp(28px,6vw,38px);font-weight:400;color:var(--text);text-align:center;line-height:1.15;margin-bottom:6px}
+.form-title em{font-style:italic;color:var(--orange)}
+.form-sub{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:28px;font-weight:300;line-height:1.6}
+.field{margin-bottom:18px}
+.field-label{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.field-input{width:100%;padding:14px 16px;font-family:var(--sans);font-size:14px;color:var(--text);background:#fff;border:1px solid var(--cream-dark);border-radius:12px;outline:none;transition:all .2s}
+.field-input::placeholder{color:#C4B49E}
+.field-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,101,26,.08)}
+select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7560' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;cursor:pointer}
+textarea.field-input{resize:none;min-height:80px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-submit{width:100%;padding:16px;background:var(--orange);color:#fff;font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:.04em;border:none;border-radius:14px;cursor:pointer;transition:all .25s;margin-top:4px;box-shadow:0 4px 20px rgba(232,101,26,.22)}
+.form-submit:hover{background:var(--orange-deep);box-shadow:0 6px 28px rgba(232,101,26,.32)}
+.form-submit:disabled{opacity:.5;cursor:not-allowed}
+.form-note{text-align:center;font-size:11px;color:var(--text-muted);margin-top:12px;font-weight:300;letter-spacing:.02em}
+
+/* === SUCCESS OVERLAY === */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(232,101,26,.96);z-index:1000;justify-content:flex-start;align-items:center;flex-direction:column;gap:0.9rem;padding:1.8rem 1rem 2rem;text-align:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.success-overlay.show{display:flex}
+.success-overlay-inner{display:flex;flex-direction:column;align-items:center;gap:0.9rem;width:100%;max-width:400px;margin:auto 0}
+.success-icon{width:64px;height:64px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--orange);animation:pop .4s ease;flex-shrink:0}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.success-h{font-family:var(--serif);font-size:clamp(26px,5.5vw,36px);color:#fff;line-height:1.2;margin:0}
+.success-h em{font-style:italic}
+.success-p{font-size:14px;color:rgba(255,255,255,.85);line-height:1.55;max-width:340px;margin:0}
+.success-card{background:rgba(255,255,255,.1);border-radius:16px;padding:18px;text-align:left;display:flex;flex-direction:column;gap:7px;width:100%;max-width:360px;box-sizing:border-box}
+@media (min-width:768px){
+  .success-overlay{padding:2.5rem 1.5rem;gap:1rem}
+  .success-icon{width:72px;height:72px;font-size:32px}
+}
+.success-row{display:flex;justify-content:space-between;font-size:13px}
+.success-row .lbl{color:rgba(255,255,255,.45)}
+.success-row .val{color:#fff;font-weight:500}
+.success-btn{display:inline-block;padding:14px 28px;border-radius:999px;font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .2s;border:none;text-decoration:none}
+.success-btn-directions{background:#fff;color:var(--orange)}
+.success-btn-directions:hover{background:var(--cream);transform:translateY(-1px)}
+.success-btn-back{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)}
+.success-btn-back:hover{background:rgba(255,255,255,.25)}
+/* Payment-pending card accents */
+.pay-card{background:#fffaf0;border:2px solid #fcd34d;border-radius:16px;padding:22px 20px;margin:-4px -4px 14px;text-align:center;box-shadow:0 10px 32px rgba(0,0,0,0.22),0 0 0 4px rgba(252,211,77,0.25);animation:payGlow 2.2s ease-in-out infinite}
+@keyframes payGlow{0%,100%{box-shadow:0 10px 32px rgba(0,0,0,0.22),0 0 0 4px rgba(252,211,77,0.25)}50%{box-shadow:0 10px 32px rgba(0,0,0,0.22),0 0 0 10px rgba(252,211,77,0.1)}}
+.pay-btn{display:block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-weight:800;font-size:16px;padding:18px 28px;border-radius:12px;text-decoration:none;letter-spacing:0.04em;box-shadow:0 8px 20px rgba(217,119,6,0.4);transition:transform .15s,box-shadow .15s;animation:payPulse 1.8s ease-in-out infinite}
+.pay-btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(217,119,6,0.5);animation:none}
+@keyframes payPulse{0%,100%{box-shadow:0 8px 20px rgba(217,119,6,0.4)}50%{box-shadow:0 8px 20px rgba(217,119,6,0.4),0 0 0 8px rgba(245,158,11,0.18)}}
+.pay-eyebrow{display:inline-block;font-size:10px;letter-spacing:0.2em;font-weight:800;color:#fff;background:#dc2626;text-transform:uppercase;margin-bottom:10px;padding:5px 12px;border-radius:999px}
+
+/* === FOOTER === */
+.footer{text-align:center;padding:32px 20px 12px}
+.footer-brand{display:flex;justify-content:center;margin-bottom:6px}
+.footer-brand img{height:24px;width:auto;object-fit:contain}
+.footer-collab{font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:12px}
+.footer-links{display:flex;gap:20px;justify-content:center;margin-bottom:8px}
+.footer-links a{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.footer-links a:hover{color:var(--orange)}
+.footer-hash{font-size:11px;color:var(--text-light);letter-spacing:.08em}
+
+/* === ANIMATIONS === */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeUp .6s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.2s}.d4{animation-delay:.28s}
+
+/* === PAGE WRAPPER === */
+.page-wrap{width:100%;max-width:100%;margin:0 auto}
+
+/* === DESKTOP TWO-COLUMN LAYOUT === */
+.desktop-split{display:block}
+.desktop-split-left,.desktop-split-right{width:100%}
+
+/* === FLOATING CTA RESPONSIVE === */
+@media(min-width:640px){
+  .floating-cta{bottom:24px;padding:17px 36px;font-size:16px;min-width:auto}
+  .floating-cta .cta-sub{display:inline-block;margin-left:4px}
+}
+@media(min-width:1024px){
+  .floating-cta{bottom:28px;padding:18px 42px;font-size:16px;gap:12px}
+}
+
+/* === TABLET (640px+) === */
+@media(min-width:640px){
+  .page-wrap{max-width:720px;margin:0 auto}
+  .topbar{padding:16px 32px}
+  .topbar-logo{height:32px}
+  .hero{padding:48px 32px 0}
+  .hero-logo{max-width:320px}
+  .hero-sub{font-size:15px;max-width:440px}
+  .hero-img-wrap{margin:40px 32px 0;border-radius:var(--radius-lg)}
+  .orange-banner{padding:48px 40px}
+  .ob-title{font-size:38px}
+  .ob-rows{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+  .ob-row{flex-direction:column;text-align:center;align-items:center;margin-bottom:0}
+  .ob-icon{width:44px;height:44px;font-size:20px;margin-bottom:8px}
+  .curations{padding:0 32px 40px}
+  .curations-grid{grid-template-columns:repeat(4,1fr)}
+  .ws-section{padding:0 32px 40px}
+  .ws-card{display:grid;grid-template-columns:1fr 1fr}
+  .ws-header{border-radius:0;display:flex;flex-direction:column;justify-content:center;min-height:280px}
+  .venue-section{padding:0 32px 40px}
+  .venue-card{display:grid;grid-template-columns:1fr 1fr}
+  .venue-photos{grid-template-columns:1fr;gap:3px}
+  .venue-photos img{aspect-ratio:16/10}
+  .form-section{max-width:520px;padding:56px 32px}
+  .footer{padding:40px 32px 16px}
+}
+
+/* === DESKTOP (1024px+) === */
+@media(min-width:1024px){
+  .page-wrap{max-width:960px}
+  .topbar{padding:18px 48px;max-width:1200px;margin:0 auto}
+  .topbar-logo{height:36px}
+  .topbar-rsvp{font-size:12px;padding:10px 24px}
+  .desktop-split{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:60px 48px;max-width:1200px;margin:0 auto}
+  .desktop-split-left{text-align:left}
+  .desktop-split-left .hero-logo{margin:0 0 24px}
+  .desktop-split-left .hero-byline,.desktop-split-left .hero-curated{text-align:left}
+  .desktop-split-left .hero-sub{margin:24px 0;text-align:left}
+  .desktop-split-right .hero-img-wrap{margin:0;border-radius:var(--radius-lg)}
+  .hero{padding:0;overflow:visible}
+  .hero-logo{max-width:340px}
+  .hero-sub{font-size:16px;max-width:420px;line-height:1.8}
+  .hero-cta{font-size:16px;padding:16px 44px}
+  .orange-banner{padding:60px 48px;max-width:100%}
+  .orange-banner .ob-inner{max-width:1100px;margin:0 auto}
+  .ob-title{font-size:44px;margin-bottom:28px}
+  .ob-rows{gap:32px}
+  .ob-label{font-size:15px}
+  .curations{padding:0 48px 48px;max-width:1060px;margin:0 auto}
+  .curations-header{padding:36px 36px 28px}
+  .curations-title{font-size:36px}
+  .curation-card{padding:24px 20px}
+  .curation-card img{border-radius:16px}
+  .curation-name{font-size:18px}
+  .ws-section{padding:0 48px 48px;max-width:1060px;margin:0 auto}
+  .ws-header{padding:40px 36px;min-height:320px}
+  .ws-header-title{font-size:36px}
+  .ws-body{padding:36px}
+  .ws-desc{font-size:15px}
+  .venue-section{padding:0 48px 48px;max-width:1060px;margin:0 auto}
+  .venue-body{padding:36px 32px}
+  .venue-title{font-size:26px}
+  .form-section{max-width:560px;padding:72px 32px}
+  .form-title{font-size:42px}
+  .footer{max-width:1060px;margin:0 auto;padding:48px 48px 20px}
+  .wa-section{padding:72px 48px !important}
+}
+
+/* === LARGE DESKTOP (1400px+) === */
+@media(min-width:1400px){
+  .page-wrap{max-width:1100px}
+  .desktop-split{max-width:1320px;gap:60px;padding:80px 64px}
+  .hero-logo{max-width:380px}
+  .hero-sub{font-size:17px}
+  .ob-title{font-size:48px}
+  .curations{max-width:1200px}
+  .curations-grid{gap:3px}
+  .ws-section{max-width:1200px}
+  .venue-section{max-width:1200px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP STRIPE -->
+<div class="stripe-bar"></div>
+
+<!-- TOP BAR — Hilo Devanagari logo -->
+<div class="topbar">
+  <a href="https://hilodesign.co"><img src="hilo-logo-orange.png" alt="HILO DESIGN" class="topbar-logo"></a>
+  <a href="#rsvp" class="topbar-rsvp">RSVP</a>
+</div>
+
+<!-- FLOATING CTA — appears after user scrolls past hero, disappears when form is in view -->
+<a href="#rsvp" class="floating-cta" id="floatingCta" data-cta="floating" aria-label="RSVP / Register for the event">
+  <span class="cta-dot" aria-hidden="true"></span>
+  <span>RSVP / Register</span>
+  <span class="cta-sub">Free &middot; Limited Seats</span>
+  <span class="cta-arrow" aria-hidden="true">&#8594;</span>
+</a>
+
+<!-- HERO (desktop: two-column split) -->
+<div class="desktop-split">
+  <div class="desktop-split-left">
+    <section class="hero" style="position:relative">
+      <!-- Mango decoration top-right -->
+      <div class="mango-decor" style="top:10px;right:12px;width:60px;height:75px;opacity:.25;transform:rotate(20deg)">
+        <img src="mango-xs.png" alt="">
+      </div>
+
+      <div class="hero-logo fade">
+        <img src="the-summer-story-logo-web.png" alt="The Summer Story" style="width:100%;height:auto;filter:drop-shadow(0 4px 12px rgba(232,101,26,.25))">
+      </div>
+      <div class="hero-byline fade d1">by HILO DESIGN</div>
+      <div class="hero-curated fade d2">Curated by <strong>Nilah Collective</strong></div>
+      <p class="hero-sub fade d2">A sun-drenched afternoon of linen, block prints, art and golden hour. Browse the summer collection. Paint your own artwork. Good food, easy company.</p>
+      <a href="#rsvp" class="hero-cta fade d3" data-cta="hero">RSVP / Register &#8594;</a>
+    </section>
+  </div>
+  <div class="desktop-split-right">
+    <!-- HERO IMAGE — Venue Photos (Kissa Coffee House) -->
+    <div class="hero-img-wrap fade d4">
+      <img id="heroImg1" src="hero-model.jpg" alt="HILO DESIGN Summer Collection">
+      <img id="heroImg2" src="venue-2.jpg" alt="Kissa Coffee House">
+      <div class="hero-img-caption">
+        <span class="hero-img-tag">Kissa Coffee House, Jubilee Hills</span>
+        <span class="hero-img-pill">April 11</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height:32px"></div>
+
+<!-- COMMUNITY / WHAT'S HAPPENING SECTION -->
+<div class="stripe-bar"></div>
+<section class="orange-banner">
+  <!-- Hilo watermark top-right -->
+  <div class="hilo-watermark" style="top:20px;right:20px;width:60px;height:28px">
+    <img src="hilo-logo-white.png" alt="">
+  </div>
+  <!-- Mango decoration bottom-left -->
+  <div class="mango-decor" style="bottom:-10px;left:12px;width:70px;height:87px;opacity:.15;transform:rotate(-30deg) scaleX(-1)">
+    <img src="mango-xs.png" alt="">
+  </div>
+  <div class="ob-inner">
+    <div class="ob-eyebrow">What's happening</div>
+    <div class="ob-title">An afternoon<br>for our <em>community.</em></div>
+    <div class="ob-rows">
+      <div class="ob-row">
+        <div class="ob-icon">&#128526;</div>
+        <div class="ob-label"><strong>Browse the summer collection</strong><br>Linens, embroideries, and artisanal prints for a refined summer aesthetic.</div>
+      </div>
+      <div class="ob-row">
+        <div class="ob-icon">&#127912;</div>
+        <div class="ob-label"><strong>Workshop by Nilah Collective</strong><br>Create a summer-themed artwork and leave with your own A5 frame. Food & beverages included &#124; &#8377;999 per person</div>
+      </div>
+      <div class="ob-row">
+        <div class="ob-icon">&#9749;</div>
+        <div class="ob-label"><strong>At Kissa Coffee House</strong><br>Good food, summer specials, easy company. No rush. Just a good Saturday afternoon.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENT META STRIP -->
+<div style="background:var(--cream-warm);padding:20px 24px;text-align:center">
+  <div style="font-size:14px;color:var(--text)"><strong>Saturday, April 11</strong> &middot; 2 PM – 8:30 PM</div>
+  <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Kissa Coffee House, Jubilee Hills, Hyderabad</div>
+</div>
+<div class="stripe-bar"></div>
+
+<div style="height:32px"></div>
+
+<!-- FOUR CURATIONS — Product images -->
+<div class="curations" style="position:relative">
+  <!-- Mango decoration -->
+  <div class="mango-decor" style="top:-25px;right:28px;width:80px;height:100px;opacity:.2;transform:rotate(25deg)">
+    <img src="mango-sm.png" alt="">
+  </div>
+
+  <div class="curations-header">
+    <div class="curations-eyebrow">Summer 2026 &middot; HILO DESIGN</div>
+    <div class="curations-title">Four Curations for<br>this <em>Summer</em></div>
+    <!-- Hilo watermark -->
+    <div class="hilo-watermark" style="top:16px;right:16px;width:50px;height:23px">
+      <img src="hilo-logo-white.png" alt="">
+    </div>
+  </div>
+  <div class="curations-grid">
+    <div class="curation-card">
+      <img id="curation1" src="curation-blockprint.png" alt="Block Print Shirt">
+      <div class="curation-name">Block Print</div>
+      <div class="curation-sub">Handcrafted</div>
+    </div>
+    <div class="curation-card">
+      <img id="curation2" src="curation-linen.png" alt="Linen Shirt">
+      <div class="curation-name">Linen Essentials</div>
+      <div class="curation-sub">Summer Staples</div>
+    </div>
+    <div class="curation-card">
+      <img id="curation3" src="curation-embroidered.png" alt="Embroidered Shirt">
+      <div class="curation-name">Embroidered Edit</div>
+      <div class="curation-sub">Occasion Ready</div>
+    </div>
+    <div class="curation-card">
+      <img id="curation4" src="curation-cotton.png" alt="Cotton Shirt">
+      <div class="curation-name">Cotton Summer</div>
+      <div class="curation-sub">Easy Everyday</div>
+    </div>
+  </div>
+  <div class="curations-bottom">
+    <div class="curations-bottom-text">Ready to Pick. Made to order. Customize.</div>
+  </div>
+</div>
+
+<!-- WORKSHOP SECTION (stencil picker removed) -->
+<div class="ws-section">
+  <!-- Mango decoration -->
+  <div class="mango-decor" style="top:60px;left:-15px;width:70px;height:87px;opacity:.15;transform:rotate(-20deg)">
+    <img src="mango-xs.png" alt="">
+  </div>
+  <div class="ws-card">
+    <div class="ws-header">
+      <div class="ws-header-eyebrow">Workshop by Nilah Collective</div>
+      <div class="ws-header-title">Paint your own<br><em>summer art.</em></div>
+    </div>
+    <div class="ws-body">
+      <div class="ws-desc">Sit with our in-house artist. Pick a summer stencil, paint it in your colours, and leave with a finished A5 artwork in a wooden frame.</div>
+      <div class="ws-price-row">
+        <div class="ws-price">&#8377;999</div>
+        <div class="ws-price-sub">per person</div>
+      </div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted)"><span style="font-size:16px">&#127912;</span> All materials + wooden frame included</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted)"><span style="font-size:16px">&#127865;</span> Light bites and something to drink — on us.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VENUE SECTION -->
+<div class="venue-section" style="position:relative">
+  <!-- Mango decoration -->
+  <div class="mango-decor" style="top:-18px;left:28px;width:80px;height:100px;opacity:.2;transform:rotate(10deg)">
+    <img src="mango-sm.png" alt="">
+  </div>
+  <div class="venue-card">
+    <div class="venue-photos">
+      <img id="venueImg1" src="venue-1.jpg" alt="Kissa Coffee House">
+      <img id="venueImg2" src="venue-2.jpg" alt="Kissa Coffee House">
+    </div>
+    <div class="venue-body">
+      <!-- Hilo watermark -->
+      <div class="hilo-watermark" style="bottom:20px;right:20px;width:50px;height:23px">
+        <img src="hilo-logo-white.png" alt="">
+      </div>
+      <div class="venue-title">The venue — Kissa Coffee House</div>
+      <div class="venue-address">Road No. 22, Jubilee Hills &middot; Hyderabad</div>
+      <div class="venue-detail"><span class="venue-detail-icon">&#128197;</span> <strong>Saturday, April 11</strong> &middot; 2 PM – 8:30 PM</div>
+      <div class="venue-detail"><span class="venue-detail-icon">&#10024;</span> Entry is free. We're keeping it intimate.</div>
+      <div class="venue-detail"><span class="venue-detail-icon">&#128232;</span> <strong>RSVP by April 10</strong> to confirm your place.</div>
+    </div>
+  </div>
+</div>
+
+<div class="stripe-bar"></div>
+
+<!-- RSVP FORM -->
+<section class="form-section" id="rsvp" style="position:relative">
+  <!-- Mango decoration -->
+  <div class="mango-decor" style="top:0;right:-5px;width:60px;height:75px;opacity:.12;transform:rotate(35deg)">
+    <img src="mango-xs.png" alt="">
+  </div>
+
+  <div class="form-title">See you<br><em>Saturday.</em></div>
+  <div class="form-sub">Free entry. Limited seats. We'll confirm via WhatsApp.</div>
+
+  <form id="rsvpForm" onsubmit="submitRSVP(event)">
+    <div class="field">
+      <label class="field-label">Full Name</label>
+      <input class="field-input" type="text" id="fname" placeholder="Your name" required>
+    </div>
+    <div class="field">
+      <label class="field-label">WhatsApp Number</label>
+      <input class="field-input" type="tel" id="fphone" placeholder="+91 98765 43210" required>
+    </div>
+    <div class="field">
+      <label class="field-label">Email Address</label>
+      <input class="field-input" type="email" id="femail" placeholder="you@email.com (optional)">
+    </div>
+    <div class="field">
+      <label class="field-label">Workshop Interest</label>
+      <select class="field-input" id="fworkshop" onchange="document.getElementById('workshopHint').style.display=this.value==='yes'?'flex':'none'">
+        <option value="yes">Yes — reserve my workshop slot @ &#8377;999 Per Person</option>
+        <option value="not_sure">Not sure yet</option>
+        <option value="no">No, just browsing the collection</option>
+      </select>
+      <div id="workshopHint" style="display:flex;align-items:center;gap:6px;margin-top:8px;padding:10px 14px;background:rgba(232,101,26,0.08);border-radius:12px;font-size:12px;color:var(--orange);line-height:1.4"><span style="font-size:15px">&#127865;</span> Light bites and something to drink — on us.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Guests</label>
+      <select class="field-input" id="fguests">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Any notes for us?</label>
+      <textarea class="field-input" id="fnotes" placeholder="Optional: Let us know if you have any preferences."></textarea>
+    </div>
+
+    <button type="submit" class="form-submit" id="submitBtn">Confirm Attendance</button>
+    <div class="form-note">RSVP by April 10 &middot; Workshop slots limited</div>
+  </form>
+</section>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-overlay-inner">
+    <div class="success-icon" id="successIcon">&#10003;</div>
+    <div class="success-h" id="successHeading">You're in,<br><em id="successName"></em>.</div>
+    <div class="success-p" id="successSubtext">We'll confirm your spot via WhatsApp. Get summer-ready! See you!</div>
+    <div class="success-card" id="successDetails"></div>
+    <div id="successButtons" style="display:flex;gap:10px;margin-top:0.4rem;flex-wrap:wrap;justify-content:center">
+      <a href="https://maps.app.goo.gl/A4UYZknRKPnhCQNw9?g_st=ic" target="_blank" class="success-btn success-btn-directions">&#128205; Get Directions</a>
+      <button onclick="closeSuccess()" class="success-btn success-btn-back">&#8592; Back to Page</button>
+    </div>
+    <div id="successFootnote" style="display:none;font-size:12px;color:rgba(255,255,255,.75);max-width:340px;line-height:1.5">Your workshop slot is only confirmed after payment.</div>
+    <div style="margin-top:0.3rem;font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.08em">#TheSummerStory &middot; April 11 &middot; Kissa Coffee House</div>
+  </div>
+</div>
+
+<!-- WHATSAPP CONTACT SECTION -->
+<div class="wa-section" style="background:var(--orange);padding:40px 24px;text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;top:-40px;left:-20px;width:120px;height:120px;border-radius:50%;border:3px dashed rgba(255,255,255,.1)"></div>
+  <!-- Hilo watermark -->
+  <div class="hilo-watermark" style="bottom:16px;left:20px;width:50px;height:23px;opacity:.15">
+    <img src="hilo-logo-white.png" alt="">
+  </div>
+  <!-- Mango decoration -->
+  <div class="mango-decor" style="top:16px;right:16px;width:50px;height:62px;opacity:.15;transform:rotate(15deg)">
+    <img src="mango-sm.png" alt="" style="filter:brightness(10)">
+  </div>
+  <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px;font-weight:500">Get in touch</div>
+  <div style="font-family:var(--serif);font-size:clamp(26px,6vw,36px);color:#fff;line-height:1.15;margin-bottom:8px">Questions?<br><em style="font-style:italic;color:var(--peach)">Say hello.</em></div>
+  <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:24px;line-height:1.6">Drop us a message on WhatsApp.<br>We're happy to help with anything.</div>
+  <a href="https://wa.me/917075840854?text=Hey!%20In%20regard%20to%20The%20Summer%20Story%20by%20Hilo%20Design" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--orange);font-family:var(--sans);font-size:15px;font-weight:700;padding:16px 32px;border-radius:999px;transition:all .25s;box-shadow:0 4px 20px rgba(0,0,0,.1);text-decoration:none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Chat on WhatsApp
+  </a>
+  <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.4)">+91 70758 40854</div>
+</div>
+
+<!-- FOOTER -->
+<div class="stripe-bar"></div>
+<div class="footer">
+  <div class="footer-brand"><img src="hilo-logo-orange.png" alt="HILO DESIGN"></div>
+  <div class="footer-collab">&times; Nilah Collective</div>
+  <div class="footer-links">
+    <a href="https://hilodesign.co">Shop</a>
+    <a href="https://instagram.com/hilodesign.co">Instagram</a>
+    <a href="https://wa.me/917075840854">WhatsApp</a>
+  </div>
+  <div class="footer-hash">#TheSummerStory</div>
+</div>
+<div class="stripe-bar"></div>
+
+<script>
+var SUPA_URL='https://xcijvmfzmogwhkxvigbn.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjaWp2bWZ6bW9nd2hreHZpZ2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjkzNTQsImV4cCI6MjA4OTYwNTM1NH0.Re5yHJtIdDg4a09J9rNg_QLqLrBKyNGD8hvjk9tqpLE';
+
+// Fix auto-scroll: clear hash on page load so it doesn't jump to #rsvp
+if(window.location.hash){
+  history.replaceState(null,null,' ');
+  window.scrollTo(0,0);
+}
+window.addEventListener('DOMContentLoaded',function(){window.scrollTo(0,0)});
+
+// === Vercel Analytics custom event helper ===
+function trackVa(name, data){
+  try{ if(typeof window.va==='function'){ window.va('event',{name:name,data:data||{}}); } }catch(e){}
+}
+
+// === CTA click tracking (which button actually drives conversion) ===
+(function(){
+  document.querySelectorAll('[data-cta]').forEach(function(el){
+    el.addEventListener('click',function(){
+      trackVa('cta_click',{source:el.getAttribute('data-cta')});
+    });
+  });
+  var topbarCta=document.querySelector('.topbar-rsvp');
+  if(topbarCta){ topbarCta.addEventListener('click',function(){ trackVa('cta_click',{source:'topbar'}); }); }
+})();
+
+// === FLOATING CTA — show after hero, hide when form in view ===
+(function(){
+  var cta=document.getElementById('floatingCta');
+  if(!cta)return;
+  var form=document.getElementById('rsvp');
+  var topbar=document.querySelector('.topbar');
+  var heroCta=document.querySelector('.hero-cta');
+
+  // Hide inside success overlay
+  var successEl=document.getElementById('successOverlay');
+
+  function update(){
+    // Hide when success overlay is active
+    if(successEl && successEl.classList.contains('show')){
+      cta.classList.remove('is-visible');
+      return;
+    }
+    var scrolled=window.scrollY||window.pageYOffset;
+    var triggerAt=260; // show after user scrolls a bit past hero headline
+    var show=scrolled>triggerAt;
+
+    // Hide when RSVP form is visible in viewport (user is already there)
+    if(show && form){
+      var rect=form.getBoundingClientRect();
+      var vh=window.innerHeight||document.documentElement.clientHeight;
+      // If top of form is within viewport, hide (user has arrived)
+      if(rect.top < vh*0.6 && rect.bottom > 0){
+        show=false;
+      }
+    }
+    cta.classList.toggle('is-visible',show);
+  }
+
+  window.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('resize',update);
+  setTimeout(update,300);
+})();
+
+function closeSuccess(){
+  document.getElementById('successOverlay').classList.remove('show');
+  document.getElementById('rsvpForm').reset();
+  document.getElementById('submitBtn').disabled=false;
+  document.getElementById('submitBtn').textContent='Confirm Attendance';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function submitRSVP(e){
+  e.preventDefault();
+  var btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='Sending...';
+
+  var name=document.getElementById('fname').value.trim();
+  var phone=document.getElementById('fphone').value.trim();
+  var email=document.getElementById('femail').value.trim();
+  var workshop=document.getElementById('fworkshop').value;
+  var guests=parseInt(document.getElementById('fguests').value)||1;
+  var notes=document.getElementById('fnotes').value.trim();
+
+  if(!name||!phone){alert('Please enter your name and WhatsApp number.');btn.disabled=false;btn.textContent='Confirm Attendance';return}
+
+  try{
+    var res=await fetch(SUPA_URL+'/rest/v1/event_rsvps',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=representation'},
+      body:JSON.stringify({event_slug:'summer-story-2026',name:name,phone:phone,email:email||null,guests:guests,workshop_interest:workshop,preferred_time:null,preferred_stencil:null,notes:notes||null})
+    });
+    if(!res.ok)throw new Error('Failed: '+res.status);
+
+    trackVa('rsvp_submit',{workshop:workshop,guests:guests,has_email:email?1:0});
+
+    var firstName=name.split(' ')[0];
+    var heading=document.getElementById('successHeading');
+    var subtext=document.getElementById('successSubtext');
+    var icon=document.getElementById('successIcon');
+    var footnote=document.getElementById('successFootnote');
+    var d='';
+
+    if(workshop==='yes'){
+      // PAYMENT-PENDING STATE — make it unmistakable that action is still required.
+      icon.innerHTML='&#8987;'; // hourglass
+      heading.innerHTML="Almost there,<br><em>"+firstName+"</em>.";
+      subtext.innerHTML="Your workshop slot is held. Complete the payment below to confirm your booking.";
+      footnote.style.display='block';
+
+      // Hero payment block — warm cream bg + glowing gold border so it pops against the orange overlay.
+      var total=999*guests;
+      d+='<div class="pay-card">';
+      d+='<div class="pay-eyebrow">&#9888;&#65039; Payment Required</div>';
+      d+='<div style="font-family:var(--serif);font-size:22px;font-weight:700;color:#1b1c1a;line-height:1.15;margin-bottom:4px">Workshop Booking</div>';
+      if(guests>1){
+        d+='<div style="font-size:13px;color:#6b6155;margin-bottom:16px">&#8377;999 &times; '+guests+' = <strong style="color:#1b1c1a;font-size:15px">&#8377;'+total.toLocaleString('en-IN')+'</strong></div>';
+      }else{
+        d+='<div style="font-size:13px;color:#6b6155;margin-bottom:16px"><strong style="color:#1b1c1a;font-size:15px">&#8377;999</strong> per person</div>';
+      }
+      d+='<a href="https://rzp.io/rzp/fNx9jfeM?quantity='+guests+'" target="_blank" class="pay-btn" onclick="trackVa(\'payment_click\',{guests:'+guests+',amount:'+total+'})">Pay Now to Confirm Slot &#8594;</a>';
+      if(guests>1){
+        d+='<div style="font-size:11px;color:#a09688;margin-top:12px;line-height:1.5">Please confirm <strong style="color:#6b6155">'+guests+' tickets</strong> on the payment page.</div>';
+      }
+      d+='</div>';
+
+      // Booking details heading
+      d+='<div style="font-size:10px;letter-spacing:0.15em;color:rgba(255,255,255,0.45);text-transform:uppercase;margin:4px 0 8px;font-weight:600">Booking Details</div>';
+      d+='<div class="success-row"><span class="lbl">Name</span><span class="val">'+name+'</span></div>';
+      d+='<div class="success-row"><span class="lbl">WhatsApp</span><span class="val">'+phone+'</span></div>';
+      if(guests>1)d+='<div class="success-row"><span class="lbl">Guests</span><span class="val">'+guests+'</span></div>';
+      d+='<div class="success-row"><span class="lbl">When</span><span class="val">Saturday, April 11 &middot; 2–6 PM</span></div>';
+      d+='<div class="success-row"><span class="lbl">Where</span><span class="val">Kissa Coffee House</span></div>';
+      d+='<div style="margin-top:10px;padding:12px 14px;border-radius:12px;background:rgba(252,211,77,0.15);border:1px solid rgba(252,211,77,0.35);display:flex;align-items:center;gap:12px"><span style="font-size:28px;line-height:1">&#8987;</span><div style="text-align:left;flex:1"><div style="font-size:10px;letter-spacing:0.15em;color:rgba(255,255,255,0.55);text-transform:uppercase;font-weight:600">Status</div><div style="font-size:17px;font-weight:700;color:#ffd9ad;line-height:1.2">Payment Pending</div></div></div>';
+    } else {
+      // RSVP-ONLY STATE — original confirmed-spot flow.
+      icon.innerHTML='&#10003;';
+      heading.innerHTML="You're in,<br><em>"+firstName+"</em>.";
+      subtext.innerHTML="We'll confirm your spot via WhatsApp. Get summer-ready! See you!";
+      footnote.style.display='none';
+
+      d+='<div class="success-row"><span class="lbl">Name</span><span class="val">'+name+'</span></div>';
+      d+='<div class="success-row"><span class="lbl">WhatsApp</span><span class="val">'+phone+'</span></div>';
+      d+='<div class="success-row"><span class="lbl">When</span><span class="val">Saturday, April 11 &middot; 2–6 PM</span></div>';
+      d+='<div class="success-row"><span class="lbl">Where</span><span class="val">Kissa Coffee House</span></div>';
+      if(guests>1)d+='<div class="success-row"><span class="lbl">Guests</span><span class="val">'+guests+'</span></div>';
+    }
+
+    document.getElementById('successDetails').innerHTML=d;
+    document.getElementById('successOverlay').classList.add('show');
+  }catch(err){
+    console.error(err);
+    alert('Something went wrong. Please try again or DM us @hilodesign.co');
+    btn.disabled=false;btn.textContent='Confirm Attendance';
+  }
+}
+</script>
+</body>
+</html>

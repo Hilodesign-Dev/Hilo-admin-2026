@@ -1,0 +1,4 @@
+#!/bin/sh
+# Auto-pull before push to avoid conflicts across Cowork sessions
+echo "⟳ Pulling latest before push..."
+git pull --rebase origin main
