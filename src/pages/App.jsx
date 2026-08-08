@@ -28,6 +28,10 @@ import UsersTab from './users/UsersTab'
 import HiringTab from './hiring/HiringTab'
 import OutsourceVendorsTab from './outsource/OutsourceVendorsTab'
 import OrdersTab from './orders/OrdersTab'
+import AppOrdersTab from './orders/AppOrdersTab'
+import MobileCmsTab from './cms/MobileCmsTab'
+import AppUsersTab from './customers/AppUsersTab'
+import AppSupportTab from './support/AppSupportTab'
 import ProductionTab from './production/ProductionTab'
 import FulfillmentTab from './fulfillment/FulfillmentTab'
 import DelayedReportingTab from './delayed/DelayedReportingTab'
@@ -37,6 +41,7 @@ import InventoryTab from './inventory/InventoryTab'
 import FinanceTab from './finance/FinanceTab'
 import GSTTab from './finance/GSTTab'
 import ReturnsTab from './returns/ReturnsTab'
+import SyncCenter from './sync/SyncCenter'
 import { OrdersProvider } from '../context/OrdersContext'
 
 const App = () => {
@@ -446,6 +451,18 @@ const App = () => {
         <div style={{display: page === 'fulfillment' ? '' : 'none'}}>
           {mountedTabs.has('fulfillment') && allowedTabs.includes('fulfillment') && <FulfillmentTab key={refreshKeys.fulfillment||0} user={user} stitchingMaster={stitching} openCustomer={openCustomer} />}
         </div>
+        <div style={{display: page === 'app-orders' ? '' : 'none'}}>
+          {mountedTabs.has('app-orders') && allowedTabs.includes('app-orders') && <AppOrdersTab key={refreshKeys['app-orders']||0} user={user} />}
+        </div>
+        <div style={{display: page === 'mobile-cms' ? '' : 'none'}}>
+          {mountedTabs.has('mobile-cms') && allowedTabs.includes('mobile-cms') && <MobileCmsTab key={refreshKeys['mobile-cms']||0} />}
+        </div>
+        <div style={{display: page === 'app-users' ? '' : 'none'}}>
+          {mountedTabs.has('app-users') && allowedTabs.includes('app-users') && <AppUsersTab key={refreshKeys['app-users']||0} />}
+        </div>
+        <div style={{display: page === 'app-support' ? '' : 'none'}}>
+          {mountedTabs.has('app-support') && allowedTabs.includes('app-support') && <AppSupportTab key={refreshKeys['app-support']||0} user={user} />}
+        </div>
         <div style={{display: page === 'delayed'     ? '' : 'none'}}>
           {mountedTabs.has('delayed')     && allowedTabs.includes('delayed')     && <DelayedReportingTab key={refreshKeys.delayed||0} user={user} stitchingMaster={stitching} />}
         </div>
@@ -487,6 +504,9 @@ const App = () => {
         </div>
         <div style={{display: page === 'returns'    ? '' : 'none'}}>
           {mountedTabs.has('returns')    && allowedTabs.includes('returns')    && <ReturnsTab key={refreshKeys.returns||0} user={user} />}
+        </div>
+        <div style={{display: page === 'sync-center' ? '' : 'none'}}>
+          {mountedTabs.has('sync-center') && allowedTabs.includes('sync-center') && <SyncCenter key={refreshKeys['sync-center']||0} />}
         </div>
       </main>
       <BottomNav page={page} setPage={navigateTo} offerCount={offerCount} allowedTabs={allowedTabs} isAdmin={isAdmin} />

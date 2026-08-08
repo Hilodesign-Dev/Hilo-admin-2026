@@ -129,74 +129,111 @@ const ProductCardV2 = ({ row, onOpen, onLabel }) => {
   const totalSizes = totalSizeCount(row)
   const needsReview = row?.import_status && row.import_status !== 'verified'
   const pill = STATUS_PILL[rowReviewStatus(row)] || STATUS_PILL.pending
+  const priceLabel = priceRange.min > 0
+    ? (priceRange.min === priceRange.max ? `₹${fmt(priceRange.min)}` : `₹${fmt(priceRange.min)} – ₹${fmt(priceRange.max)}`)
+    : '—'
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden cursor-pointer transition-all hover:-translate-y-0.5"
+    <div
+      className="bg-white rounded-2xl overflow-hidden cursor-pointer transition-all hover:-translate-y-0.5 flex flex-col h-full"
       style={{ boxShadow: '0 4px 16px rgba(27,28,26,0.06)', border: '1px solid rgba(208,197,176,0.3)' }}
-      onClick={() => onOpen(row)}>
-      {/* Top: image + identity */}
-      <div className="flex gap-3 p-4 pb-3">
-        <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center"
-          style={{ background: '#f5f3f0', border: '1px solid rgba(208,197,176,0.4)' }}>
+      onClick={() => onOpen(row)}
+    >
+      {/* Top: image + identity — fixed rhythm so cards align in the grid */}
+      <div className="flex gap-3.5 p-4 flex-1 min-h-0">
+        <div
+          className="w-[88px] h-[88px] rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center"
+          style={{ background: '#f5f3f0', border: '1px solid rgba(208,197,176,0.4)' }}
+        >
           {row.image_url
             ? <img src={row.image_url} alt="" className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
-            : <span className="text-3xl text-gray-300">📷</span>}
+            : <span className="text-2xl text-gray-300">📷</span>}
         </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <span style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.04em', color: '#795900', fontWeight: 600 }}>{dv?.style_code || '—'}</span>
-            <div className="flex items-center gap-1.5">
-              <button title="Print QR label" onClick={(e) => { e.stopPropagation(); onLabel && onLabel(row) }}
+
+        <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+          <div className="flex items-start justify-between gap-2">
+            <span
+              className="truncate"
+              style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 11, letterSpacing: '0.03em', color: '#795900', fontWeight: 600, lineHeight: 1.3 }}
+              title={dv?.style_code || ''}
+            >
+              {dv?.style_code || '—'}
+            </span>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                title="Print QR label"
+                onClick={(e) => { e.stopPropagation(); onLabel && onLabel(row) }}
                 className="flex items-center gap-1 px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(201,164,50,0.14)', color: '#795900', border: '1px solid rgba(201,164,50,0.4)', cursor: 'pointer' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 14v.01M14 20v.01M17 17v.01M20 17v.01M17 20v.01M20 20v.01"/></svg>
+                style={{ background: 'rgba(201,164,50,0.14)', color: '#795900', border: '1px solid rgba(201,164,50,0.4)', cursor: 'pointer', height: 22 }}
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 14v.01M14 20v.01M17 17v.01M20 17v.01M17 20v.01M20 20v.01"/></svg>
                 <span className="text-[9px] font-bold uppercase tracking-tight">Label</span>
               </button>
               {needsReview
-                ? <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight" style={{ background: '#fee2e2', color: '#991b1b' }}>Needs review</span>
-                : <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight" style={{ background: pill.bg, color: pill.fg }}>{pill.label}</span>}
+                ? <span className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight" style={{ background: '#fee2e2', color: '#991b1b', height: 22, display: 'inline-flex', alignItems: 'center' }}>Needs review</span>
+                : <span className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tight" style={{ background: pill.bg, color: pill.fg, height: 22, display: 'inline-flex', alignItems: 'center' }}>{pill.label}</span>}
             </div>
           </div>
-          <div className="mt-1 line-clamp-2" style={{ fontFamily: 'Manrope,sans-serif', fontWeight: 700, fontSize: 15, color: '#1b1c1a', lineHeight: 1.2 }}>{row.product_title || '(untitled)'}</div>
-          <div className="flex flex-wrap gap-1.5 mt-1.5 items-center">
+
+          <div
+            className="line-clamp-2"
+            style={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 14, color: '#1b1c1a', lineHeight: 1.25, minHeight: 35 }}
+            title={row.product_title || ''}
+          >
+            {row.product_title || '(untitled)'}
+          </div>
+
+          <div className="flex flex-wrap gap-1 items-center" style={{ minHeight: 20 }}>
             {row.category && <CardChip label={row.category} tone="gold" />}
             {rowIsSet(row) && <CardChip label="Set" tone="blue" />}
             <CardChip label={`${variants.length} var · ${totalSizes} sz`} tone="gray" />
           </div>
-          {priceRange.min > 0 && (
-            <div className="mt-1.5" style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: '#1b1c1a' }}>
-              {priceRange.min === priceRange.max ? `₹${fmt(priceRange.min)}` : `₹${fmt(priceRange.min)} – ₹${fmt(priceRange.max)}`}
-            </div>
-          )}
+
+          <div
+            className="mt-auto"
+            style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 13, fontWeight: 700, color: priceRange.min > 0 ? '#1b1c1a' : '#c4bfb4', lineHeight: 1.2, minHeight: 16 }}
+          >
+            {priceLabel}
+          </div>
         </div>
       </div>
 
-      {/* Stat bar */}
-      <div className="grid grid-cols-4 px-4 pb-3" style={{ borderTop: '1px solid rgba(208,197,176,0.3)' }}>
+      {/* Stat bar — equal padding above/below labels */}
+      <div
+        className="grid grid-cols-4 px-3"
+        style={{ borderTop: '1px solid rgba(208,197,176,0.3)', background: 'rgba(250,249,245,0.65)' }}
+      >
         {[
           { l: 'COGS', v: cogs > 0 ? `₹${fmt(n(cogs).toFixed(0))}` : '—', c: '#494bd6' },
           { l: 'MRP', v: mrp > 0 ? `₹${fmt(mrp)}` : '—', c: '#1b1c1a' },
           { l: 'Eff.SP', v: effSP > 0 ? `₹${fmt(effSP.toFixed(0))}` : '—', c: '#494bd6' },
           { l: 'GM%', v: cogs > 0 ? `${(gm * 100).toFixed(1)}%` : '—', c: gm > 0.5 ? '#16a34a' : gm > 0.3 ? '#d97706' : '#dc2626' },
         ].map((s, i) => (
-          <div key={i} className="text-center pt-2" style={{ borderLeft: i === 0 ? 'none' : '1px solid rgba(208,197,176,0.3)' }}>
-            <div style={{ fontSize: 9, letterSpacing: '0.06em', color: '#7f7663', textTransform: 'uppercase', fontWeight: 700 }}>{s.l}</div>
-            <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: s.c, marginTop: 2 }}>{s.v}</div>
+          <div
+            key={i}
+            className="text-center py-2.5 px-1"
+            style={{ borderLeft: i === 0 ? 'none' : '1px solid rgba(208,197,176,0.28)' }}
+          >
+            <div style={{ fontSize: 9, letterSpacing: '0.06em', color: '#7f7663', textTransform: 'uppercase', fontWeight: 700, lineHeight: 1 }}>{s.l}</div>
+            <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 12, fontWeight: 700, color: s.c, marginTop: 4, lineHeight: 1.2, minHeight: 15 }}>{s.v}</div>
           </div>
         ))}
       </div>
 
       {/* Action */}
-      <div className="px-4 pb-4">
-        <button onClick={(e) => { e.stopPropagation(); onOpen(row) }}
-          className="w-full py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.99]"
-          style={{ background: '#c9a432', color: '#4c3b00' }}>
-          <Icon name="edit" cls="w-4 h-4" /> Open & Edit
+      <div className="p-3 pt-2.5">
+        <button
+          onClick={(e) => { e.stopPropagation(); onOpen(row) }}
+          className="w-full py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.99]"
+          style={{ background: '#c9a432', color: '#4c3b00' }}
+        >
+          <Icon name="edit" cls="w-3.5 h-3.5" /> Open & Edit
         </button>
       </div>
     </div>
   )
 }
+
 
 const CatalogueV2 = (props) => {
   const { fabrics = [], dyes = [], categories: masterCategories = [], consumption = [], stitchingMaster = [] } = props
@@ -228,26 +265,36 @@ const CatalogueV2 = (props) => {
   }
   useEffect(() => { reload() }, [])
 
-  // ── category → tags lookup (DB-driven), exactly like V1 ────────────────────
+  // ── category → tags lookup (DB-driven). Always include category name as a
+  // fallback key so auto-synced Shopify product_type masters (empty shopify_tag)
+  // still match products whose `category` / tags equal that name.
   const catTagMap = useMemo(() => {
     const map = {}
     ;(masterCategories || []).forEach(c => {
-      if (c.shopify_tag) map[c.name] = c.shopify_tag.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+      if (!c.name) return
+      const fromShopify = c.shopify_tag
+        ? c.shopify_tag.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+        : []
+      map[c.name] = [...new Set([...fromShopify, String(c.name).toLowerCase()])]
     })
     return map
   }, [masterCategories])
 
   const productMatchesCat = (row, cat) => {
-    if (cat === 'Other') {
-      const tags = parseTags(row.shopify_tags).map(t => t.toLowerCase())
-      const allMasterTags = []
-      Object.values(catTagMap).forEach(arr => arr.forEach(t => allMasterTags.push(t)))
-      return !allMasterTags.some(mt => tags.includes(mt))
-    }
-    const catTags = catTagMap[cat]
-    if (!catTags || !catTags.length) return false
     const tags = parseTags(row.shopify_tags).map(t => t.toLowerCase())
-    return catTags.some(ct => tags.includes(ct))
+    const productCat = String(row.category || row.product_type || '').trim().toLowerCase()
+
+    const matchesNamed = (catName) => {
+      const keys = catTagMap[catName] || [String(catName).toLowerCase()]
+      if (productCat && keys.includes(productCat)) return true
+      return keys.some(k => tags.includes(k))
+    }
+
+    if (cat === 'Other') {
+      const names = (masterCategories || []).map(c => c.name).filter(Boolean)
+      return !names.some(name => matchesNamed(name))
+    }
+    return matchesNamed(cat)
   }
 
   const availableCats = useMemo(() => {

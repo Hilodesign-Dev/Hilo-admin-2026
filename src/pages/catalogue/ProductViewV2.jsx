@@ -226,6 +226,9 @@ const ProductViewV2 = ({ row: initialRow, fabrics = [], dyes = [], categories = 
                 <div><Lbl>Category</Lbl>
                   <Sel value={form.category} onChange={v => set('category', v)}>
                     <option value="">— Select —</option>
+                    {form.category && !((categories.length ? categories.map(c => c.name) : ['Kurta','Sherwani','Blazer','Indowestern']).includes(form.category)) && (
+                      <option value={form.category}>{form.category}</option>
+                    )}
                     {(categories.length ? categories.map(c => c.name) : ['Kurta','Sherwani','Blazer','Indowestern']).filter(Boolean).map(c => <option key={c} value={c}>{c}</option>)}
                   </Sel>
                 </div>

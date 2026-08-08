@@ -66,29 +66,32 @@ var Catalogue = function({ products, setProducts, fabrics, stitchingMaster, dyes
     return arr.map(function(t) { return t.replace(/^[\["'\s]+|[\]"'\s]+$/g, '').trim() }).filter(Boolean)
   }
 
-  // Build category→tags lookup from Masters categories (DB-driven)
-  // Each category can have multiple comma-separated shopify_tags
+  // Build category→tags lookup from Masters. Always include category name so
+  // auto-synced Shopify product_type rows (empty shopify_tag) still match.
   var catTagMap = useMemo(function() {
     var map = {}
     ;(categories || []).forEach(function(c) {
-      if (c.shopify_tag) {
-        map[c.name] = c.shopify_tag.split(',').map(function(t) { return t.trim().toLowerCase() }).filter(Boolean)
-      }
+      if (!c.name) return
+      var fromShopify = c.shopify_tag
+        ? c.shopify_tag.split(',').map(function(t) { return t.trim().toLowerCase() }).filter(Boolean)
+        : []
+      map[c.name] = Array.from(new Set(fromShopify.concat([String(c.name).toLowerCase()])))
     })
     return map
   }, [categories])
   var productMatchesCat = function(p, cat) {
-    // "Other" = products that don't match ANY Masters category tag
-    if (cat === 'Other') {
-      var tags = parseTags(p.shopify_tags).map(function(t) { return t.toLowerCase() })
-      var allMasterTags = []
-      Object.values(catTagMap).forEach(function(arr) { arr.forEach(function(t) { allMasterTags.push(t) }) })
-      return !allMasterTags.some(function(mt) { return tags.includes(mt) })
-    }
-    var catTags = catTagMap[cat]
-    if (!catTags || !catTags.length) return false  // category has no shopify_tag — can't match
     var tags = parseTags(p.shopify_tags).map(function(t) { return t.toLowerCase() })
-    return catTags.some(function(ct) { return tags.includes(ct) })
+    var productCat = String(p.category || p.product_type || '').trim().toLowerCase()
+    var matchesNamed = function(catName) {
+      var keys = catTagMap[catName] || [String(catName).toLowerCase()]
+      if (productCat && keys.indexOf(productCat) !== -1) return true
+      return keys.some(function(k) { return tags.indexOf(k) !== -1 })
+    }
+    if (cat === 'Other') {
+      var names = (categories || []).map(function(c) { return c.name }).filter(Boolean)
+      return !names.some(function(name) { return matchesNamed(name) })
+    }
+    return matchesNamed(cat)
   }
 
   // All unique tags

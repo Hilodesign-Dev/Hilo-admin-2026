@@ -73,6 +73,15 @@ function ProductDrawer({ product, locationId, locName, onClose, onSaved }) {
       const mvs = ch.map(r => ({ sku_id: r.id, location_id: locationId, qty_delta: Number(r.newQty) - r.onhand, movement_type: 'adjustment', reference_type: 'manual_adjust', reason: reason || 'Manual stock adjustment', notes: `${r.size}: ${r.onhand}→${r.newQty}`, created_by_name: me() }))
       const { error } = await supa.from('inventory_movements').insert(mvs)
       if (error) throw error
+
+      for (const r of ch) {
+        await supa.from('inventory_stock').upsert({
+          sku_id: r.id,
+          location_id: locationId,
+          quantity_on_hand: Number(r.newQty)
+        }, { onConflict: 'sku_id,location_id' })
+      }
+
       toast(true, `Updated ${ch.length} size(s)`); setReason(''); await load(); onSaved()
     } catch (e) { toast(false, 'Failed: ' + (e.message || e)) } finally { setBusy(false) }
   }
@@ -237,6 +246,12 @@ export const InventoryTab = () => {
         let skuId = editMap[sz]?.sku_id
         if (!skuId) { const { data, error } = await supa.rpc('get_or_create_sku', { p_product_id: editId, p_size: sz }); if (error) throw error; skuId = data }
         mvs.push({ sku_id: skuId, location_id: locId, qty_delta: Number(v) - onhand, movement_type: 'adjustment', reference_type: 'manual_adjust', reason: 'Inline stock update', notes: `${sz}: ${onhand}→${v}`, created_by_name: me() })
+        
+        await supa.from('inventory_stock').upsert({
+          sku_id: skuId,
+          location_id: locId,
+          quantity_on_hand: Number(v)
+        }, { onConflict: 'sku_id,location_id' })
       }
       const { error } = await supa.from('inventory_movements').insert(mvs)
       if (error) throw error
@@ -246,13 +261,32 @@ export const InventoryTab = () => {
   }
 
   // ── category → tags lookup + matcher (mirrors Catalogue V2) ──
-  const catTagMap = useMemo(() => { const m = {}; cats.forEach(c => { if (c.shopify_tag) m[c.name] = c.shopify_tag.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) }); return m }, [cats])
+  // Include category name as fallback so product_type masters without shopify_tag still count.
+  const catTagMap = useMemo(() => {
+    const m = {}
+    cats.forEach(c => {
+      if (!c.name) return
+      const fromShopify = c.shopify_tag
+        ? c.shopify_tag.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+        : []
+      m[c.name] = [...new Set([...fromShopify, String(c.name).toLowerCase()])]
+    })
+    return m
+  }, [cats])
   const matchesCat = useCallback((row, cat) => {
     if (cat === 'All') return true
     const tags = parseTags(row.tags_csv).map(t => t.toLowerCase())
-    if (cat === 'Other') { const all = []; Object.values(catTagMap).forEach(a => a.forEach(t => all.push(t))); return !all.some(mt => tags.includes(mt)) }
-    const ct = catTagMap[cat]; return ct && ct.length ? ct.some(c => tags.includes(c)) : false
-  }, [catTagMap])
+    const productCat = String(row.garment_category || row.category || '').trim().toLowerCase()
+    const matchesNamed = (catName) => {
+      const keys = catTagMap[catName] || [String(catName).toLowerCase()]
+      if (productCat && keys.includes(productCat)) return true
+      return keys.some(k => tags.includes(k))
+    }
+    if (cat === 'Other') {
+      return !cats.map(c => c.name).filter(Boolean).some(name => matchesNamed(name))
+    }
+    return matchesNamed(cat)
+  }, [catTagMap, cats])
   const availableCats = useMemo(() => {
     const order = ['Occasion Wear', 'Urban Wear', 'Kids', 'Accessories', '']; const out = []
     order.forEach(g => cats.filter(c => (c.group_name || '') === g).forEach(c => { if (c.name) out.push(c.name) }))

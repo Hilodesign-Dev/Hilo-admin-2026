@@ -297,7 +297,13 @@ const ProductForm = ({ product, fabrics, stitchingMaster, dyes, categories, cons
         <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Identity</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 form-grid-2">
           <Field label="Style Code *"><Input field="styleCode" placeholder="HL-KU-01" /></Field>
-          <Field label="Category"><PFSelect field="category" options={allCatNames.map(c => <option key={c}>{c}</option>)} /></Field>
+          <Field label="Category">
+            <PFSelect field="category" options={[
+              <option key="select-empty" value="">-- Select Category --</option>,
+              ...(form.category && !allCatNames.includes(form.category) ? [<option key={form.category} value={form.category}>{form.category}</option>] : []),
+              ...allCatNames.map(c => <option key={c} value={c}>{c}</option>)
+            ]} />
+          </Field>
           <Field label="Product Title"><Input field="productTitle" /></Field>
           <Field label="Product Name"><Input field="productName" /></Field>
           <Field label="Primary Colour"><Input field="colourPrimary" /></Field>
@@ -359,7 +365,10 @@ const ProductForm = ({ product, fabrics, stitchingMaster, dyes, categories, cons
                     <select value={piece.category||''} onChange={e => updatePiece(idx,'category',e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-sm bg-amber-50 border-amber-200">
                       <option value="">— Select category —</option>
-                      {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                      {piece.category && !allCatNames.includes(piece.category) && (
+                        <option value={piece.category}>{piece.category}</option>
+                      )}
+                      {allCatNames.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                     {piece.category && (() => {
                       const cat = categories.find(x => x.name === piece.category);
