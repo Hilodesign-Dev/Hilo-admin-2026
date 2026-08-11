@@ -1,4 +1,15 @@
-name: CI
+name: Deploy preview note
+
+# Vercel Git integration is preferred for admindev.hilodesign.co.
+# Connect Hilodesign-Dev/Hilo-admin-2026 in the Vercel dashboard:
+#   Framework: Vite
+#   Build: npm run build
+#   Output: dist
+#   Production branch: dev
+#   Env: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+#   Domain: admindev.hilodesign.co
+#
+# This workflow only verifies the production build on push.
 
 on:
   push:
@@ -23,7 +34,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
-          if [ -z "$VITE_SUPABASE_URL" ]; then
+          if [ -z "${VITE_SUPABASE_URL:-}" ]; then
             export VITE_SUPABASE_URL='https://placeholder.supabase.co'
             export VITE_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder'
           fi
