@@ -30,12 +30,12 @@ Fresh empty Supabase: run `supabase/dev-bootstrap.sql` then seed (see `DEV_SETUP
 ## Deploy (dev)
 
 1. [Vercel](https://vercel.com) → **Add Project** → import `Hilodesign-Dev/Hilo-admin-2026`
-2. Framework: Vite · Build `npm run build` · Output `dist` · Production branch: `dev`
+2. Framework: Vite · Build `npm run build` · Output `dist` · Production branch: `main`
 3. Env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (never put service role in browser env)
 4. Domains → add `admindev.hilodesign.co`
 5. In **BigRock DNS** for `hilodesign.co`, create CNAME `admindev` → `cname.vercel-dns.com` (or the target Vercel shows)
 
-After that, every push to `dev` redeploys the admin UI.
+After that, every push to `main` redeploys the admin UI.
 
 ## Related
 
