@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { api, API_URL } from '../../lib/api';
 import { supa } from '../../lib/supabase';
-import Icon from '../../components/Icon';
 import { _logError } from '../../lib/logger';
 
 const SyncCenter = () => {
@@ -9,41 +9,29 @@ const SyncCenter = () => {
   const [loading, setLoading] = useState(false);
   const [triggeringType, setTriggeringType] = useState(null);
   const [error, setError] = useState(null);
+  const [apiHealth, setApiHealth] = useState(null); // 'ok' | 'down' | null
+  const [catalogueCount, setCatalogueCount] = useState(null);
 
   const fetchSyncData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // 1. Fetch 20 most recent sync runs
-      const { data: runsData, error: runsErr } = await supa
-        .from('sync_runs')
-        .select('*')
-        .order('started_at', { ascending: false })
-        .limit(20);
+      const [status, healthSettled, productsSettled] = await Promise.all([
+        api.syncStatus(),
+        api.health().then(() => 'ok').catch(() => 'down'),
+        api.catalogueProducts({ page: 1, limit: 1 })
+          .then((d) => d?.meta?.total ?? d?.data?.length ?? null)
+          .catch(() => null),
+      ]);
 
-      if (runsErr) throw runsErr;
-      setRuns(runsData || []);
-
-      // 2. Derive latest per type
-      const latest = { catalogue: null, orders: null, customers: null };
-      const types = ['catalogue', 'orders', 'customers'];
-      for (const type of types) {
-        const { data: typeData, error: typeErr } = await supa
-          .from('sync_runs')
-          .select('*')
-          .eq('sync_type', type)
-          .order('started_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (!typeErr && typeData) {
-          latest[type] = typeData;
-        }
-      }
-      setLatestRuns(latest);
+      setApiHealth(healthSettled);
+      setCatalogueCount(productsSettled);
+      setRuns(status.recent || []);
+      setLatestRuns(status.latest || { catalogue: null, orders: null, customers: null });
     } catch (err) {
-      console.error('[HILO] Failed to fetch sync runs:', err);
+      console.error('[HILO] Failed to fetch sync runs via API:', err);
       setError(err.message || 'Error loading sync details');
+      setApiHealth('down');
       _logError('sync_center_load', err.message || 'Unknown', err.stack || '');
     } finally {
       setLoading(false);
@@ -104,6 +92,25 @@ const SyncCenter = () => {
             Sync Center
           </h1>
           <p style={{ fontSize: '0.875rem', color: '#64748b' }}>Manage and monitor catalogue, orders, and customer synchronization with Shopify</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+            <span
+              className={`px-2 py-0.5 rounded-full border font-medium ${
+                apiHealth === 'ok'
+                  ? 'bg-green-50 text-green-700 border-green-200'
+                  : apiHealth === 'down'
+                    ? 'bg-red-50 text-red-700 border-red-200'
+                    : 'bg-slate-50 text-slate-500 border-slate-200'
+              }`}
+              title={API_URL}
+            >
+              API {apiHealth === 'ok' ? 'online' : apiHealth === 'down' ? 'offline' : '…'}
+            </span>
+            {catalogueCount != null && (
+              <span className="px-2 py-0.5 rounded-full border bg-slate-50 text-slate-600 border-slate-200 font-medium">
+                Catalogue via API: {catalogueCount} products
+              </span>
+            )}
+          </div>
         </div>
         <button
           onClick={fetchSyncData}
