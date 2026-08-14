@@ -22,18 +22,38 @@ const ProductionCard = ({ item, order, teamMembers, vendors, fabricVendors = [],
   const fileRef = useRef(null)
 
   const isCustom = (item.type || '').toLowerCase() === 'custom'
+  const isAppOrder = (order?.order_origin || '') === 'customer_api' || String(order?.order_number || item.order_number || '').startsWith('APP-')
+  const addr = order?.shipping_address && typeof order.shipping_address === 'object' ? order.shipping_address : null
+  const customerName = order?.customer_name || addr?.name || ''
+  const customerPhone = order?.buyer_phone || order?.customer_phone || addr?.phone || ''
+  const customerEmail = order?.customer_email || ''
+  const customerLoc = [addr?.city, addr?.state, addr?.pincode].filter(Boolean).join(', ')
+  const payNote = String(order?.notes || '').match(/\b(COD|ONLINE)\b/i)?.[1]
 
-  // Find matching catalogue product by SKU (style code)
-  const catalogueProduct = (products || []).find(p =>
-    p.styleCode && item.sku && (item.sku === p.styleCode || item.sku.startsWith(p.styleCode))
-  )
+  const catalogueProduct = (products || []).find(p => {
+    if (!p) return false
+    const sku = (item.sku || '').trim()
+    if (p.styleCode && sku && (sku === p.styleCode || sku.startsWith(p.styleCode) || p.styleCode.startsWith(sku))) return true
+    if (p.id && sku && String(p.id) === sku) return true
+    const itemTitle = (item.title || '').split(/[–—]/)[0].trim().toLowerCase()
+    const pTitle = (p.productTitle || p.title || p.productName || '').toLowerCase()
+    return itemTitle.length >= 4 && pTitle && (pTitle.includes(itemTitle) || itemTitle.includes(pTitle))
+  })
 
-  // Determine images: custom products use custom_images, others use catalogue
-  const images = isCustom
-    ? (customImages.length > 0 ? customImages : [])
-    : (catalogueProduct?.shopify_images?.length > 0
-        ? catalogueProduct.shopify_images.map(i => typeof i === 'string' ? i : i.src || i.url || '')
-        : catalogueProduct?.image_url ? [catalogueProduct.image_url] : [])
+  const asUrl = (u) => {
+    if (!u) return null
+    if (typeof u === 'string') return u
+    return u.src || u.url || null
+  }
+  const storedImages = [
+    ...(customImages || []),
+    ...(Array.isArray(item.custom_images) ? item.custom_images : []),
+    item.image_url,
+  ].map(asUrl).filter(Boolean)
+  const catalogueImages = catalogueProduct?.shopify_images?.length > 0
+    ? catalogueProduct.shopify_images.map(asUrl)
+    : catalogueProduct?.image_url ? [catalogueProduct.image_url] : []
+  const images = [...new Set((isCustom ? storedImages : [...catalogueImages, ...storedImages]).filter(Boolean))]
 
   const updateField = async (field, value) => {
     setUpdatingField(field)
@@ -159,12 +179,15 @@ const ProductionCard = ({ item, order, teamMembers, vendors, fabricVendors = [],
 
         {/* Customer */}
         <div className="text-xs" style={{ color: C.text }}>
-          <b>Customer:</b> {order?.customer_name || '—'}
+          <b>Customer:</b> {customerName || '—'}
         </div>
-        {(order?.customer_email || order?.buyer_phone) && (
+        {(customerEmail || customerPhone) && (
           <div className="text-[10px] truncate" style={{ color: C.textMuted }}>
-            {order.customer_email}{order.customer_email && order.buyer_phone ? ' · ' : ''}{order.buyer_phone}
+            {customerEmail}{customerEmail && customerPhone ? ' · ' : ''}{customerPhone}
           </div>
+        )}
+        {customerLoc && (
+          <div className="text-[10px] truncate" style={{ color: C.textMuted }}>{customerLoc}</div>
         )}
 
         {/* Delivery date */}
@@ -176,6 +199,8 @@ const ProductionCard = ({ item, order, teamMembers, vendors, fabricVendors = [],
         <div className="flex items-center gap-2 pt-1">
           <span className="text-xs" style={{ color: C.textMuted }}>Channel:</span>
           {order?.channel && <Badge color="#fff" bg={C.green}>{order.channel}</Badge>}
+          {isAppOrder && <Badge color="#fff" bg="#2563eb">App{payNote ? ` · ${payNote.toUpperCase()}` : ''}</Badge>}
+          {item.size && <Badge color={C.text} bg="rgba(0,0,0,0.06)">{item.size}</Badge>}
           <button onClick={handleQuickPrint} className="ml-auto text-xs px-3 py-1.5 rounded-lg font-bold" style={{ background: C.goldDark, color: '#fff' }}>
             Print
           </button>

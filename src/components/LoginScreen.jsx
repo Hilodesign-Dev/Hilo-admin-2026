@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Icon from './Icon'
-import { supa } from '../lib/supabase'
+import { SUPABASE_URL, supa } from '../lib/supabase'
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +15,11 @@ const LoginScreen = () => {
       email: email.trim().toLowerCase(), password,
     });
     setLoading(false);
-    if (err) setError('Incorrect email or password. Contact your admin if you need access.');
+    if (err) {
+      let host = ''
+      try { host = new URL(SUPABASE_URL).hostname } catch { host = SUPABASE_URL || '' }
+      setError(`${err.message || 'Incorrect email or password'} (${host})`);
+    }
   };
 
   return (

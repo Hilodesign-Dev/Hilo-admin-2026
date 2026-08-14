@@ -181,7 +181,99 @@ const ProductionTab = ({ user, products, fabrics, dyes }) => {
             })
           }
         }
-        if (myReq === reqIdRef.current) setOrders(orderMap)
+
+        // App orders: overlay customer, shipping, and product images from shopper tables.
+        // Older handoffs wrote ops rows without these fields.
+        try {
+        const appIds = orderIds.filter(id => {
+          const o = orderMap[id]
+          return o?.order_origin === 'customer_api' || String(o?.order_number || '').startsWith('APP-')
+        })
+        if (appIds.length > 0) {
+          const numbers = [...new Set(appIds.map(id => orderMap[id]?.order_number).filter(Boolean))]
+          const [{ data: byOps }, { data: byNum }] = await Promise.all([
+            supa.from('shopper_orders').select('*').in('ops_order_id', appIds),
+            numbers.length
+              ? supa.from('shopper_orders').select('*').in('order_number', numbers)
+              : Promise.resolve({ data: [] }),
+          ])
+          const seenShopper = new Set()
+          const shoppers = [...(byOps || []), ...(byNum || [])].filter(s => {
+            if (!s?.id || seenShopper.has(s.id)) return false
+            seenShopper.add(s.id)
+            return true
+          })
+          if (shoppers && shoppers.length > 0) {
+            const userIds = [...new Set(shoppers.map(s => s.user_id).filter(Boolean))]
+            const { data: users } = userIds.length
+              ? await supa.from('shopper_users').select('id, name, email, phone').in('id', userIds)
+              : { data: [] }
+            const userById = {}
+            ;(users || []).forEach(u => { userById[u.id] = u })
+            const shopperByOps = {}
+            const shopperByNumber = {}
+            shoppers.forEach(s => {
+              if (s.ops_order_id) shopperByOps[s.ops_order_id] = s
+              if (s.order_number) shopperByNumber[s.order_number] = s
+            })
+            const { data: sItems } = await supa
+              .from('shopper_order_items')
+              .select('*')
+              .in('order_id', shoppers.map(s => s.id))
+            const itemsByShopper = {}
+            ;(sItems || []).forEach(si => {
+              if (!itemsByShopper[si.order_id]) itemsByShopper[si.order_id] = []
+              itemsByShopper[si.order_id].push(si)
+            })
+            appIds.forEach(id => {
+              const o = orderMap[id]
+              const s = shopperByOps[id] || shopperByNumber[o?.order_number]
+              if (!o || !s) return
+              const u = userById[s.user_id] || {}
+              if (!o.customer_name) o.customer_name = s.shipping_name || u.name || ''
+              if (!o.customer_email) o.customer_email = u.email || ''
+              if (!o.customer_phone) o.customer_phone = s.shipping_phone || u.phone || ''
+              if (!o.buyer_phone) o.buyer_phone = o.customer_phone
+              if (!o.shipping_address) {
+                o.shipping_address = {
+                  name: s.shipping_name,
+                  phone: s.shipping_phone,
+                  line1: s.shipping_line1,
+                  line2: s.shipping_line2,
+                  city: s.shipping_city,
+                  state: s.shipping_state,
+                  pincode: s.shipping_pincode,
+                  country: s.shipping_country,
+                }
+              }
+            })
+            data.forEach(li => {
+              const s = shopperByOps[li.order_id] || shopperByNumber[li.order_number]
+              if (!s) return
+              const match = (itemsByShopper[s.id] || []).find(si => si.variant_id === li.sku || si.title === li.title)
+              if (match?.image_url && !(Array.isArray(li.custom_images) && li.custom_images.length)) {
+                li.custom_images = [match.image_url]
+              }
+              if (!li.size && (match?.title || li.title)) {
+                const slash = String(match?.title || li.title).split('/').pop()?.trim()
+                if (slash && slash.length <= 8) li.size = slash
+              }
+              if (!li.delivery_type) li.delivery_type = 'Courier'
+              if (!li.est_shipping_date && (s.created_at || li.created_at)) {
+                const d = new Date(s.created_at || li.created_at)
+                d.setDate(d.getDate() + 14)
+                li.est_shipping_date = d.toISOString().slice(0, 10)
+              }
+            })
+          }
+        }
+        } catch (overlayErr) {
+          console.warn('App order overlay skipped', overlayErr)
+        }
+        if (myReq === reqIdRef.current) {
+          setItems([...data])
+          setOrders(orderMap)
+        }
       }
     } catch (e) {
       if (myReq !== reqIdRef.current) return
