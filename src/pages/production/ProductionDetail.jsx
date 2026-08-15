@@ -133,6 +133,9 @@ const ProductionDetail = ({ item, order, products, fabrics, dyes, onBack, onEdit
   const fabricDropdownRef = useRef(null)
 
   const isCustom = (item.type || '').toLowerCase() === 'custom'
+  const addr = order?.shipping_address && typeof order.shipping_address === 'object' ? order.shipping_address : null
+  const customerName = order?.customer_name || addr?.name || buyerInfo?.name || ''
+  const customerPhone = buyerInfo?.phone || order?.buyer_phone || order?.customer_phone || addr?.phone || ''
 
   // Fetch colour master for editable colour picker
   useEffect(() => {
@@ -258,10 +261,16 @@ const ProductionDetail = ({ item, order, products, fabrics, dyes, onBack, onEdit
 
   const selectedFabric = (fabrics || []).find(f => f.id === fabricId)
 
-  // Find catalogue product by SKU
-  const catalogueProduct = (products || []).find(p =>
-    p.styleCode && item.sku && (item.sku === p.styleCode || item.sku.startsWith(p.styleCode))
-  )
+  // Find catalogue product by SKU, id, or title
+  const catalogueProduct = (products || []).find(p => {
+    if (!p) return false
+    const sku = (item.sku || '').trim()
+    if (p.styleCode && sku && (sku === p.styleCode || sku.startsWith(p.styleCode) || p.styleCode.startsWith(sku))) return true
+    if (p.id && sku && String(p.id) === sku) return true
+    const itemTitle = (item.title || '').split(/[–—]/)[0].trim().toLowerCase()
+    const pTitle = (p.productTitle || p.title || p.productName || '').toLowerCase()
+    return itemTitle.length >= 4 && pTitle && (pTitle.includes(itemTitle) || itemTitle.includes(pTitle))
+  })
 
   // Build reference image URLs with their tags for display
   const refImgs = refImages.map(r => ({ url: r.url, tag: (r.tags || []).join(', '), isRef: true }))
@@ -273,11 +282,17 @@ const ProductionDetail = ({ item, order, products, fabrics, dyes, onBack, onEdit
     isRef: true,
   }] : []
 
+  const storedImages = [
+    ...(customImages || []),
+    ...(Array.isArray(item.custom_images) ? item.custom_images : []),
+    item.image_url,
+  ].filter(u => typeof u === 'string' && u)
+  const catalogueImages = catalogueProduct?.shopify_images?.length > 0
+    ? catalogueProduct.shopify_images.map(i => typeof i === 'string' ? i : i.src || i.url || '')
+    : catalogueProduct?.image_url ? [catalogueProduct.image_url] : []
   const baseImages = isCustom
-    ? (customImages.length > 0 ? customImages : [])
-    : (catalogueProduct?.shopify_images?.length > 0
-        ? catalogueProduct.shopify_images.map(i => typeof i === 'string' ? i : i.src || i.url || '')
-        : catalogueProduct?.image_url ? [catalogueProduct.image_url] : [])
+    ? storedImages
+    : [...catalogueImages, ...storedImages].filter(Boolean)
 
   // Combine: base images (plain URLs) + reference images (objects with tag) + colour ref image
   const allImages = [
@@ -553,9 +568,9 @@ const ProductionDetail = ({ item, order, products, fabrics, dyes, onBack, onEdit
             {/* Compact metadata chips — primary working surface is below */}
             <div className="flex flex-wrap items-center gap-1.5 pb-3 border-b" style={{ borderColor: C.border }}>
               <Chip mono><span style={{ color: C.textMuted }}>#</span>{item.order_number}</Chip>
-              <Chip>{order?.customer_name || '—'}</Chip>
-              {(buyerInfo?.phone || order?.notes?.match(/\+?\d[\d\s-]{7,}/)?.[0]) && (
-                <Chip mono small>{buyerInfo?.phone || order?.notes?.match(/\+?\d[\d\s-]{7,}/)?.[0]}</Chip>
+              <Chip>{customerName || '—'}</Chip>
+              {(customerPhone || order?.notes?.match(/\+?\d[\d\s-]{7,}/)?.[0]) && (
+                <Chip mono small>{customerPhone || order?.notes?.match(/\+?\d[\d\s-]{7,}/)?.[0]}</Chip>
               )}
               {item.size && <Chip tone="size">Size {item.size}</Chip>}
               {item.stylist && <Chip tone="stylist">Stylist: {resolveStaffName(teamMembers, item.stylist)}</Chip>}

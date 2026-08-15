@@ -1,6 +1,6 @@
 # Hilo Admin (`Hilo-admin-2026`)
 
-Staff operations dashboard (Vite + React). Talks **only** to Supabase Auth + PostgREST.
+Staff operations dashboard (Vite + React). Staff auth + most screens use **Supabase**. Basic ops reads (health, sync status, catalogue peek) use the Customer API via `VITE_API_URL`.
 
 Shopper / Flutter HTTP API lives in the sibling repo: **[Hilo-backend-2026](https://github.com/Hilodesign-Dev/Hilo-backend-2026)**.
 
@@ -9,11 +9,14 @@ Shopper / Flutter HTTP API lives in the sibling repo: **[Hilo-backend-2026](http
 ```bash
 cp .env.example .env.local
 # Fill VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
+# Optional: VITE_API_URL (defaults to https://backenddev.hilodesign.co/api/v1)
 npm install
 npm run dev
 ```
 
 Open http://localhost:5173
+
+Basic ops reads (health, sync status, catalogue count) go through `VITE_API_URL`. Staff login and most screens still use Supabase directly.
 
 Optional admin seed (needs `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`):
 

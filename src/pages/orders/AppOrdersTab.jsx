@@ -6,6 +6,28 @@ import { Btn, Badge } from './ui'
 
 const STATUS_OPTIONS = ['pending', 'pending_payment', 'confirmed', 'cancelled', 'fulfilled']
 const PAYMENT_STATUS_OPTIONS = ['unpaid', 'pending', 'paid', 'failed', 'refunded']
+const APP_SLA_DAYS = 14
+const SIZE_TOKEN = /^(XXS|XS|S|M|L|XL|XXL|XXXL|OS|MTF|FREE|ONESIZE)$/i
+
+function plusDays(iso, days) {
+  const d = new Date(iso || Date.now())
+  if (Number.isNaN(d.getTime())) return new Date().toISOString().slice(0, 10)
+  d.setDate(d.getDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
+function parseSizeFromTitle(title) {
+  if (!title) return null
+  const slash = title.split('/').pop()?.trim()
+  if (slash && SIZE_TOKEN.test(slash.replace(/\s+/g, ''))) {
+    const t = slash.replace(/\s+/g, '').toUpperCase()
+    return t === 'ONESIZE' ? 'OS' : slash.toUpperCase()
+  }
+  const tokens = String(title).split(/[\s,–—-]+/).filter(Boolean)
+  const last = tokens[tokens.length - 1]
+  if (last && SIZE_TOKEN.test(last)) return last.toUpperCase()
+  return null
+}
 
 export default function AppOrdersTab({ user }) {
   const [orders, setOrders] = useState([])
@@ -155,14 +177,29 @@ export default function AppOrdersTab({ user }) {
 
       const opsId = order.ops_order_id || crypto.randomUUID()
       const opsNumber = order.ops_order_number || order.order_number
+      const shipDate = plusDays(order.created_at, APP_SLA_DAYS)
+
+      let profile = userMap[order.user_id] || {}
+      if (!profile.email && order.user_id) {
+        const { data: u } = await supa
+          .from('shopper_users')
+          .select('id, name, phone, email')
+          .eq('id', order.user_id)
+          .maybeSingle()
+        if (u) profile = { name: u.name, phone: u.phone, email: u.email }
+      }
+
+      const customerName = order.shipping_name || profile.name || ""
+      const customerPhone = order.shipping_phone || profile.phone || null
+      const customerEmail = order.customer_email || profile.email || null
 
       // 2. Insert order header into shopify_orders
       const richPayload = {
         id: opsId,
         order_number: opsNumber,
-        customer_name: order.shipping_name || "",
-        customer_email: order.customer_email || null,
-        customer_phone: order.shipping_phone || null,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: customerPhone,
         total_price: Number(order.grand_total),
         subtotal_price: Number(order.subtotal),
         total_discounts: 0,
@@ -170,14 +207,16 @@ export default function AppOrdersTab({ user }) {
         channel_id: "online",
         financial_status: order.payment_status === "paid" ? "paid" : "pending",
         fulfillment_status: "unfulfilled",
-        order_status: order.order_status === "confirmed" ? "confirmed" : "pending",
+        order_status: order.order_status === "confirmed" ? "in-progress" : "pending",
         order_origin: "customer_api",
         payment_status: order.payment_status === "paid" ? "paid" : "unpaid",
         payment_collected: order.payment_status === "paid" ? Number(order.grand_total) : 0,
         payment_balance: order.payment_status === "paid" ? 0 : Number(order.grand_total),
+        delivery_type: "Courier",
+        est_shipping_date: shipDate,
         shipping_address: {
-          name: order.shipping_name,
-          phone: order.shipping_phone,
+          name: order.shipping_name || profile.name,
+          phone: order.shipping_phone || profile.phone,
           line1: order.shipping_line1,
           line2: order.shipping_line2,
           city: order.shipping_city,
@@ -185,7 +224,11 @@ export default function AppOrdersTab({ user }) {
           pincode: order.shipping_pincode,
           country: order.shipping_country || 'IN',
         },
-        notes: `App order ${order.order_number} (${order.payment_type})`,
+        notes: [
+          `App order ${order.order_number}`,
+          `${order.payment_type} · ${order.payment_status}`,
+          [order.shipping_line1, order.shipping_city, order.shipping_state, order.shipping_pincode].filter(Boolean).join(', '),
+        ].filter(Boolean).join(' | '),
         created_at: new Date().toISOString(),
       }
 
@@ -203,7 +246,7 @@ export default function AppOrdersTab({ user }) {
           const minimal = {
             id: opsId,
             order_number: opsNumber,
-            customer_name: order.shipping_name || "",
+            customer_name: customerName,
             created_at: new Date().toISOString(),
           }
           const { error: retryErr } = await supa.from('shopify_orders').insert([minimal])
@@ -222,10 +265,14 @@ export default function AppOrdersTab({ user }) {
           quantity: Number(item.quantity),
           unit_price: Number(item.unit_price),
           sale_price: Number(item.line_total),
+          size: parseSizeFromTitle(item.title),
           product_type: "catalog",
           type: "General",
-          production_stage: "pending",
+          production_stage: order.order_status === "confirmed" ? "fabrication" : "pending",
           confirmation_status: "confirmed",
+          delivery_type: "Courier",
+          est_shipping_date: shipDate,
+          custom_images: item.image_url ? [item.image_url] : [],
           created_at: new Date().toISOString(),
         }
 
