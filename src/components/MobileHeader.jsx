@@ -1,29 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Icon from './Icon'
 import ProfilePopover, { getAvatarUrl } from './ProfilePopover'
+import { TAB_LABELS } from '../lib/constants'
 
 const MobileHeader = ({ page, user, onLogout }) => {
   const [showProfile, setShowProfile] = useState(false);
   const labels = {
+    ...TAB_LABELS,
     pos:         'POS',
-    catalogue:   'Catalogue',
-    growth:      'Marketing',
-    production:  'Production',
-    fulfillment: 'Fulfillment',
     delayed:     'Delayed Reporting',
-    collections: 'Collections',
-    customers:   'Customers',
     leads:       'Leads',
-    fabrics:     'Fabrics',
     outsource:   'Outsource',
-    masters:     'Masters',
-    returns:     'Returns',
-    gst:         'GST',
-    finance:     'Finance',
     users:       'Team',
-    dashboard:   'Dashboard',
-    calculator:  'Calculator',
-    offers:      'Offers',
   };
   return (
     <div className="mobile-header sticky top-0 z-40 flex items-center justify-between px-3 sm:px-4" style={{background:'#0b1929',height:52,borderBottom:'1px solid rgba(201,164,50,0.12)'}}>

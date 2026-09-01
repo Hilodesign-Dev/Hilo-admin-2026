@@ -27,6 +27,7 @@ export const ALL_NAV = [
   { id: 'mobile-cms',   label: 'Mobile CMS',         icon: 'grid' },
   { id: 'app-users',    label: 'App Users',          icon: 'people' },
   { id: 'app-support',  label: 'App Support',        icon: 'send' },
+  { id: 'stylist-inbox', label: 'Stylist inbox',     icon: 'chat' },
   { id: 'delayed',      label: 'Delayed Reporting',  icon: 'clock' },
   { id: 'collections',  label: 'Collections',        icon: 'grid' },
   { id: 'customers',    label: 'Customers',          icon: 'people' },
@@ -50,11 +51,11 @@ export const DEFAULT_TABS = ['pos', 'catalogue']
 export const ROLE_PRESETS = {
   founder:            { label: 'Founder',            tabs: ALL_TABS, locked: true },
   admin:              { label: 'Admin',              tabs: ALL_TABS, locked: true },
-  operations_manager: { label: 'Operations Manager', tabs: ['pos','dashboard','production','fulfillment','app-orders','mobile-cms','app-users','app-support','delayed','collections','fabrics','outsource','customers','leads','masters','returns','sync-center'] },
+  operations_manager: { label: 'Operations Manager', tabs: ['pos','dashboard','production','fulfillment','app-orders','mobile-cms','app-users','app-support','stylist-inbox','delayed','collections','fabrics','outsource','customers','leads','masters','returns','sync-center'] },
   production_manager: { label: 'Production Manager', tabs: ['pos','production','fulfillment','outsource','fabrics','delayed'] },
-  stylist:            { label: 'Stylist',            tabs: ['pos','catalogue','offers','collections','leads','customers'] },
+  stylist:            { label: 'Stylist',            tabs: ['pos','catalogue','offers','collections','leads','customers','stylist-inbox'] },
   designer:           { label: 'Designer',           tabs: ['catalogue','collections','fabrics'] },
-  growth_manager:     { label: 'Growth Manager',     tabs: ['growth','dashboard','leads','offers','customers','app-orders','mobile-cms','app-users','app-support','sync-center'] },
+  growth_manager:     { label: 'Growth Manager',     tabs: ['growth','dashboard','leads','offers','customers','app-orders','mobile-cms','app-users','app-support','stylist-inbox','sync-center'] },
   tailor_lead:        { label: 'Tailor Lead',        tabs: ['pos','production','fulfillment','delayed'] },
   fulfillment_ops:    { label: 'Fulfillment Ops',    tabs: ['pos','fulfillment','delayed'] },
   finance:            { label: 'Finance',            tabs: ['pos','finance','outsource','fabrics','returns'] },
@@ -80,7 +81,11 @@ const upgradeLegacyTabs = (tabs) => {
 export const getUserTabs = (member) => {
   if (!member) return upgradeLegacyTabs(DEFAULT_TABS)
   if (member.role === 'admin' || member.role === 'founder') return upgradeLegacyTabs(ALL_TABS)
-  return upgradeLegacyTabs([...(member.tabs || DEFAULT_TABS), 'tasks', 'inventory'])
+  const tabs = [...(member.tabs || DEFAULT_TABS), 'tasks', 'inventory']
+  if (member.stylist_inbox || String(member.role || '').toLowerCase() === 'stylist') {
+    tabs.push('stylist-inbox')
+  }
+  return upgradeLegacyTabs(tabs)
 }
 
 export const DEFAULT_CATEGORIES = [

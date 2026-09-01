@@ -32,6 +32,8 @@ import AppOrdersTab from './orders/AppOrdersTab'
 import MobileCmsTab from './cms/MobileCmsTab'
 import AppUsersTab from './customers/AppUsersTab'
 import AppSupportTab from './support/AppSupportTab'
+import StylistInboxTab, { AcceptHandoffModal } from './stylist/StylistInboxTab'
+import { useStylistInbox } from './stylist/useStylistInbox'
 import ProductionTab from './production/ProductionTab'
 import FulfillmentTab from './fulfillment/FulfillmentTab'
 import DelayedReportingTab from './delayed/DelayedReportingTab'
@@ -136,6 +138,7 @@ const App = () => {
   const [consumption, setConsumption] = useState([]);
   const [channels, setChannels] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [stylistFocusId, setStylistFocusId] = useState(null);
 
   // Helper: reload all master data from Supabase
   const reloadFromSupabase = useCallback(async () => {
@@ -163,6 +166,10 @@ const App = () => {
   // stays the same. Depending on [user] would re-trigger sync (and setSyncing(true))
   // on every refresh, killing all mounted tab state.
   const userId = user?.id;
+
+  const inboxMember = teamMembers.find(m => m.user_id === userId)
+  const inboxEnabled = Boolean(userId && teamMembers.length > 0 && getUserTabs(inboxMember).includes('stylist-inbox'))
+  const stylistInbox = useStylistInbox({ enabled: inboxEnabled })
 
   // Load team_members from Supabase after login
   useEffect(() => {
@@ -398,7 +405,7 @@ const App = () => {
         </div>
       )}
       <Toaster />
-      <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} />
+      <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} inboxBadge={stylistInbox.badge} />
       <main className="flex-1 overflow-auto main-content" style={{position:'relative'}}>
         <MobileHeader page={page} user={user} onLogout={handleLogout} />
         {/* Refresh button — top right of content area */}
@@ -463,6 +470,20 @@ const App = () => {
         <div style={{display: page === 'app-support' ? '' : 'none'}}>
           {mountedTabs.has('app-support') && allowedTabs.includes('app-support') && <AppSupportTab key={refreshKeys['app-support']||0} user={user} />}
         </div>
+        <div style={{display: page === 'stylist-inbox' ? '' : 'none'}}>
+          {mountedTabs.has('stylist-inbox') && allowedTabs.includes('stylist-inbox') && (
+            <StylistInboxTab
+              key={refreshKeys['stylist-inbox']||0}
+              waiting={stylistInbox.waiting}
+              mine={stylistInbox.mine}
+              accessError={stylistInbox.accessError}
+              accept={stylistInbox.accept}
+              acceptingId={stylistInbox.acceptingId}
+              focusId={stylistFocusId}
+              onFocusConsumed={() => setStylistFocusId(null)}
+            />
+          )}
+        </div>
         <div style={{display: page === 'delayed'     ? '' : 'none'}}>
           {mountedTabs.has('delayed')     && allowedTabs.includes('delayed')     && <DelayedReportingTab key={refreshKeys.delayed||0} user={user} stitchingMaster={stitching} />}
         </div>
@@ -510,6 +531,20 @@ const App = () => {
         </div>
       </main>
       <BottomNav page={page} setPage={navigateTo} offerCount={offerCount} allowedTabs={allowedTabs} isAdmin={isAdmin} />
+      <AcceptHandoffModal
+        item={stylistInbox.modalItem}
+        accepting={stylistInbox.acceptingId === stylistInbox.modalItem?.id}
+        onDismiss={stylistInbox.dismissModal}
+        onAccept={async (id) => {
+          try {
+            await stylistInbox.accept(id)
+            setStylistFocusId(id)
+            navigateTo('stylist-inbox')
+          } catch {
+            // toast already shown
+          }
+        }}
+      />
     </div>
     </OrdersProvider>
   );

@@ -3,11 +3,11 @@ import Icon from './Icon'
 import ProfilePopover, { getAvatarUrl, getDisplayName, getUserRole } from './ProfilePopover'
 import { ALL_TABS, ALL_NAV } from '../lib/constants'
 
-const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allowedTabs, isAdmin }) => {
+const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allowedTabs, isAdmin, inboxBadge = 0 }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [mobileAppOpen, setMobileAppOpen] = useState(false);
 
-  const mobileSubIds = ['app-orders', 'mobile-cms', 'app-users', 'app-support'];
+  const mobileSubIds = ['app-orders', 'mobile-cms', 'app-users', 'app-support', 'stylist-inbox'];
 
   // Auto-expand if active page is a mobile sub-page
   useEffect(() => {
@@ -54,6 +54,9 @@ const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allo
                             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-left transition-colors ${page === sub.id ? 'text-amber-400 bg-white/10 font-bold' : 'text-white/40 hover:text-white/80'}`}>
                             <Icon name={sub.icon} cls="w-3.5 h-3.5 flex-shrink-0" />
                             <span className="flex-1">{sub.label}</span>
+                            {sub.id === 'stylist-inbox' && inboxBadge > 0 && (
+                              <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-bold" style={{fontSize:'10px'}}>{inboxBadge}</span>
+                            )}
                           </button>
                         ))}
                       </div>
@@ -67,7 +70,7 @@ const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allo
                   className={`sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left ${page === n.id ? 'active text-gold-400' : 'text-white/60 hover:text-white'}`}>
                   <Icon name={n.icon} cls="w-4 h-4 flex-shrink-0" />
                   <span className="flex-1">{n.label}</span>
-                  {n.badge > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-bold" style={{fontSize:'10px'}}>{n.badge}</span>}
+                  {n.id === 'stylist-inbox' && inboxBadge > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-bold" style={{fontSize:'10px'}}>{inboxBadge}</span>}
                 </button>
               );
             }

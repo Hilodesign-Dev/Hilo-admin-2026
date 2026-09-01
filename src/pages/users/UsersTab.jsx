@@ -466,6 +466,7 @@ const UsersTab = ({ teamMembers, setTeamMembers }) => {
   const [editName, setEditName] = useState('')
   const [editRole, setEditRole] = useState('')
   const [editTabs, setEditTabs] = useState([])
+  const [editStylistInbox, setEditStylistInbox] = useState(false)
   const [editDesignation, setEditDesignation] = useState('')
   const [editSaving, setEditSaving] = useState(false)
   const [pwBusy, setPwBusy] = useState(false)
@@ -480,6 +481,7 @@ const UsersTab = ({ teamMembers, setTeamMembers }) => {
     setEditName(member.name || '')
     setEditRole(member.role || 'custom')
     setEditTabs(member.tabs || DEFAULT_TABS)
+    setEditStylistInbox(!!member.stylist_inbox)
     setEditDesignation(member.designation || '')
     setEditStoreId(member.store_id || '')
     setShowAdd(false)
@@ -535,16 +537,22 @@ const UsersTab = ({ teamMembers, setTeamMembers }) => {
     setEditSaving(true)
     try {
       const finalTabs = editRole === 'admin' ? ALL_TABS : editTabs
-      await supa.from('team_members').update({
+      const payload = {
         name: editName.trim(),
         role: editRole,
         tabs: finalTabs,
         designation: editDesignation || null,
         store_id: editStoreId || null,
         updated_at: new Date().toISOString(),
-      }).eq('user_id', editMember.user_id)
+      }
+      let { error } = await supa.from('team_members').update({ ...payload, stylist_inbox: editStylistInbox }).eq('user_id', editMember.user_id)
+      if (error && /stylist_inbox/i.test(error.message || '')) {
+        const retry = await supa.from('team_members').update(payload).eq('user_id', editMember.user_id)
+        error = retry.error
+      }
+      if (error) throw error
       setTeamMembers(prev => prev.map(m => m.user_id === editMember.user_id
-        ? { ...m, name: editName.trim(), role: editRole, tabs: finalTabs, designation: editDesignation || null, updated_at: new Date().toISOString() }
+        ? { ...m, name: editName.trim(), role: editRole, tabs: finalTabs, designation: editDesignation || null, stylist_inbox: editStylistInbox, updated_at: new Date().toISOString() }
         : m))
       _logChange('update-access', 'team_member', editMember.user_id, editName.trim(), { role: editRole, tabs: finalTabs, designation: editDesignation })
       closeEdit()
@@ -1067,6 +1075,16 @@ const UsersTab = ({ teamMembers, setTeamMembers }) => {
                         })}
                       </div>
                     )}
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input type="checkbox" checked={editStylistInbox} onChange={e => setEditStylistInbox(e.target.checked)} className="mt-0.5" />
+                      <span>
+                        <span className="text-xs text-gray-700 font-semibold">Stylist inbox</span>
+                        <span className="block text-[11px] text-gray-400 mt-0.5">Lets this person claim app AI chats after a shopper taps Talk to a stylist. Admins and stylist roles already have API access.</span>
+                      </span>
+                    </label>
                   </div>
 
                   {/* SOP */}
