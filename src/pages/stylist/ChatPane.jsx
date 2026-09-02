@@ -7,13 +7,13 @@ import FormattedMessage from './FormattedMessage'
 function ProductStrip({ products }) {
   if (!products?.length) return null
   return (
-    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingTop: 8, maxWidth: '100%' }}>
+    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingTop: 6, maxWidth: '100%' }}>
       {products.map((p) => (
         <div key={p.id || p.shopifyId} style={{
-          minWidth: 112, maxWidth: 128, background: '#fff', border: `1px solid ${C.border}`,
-          borderRadius: 10, overflow: 'hidden', flexShrink: 0,
+          minWidth: 120, maxWidth: 140, background: '#fff', border: `1px solid ${C.border}`,
+          borderRadius: 10, overflow: 'hidden', flexShrink: 0, boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
         }}>
-          {p.image && <img src={p.image} alt="" style={{ width: '100%', height: 96, objectFit: 'cover', display: 'block' }} />}
+          {p.image && <img src={p.image} alt="" style={{ width: '100%', height: 100, objectFit: 'cover', display: 'block' }} />}
           <div style={{ padding: 8 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: C.text, lineHeight: 1.3 }}>{p.title}</div>
             <div style={{ fontSize: 11, color: C.textMuted, marginTop: 2 }}>{rupee(p.price)}</div>
@@ -119,24 +119,30 @@ function MessageRow({ msg, session }) {
     )
   }
   const label = labelFor(msg, session)
+  const outgoing = isOutgoing(msg.role)
+  const hasText = msg.content && String(msg.content).trim()
   return (
-    <div style={{ display: 'flex', justifyContent: bubbleAlign(msg.role), marginBottom: 12 }}>
-      <div style={{ maxWidth: '78%' }}>
+    <div style={{ display: 'flex', justifyContent: bubbleAlign(msg.role), marginBottom: 10 }}>
+      <div style={{ maxWidth: 'min(72%, 560px)', minWidth: 0 }}>
         {label && (
           <div style={{
             fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
-            color: C.textMuted, marginBottom: 4, textAlign: isOutgoing(msg.role) ? 'right' : 'left',
+            color: C.textMuted, marginBottom: 3, textAlign: outgoing ? 'right' : 'left',
           }}>{label} · {formatTime(msg.createdAt)}</div>
         )}
-        <div style={{ padding: '10px 12px', ...bubbleStyle(msg.role) }}>
-          {msg.content && String(msg.content).trim() && (
+        {hasText && (
+          <div style={{ padding: '8px 12px', ...bubbleStyle(msg.role) }}>
             <FormattedMessage text={msg.content} />
-          )}
-          <ProductStrip products={msg.products} />
-          <ColourBoard colours={msg.colours} colourBoard={msg.colourBoard} />
-          <DesignCard design={msg.design} />
-          <ImageThumbs urls={msg.imageUrls} />
-        </div>
+          </div>
+        )}
+        {(msg.products?.length || msg.colours || msg.colourBoard || msg.design || msg.imageUrls?.length) && (
+          <div style={{ marginTop: hasText ? 6 : 0 }}>
+            <ProductStrip products={msg.products} />
+            <ColourBoard colours={msg.colours} colourBoard={msg.colourBoard} />
+            <DesignCard design={msg.design} />
+            <ImageThumbs urls={msg.imageUrls} />
+          </div>
+        )}
       </div>
     </div>
   )
@@ -235,17 +241,20 @@ export default function ChatPane({
   const messages = payload?.messages || []
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 18px', background: C.bg }}>
-        {loading && !payload && <div style={{ fontSize: 13, color: C.textMuted }}>Loading transcript…</div>}
-        {messages.map((msg) => (
-          <MessageRow key={msg.id} msg={msg} session={session} />
-        ))}
-        <div ref={bottomRef} />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, background: C.bg }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', padding: '12px 16px 8px', boxSizing: 'border-box' }}>
+          <div style={{ flexGrow: 1 }} />
+          {loading && !payload && <div style={{ fontSize: 13, color: C.textMuted, textAlign: 'center', padding: 16 }}>Loading transcript…</div>}
+          {messages.map((msg) => (
+            <MessageRow key={msg.id} msg={msg} session={session} />
+          ))}
+          <div ref={bottomRef} />
+        </div>
       </div>
 
       {canSend && (
-        <div style={{ borderTop: `1px solid ${C.border}`, background: '#fff', padding: 12 }}>
+        <div style={{ flexShrink: 0, borderTop: `1px solid ${C.border}`, background: '#fff', padding: '10px 12px 12px' }}>
           {(pendingImages.length > 0 || attached.length > 0) && (
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
               {pendingImages.map((u) => (
@@ -282,13 +291,13 @@ export default function ChatPane({
               placeholder="Reply to the shopper…"
               rows={2}
               style={{
-                flex: 1, resize: 'none', border: `1px solid ${C.border}`, borderRadius: 10,
-                padding: '10px 12px', fontSize: 14, outline: 'none',
+                flex: 1, minWidth: 0, resize: 'none', border: `1px solid ${C.border}`, borderRadius: 10,
+                padding: '10px 12px', fontSize: 14, outline: 'none', lineHeight: 1.4,
               }}
             />
             <button type="button" onClick={send} disabled={sending}
               style={{
-                height: 40, padding: '0 16px', borderRadius: 10, border: 'none',
+                height: 40, padding: '0 18px', borderRadius: 10, border: 'none',
                 background: C.gold, color: '#fff', fontWeight: 700, fontSize: 12,
                 letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
                 opacity: sending ? 0.7 : 1, flexShrink: 0,
@@ -314,23 +323,22 @@ export function ShopperContext({ payload, attached, onAttach, onDetach, Catalogu
   const lastProducts = [...(payload?.messages || [])].reverse().find((m) => m.products?.length)?.products || []
 
   return (
-    <div style={{ padding: 16, overflowY: 'auto', height: '100%' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.textMuted, marginBottom: 8 }}>Shopper</div>
-      <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>{session?.shopperName || 'Shopper'}</div>
+    <div style={{ padding: 14, overflowY: 'auto', height: '100%', boxSizing: 'border-box' }}>
+      <div style={{ fontSize: 16, fontWeight: 700, color: C.text, lineHeight: 1.3 }}>{session?.shopperName || 'Shopper'}</div>
       {session?.phone && <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>{session.phone}</div>}
       {session?.reason && (
         <div style={{ fontSize: 12, color: C.amber, marginTop: 8 }}>Reason: {String(session.reason).replace(/_/g, ' ')}</div>
       )}
       {session?.summary && (
-        <div style={{ fontSize: 12, color: C.textMuted, marginTop: 8, lineHeight: 1.45 }}>{session.summary}</div>
+        <FormattedMessage text={session.summary} style={{ fontSize: 12, color: C.textMuted, marginTop: 10 }} />
       )}
 
       {memory && (memory.productTitle || memory.brief || memory.productId) && (
-        <div style={{ marginTop: 16, padding: 12, background: C.cream, borderRadius: 10 }}>
+        <div style={{ marginTop: 14, padding: 12, background: C.cream, borderRadius: 10 }}>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.textMuted, marginBottom: 6 }}>Design memory</div>
           {memory.productTitle && <div style={{ fontSize: 13, fontWeight: 600 }}>{memory.productTitle}</div>}
           {memory.productId && <div style={{ fontSize: 11, color: C.textMuted, marginTop: 2 }}>{memory.productId}</div>}
-          {memory.brief && <div style={{ fontSize: 12, color: C.textMuted, marginTop: 6 }}>{memory.brief}</div>}
+          {memory.brief && <FormattedMessage text={memory.brief} style={{ fontSize: 12, color: C.textMuted, marginTop: 6 }} />}
           {Array.isArray(memory.inspirationImageUrls) && memory.inspirationImageUrls.length > 0 && (
             <div style={{ fontSize: 11, color: C.textLight, marginTop: 6 }}>{memory.inspirationImageUrls.length} inspiration image(s)</div>
           )}
@@ -338,7 +346,7 @@ export function ShopperContext({ payload, attached, onAttach, onDetach, Catalogu
       )}
 
       {lastProducts.length > 0 && (
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 14 }}>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.textMuted, marginBottom: 8 }}>Last AI SKUs</div>
           {lastProducts.slice(0, 5).map((p) => (
             <button key={p.id} type="button" onClick={() => onAttach(p)}
@@ -351,7 +359,7 @@ export function ShopperContext({ payload, attached, onAttach, onDetach, Catalogu
         </div>
       )}
 
-      <div style={{ marginTop: 18 }}>
+      <div style={{ marginTop: 14 }}>
         {Catalogue}
       </div>
     </div>

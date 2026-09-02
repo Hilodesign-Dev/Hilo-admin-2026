@@ -395,7 +395,7 @@ const App = () => {
   // position, open editors) during catalogue sync.
   return (
     <OrdersProvider>
-    <div className="flex min-h-screen" style={{background:'#f5f4f0'}}>
+    <div className="flex" style={{background:'#f5f4f0', height:'100vh', overflow:'hidden'}}>
       {syncing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{background:'#0f172a'}}>
           <div className="text-center">
@@ -406,9 +406,20 @@ const App = () => {
       )}
       <Toaster />
       <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} inboxBadge={stylistInbox.badge} />
-      <main className="flex-1 overflow-auto main-content" style={{position:'relative'}}>
+      <main
+        className="flex-1 main-content"
+        style={{
+          position: 'relative',
+          overflow: page === 'stylist-inbox' ? 'hidden' : 'auto',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+        }}
+      >
         <MobileHeader page={page} user={user} onLogout={handleLogout} />
         {/* Refresh button — top right of content area */}
+        {page !== 'stylist-inbox' && (
         <button
           onClick={refreshCurrentTab}
           title="Refresh tab data"
@@ -430,10 +441,8 @@ const App = () => {
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
           </svg>
         </button>
-        {/* ── Keep-alive tab mounting ──────────────────────────────────────────
-            Tabs are mounted on first visit and kept in the DOM (display:none)
-            on subsequent tab switches — state (scroll, open editors, loaded
-            data) is fully preserved across navigation. ────────────────────── */}
+        )}
+        {/* Keep-alive tab mounting */}
         <div style={{display: page === 'overview'   ? '' : 'none'}}>
           {mountedTabs.has('overview')   && allowedTabs.includes('overview')   && <FounderDashboard key={refreshKeys.overview||0} onNavigate={navigateTo} />}
         </div>
@@ -470,7 +479,7 @@ const App = () => {
         <div style={{display: page === 'app-support' ? '' : 'none'}}>
           {mountedTabs.has('app-support') && allowedTabs.includes('app-support') && <AppSupportTab key={refreshKeys['app-support']||0} user={user} />}
         </div>
-        <div style={{display: page === 'stylist-inbox' ? '' : 'none'}}>
+        <div style={{display: page === 'stylist-inbox' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
           {mountedTabs.has('stylist-inbox') && allowedTabs.includes('stylist-inbox') && (
             <StylistInboxTab
               key={refreshKeys['stylist-inbox']||0}

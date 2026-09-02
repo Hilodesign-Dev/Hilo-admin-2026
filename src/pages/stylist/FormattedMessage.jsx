@@ -43,13 +43,13 @@ function lineKind(line) {
   return { type: 'text', text: line }
 }
 
-export default function FormattedMessage({ text }) {
+export default function FormattedMessage({ text, style }) {
   const raw = String(text || '')
   if (!raw.trim()) return null
   const lines = raw.replace(/\r\n/g, '\n').split('\n')
 
   return (
-    <div style={{ fontSize: 14, lineHeight: 1.55 }}>
+    <div style={{ fontSize: 14, lineHeight: 1.55, ...style }}>
       {lines.map((line, i) => {
         const kind = lineKind(line)
         if (kind.type === 'text' && kind.text === '') {
