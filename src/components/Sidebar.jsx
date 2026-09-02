@@ -21,13 +21,13 @@ const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allo
   const nav = allNav.filter(n => n.adminOnly ? isAdmin : (allowedTabs || ALL_TABS).includes(n.id));
 
   return (
-    <div className="desktop-sidebar w-56 flex-shrink-0 flex flex-col" style={{background:'#0b1929', minHeight:'100vh'}}>
-      <div className="px-5 py-6" style={{borderBottom:'1px solid rgba(201,164,50,0.15)'}}>
+    <div className="desktop-sidebar w-56 flex-shrink-0 flex flex-col" style={{background:'#0b1929', height:'100vh', overflow:'hidden'}}>
+      <div className="px-5 py-6 flex-shrink-0" style={{borderBottom:'1px solid rgba(201,164,50,0.15)'}}>
         <div style={{fontFamily:'Georgia,serif',fontSize:20,fontWeight:700,letterSpacing:'0.22em',color:'#c9a432'}}>HILO</div>
         <div style={{fontSize:9,letterSpacing:'0.18em',color:'rgba(255,255,255,0.3)',textTransform:'uppercase',marginTop:4}}>Design Studio</div>
         <div style={{fontSize:10,letterSpacing:'0.06em',color:'rgba(255,255,255,0.2)',marginTop:10}}>Catalogue Manager</div>
       </div>
-      <nav className="flex-1 py-4 space-y-0.5 px-2 overflow-y-auto max-h-[calc(100vh-170px)] scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <nav className="flex-1 py-4 space-y-0.5 px-2 overflow-y-auto min-h-0 scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {(() => {
           const rendered = [];
           let mobileAppRendered = false;
@@ -78,7 +78,7 @@ const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allo
           return rendered;
         })()}
       </nav>
-      <div className="px-3 py-3 border-t border-white/10 space-y-2">
+      <div className="px-3 py-3 border-t border-white/10 space-y-2 flex-shrink-0">
         <div className="flex items-center justify-between px-1">
           <div className="text-white/30 text-xs">{productCount} SKUs</div>
           <a href="https://www.hilodesign.co" target="_blank" className="text-xs hover:opacity-80" style={{color:'#c9a432'}}>hilodesign.co ↗</a>
