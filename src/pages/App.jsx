@@ -34,6 +34,10 @@ import AppUsersTab from './customers/AppUsersTab'
 import AppSupportTab from './support/AppSupportTab'
 import StylistInboxTab, { AcceptHandoffModal } from './stylist/StylistInboxTab'
 import { useStylistInbox } from './stylist/useStylistInbox'
+import WhatsAppInboxTab from './whatsapp/WhatsAppInboxTab'
+import { useWhatsAppInbox } from './whatsapp/useWhatsAppInbox'
+import WaHandoffModal from './whatsapp/WaHandoffModal'
+import { unlockWaAlertSound } from './whatsapp/waAlertSound'
 import ProductionTab from './production/ProductionTab'
 import FulfillmentTab from './fulfillment/FulfillmentTab'
 import DelayedReportingTab from './delayed/DelayedReportingTab'
@@ -49,7 +53,6 @@ import { OrdersProvider } from '../context/OrdersContext'
 const App = () => {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [syncing, setSyncing] = useState(true);
   // Init page from URL hash if present, else default to 'calculator'
   const [page, setPage] = useState(() => {
     let initial = getHashPage() || 'pos';
@@ -139,6 +142,7 @@ const App = () => {
   const [channels, setChannels] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
   const [stylistFocusId, setStylistFocusId] = useState(null);
+  const [waFocusId, setWaFocusId] = useState(null);
 
   // Helper: reload all master data from Supabase
   const reloadFromSupabase = useCallback(async () => {
@@ -163,13 +167,30 @@ const App = () => {
   // Sync from Supabase once per login session (keyed on user ID, not user object).
   // Using user?.id prevents re-syncing on JWT token refreshes — Supabase fires
   // onAuthStateChange with a new user object on TOKEN_REFRESHED, but the UUID
-  // stays the same. Depending on [user] would re-trigger sync (and setSyncing(true))
-  // on every refresh, killing all mounted tab state.
+  // stays the same. Depending on [user] would re-trigger the catalogue load.
   const userId = user?.id;
 
   const inboxMember = teamMembers.find(m => m.user_id === userId)
   const inboxEnabled = Boolean(userId && teamMembers.length > 0 && getUserTabs(inboxMember).includes('stylist-inbox'))
   const stylistInbox = useStylistInbox({ enabled: inboxEnabled })
+  const waEnabled = Boolean(userId && teamMembers.length > 0 && getUserTabs(inboxMember).includes('whatsapp-inbox'))
+  const whatsappInbox = useWhatsAppInbox({ enabled: waEnabled, notify: true })
+
+  useEffect(() => {
+    if (!waEnabled) return
+    if (typeof Notification === 'undefined' || Notification.permission !== 'default') return
+    Notification.requestPermission().catch(() => {})
+  }, [waEnabled])
+
+  useEffect(() => {
+    const unlock = () => unlockWaAlertSound()
+    window.addEventListener('pointerdown', unlock, { once: true })
+    window.addEventListener('keydown', unlock, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+  }, [])
 
   // Load team_members from Supabase after login
   useEffect(() => {
@@ -189,10 +210,8 @@ const App = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (!userId) { setSyncing(false); return; }
-    setSyncing(true);
+    if (!userId) return;
 
-    // 1) Load all master data from dedicated Supabase tables (replaces legacy app_state sync)
     var masterSync = reloadFromSupabase().catch(function(e) {
       console.error('[HILO] Master data sync exception:', e);
       _logError('sync_exception', e.message || 'Unknown sync error', e.stack || '');
@@ -263,20 +282,10 @@ const App = () => {
       } catch(e) {
         console.error('[HILO] Fabric fetch exception:', e);
         _logError('fabric_fetch', e.message || 'Unknown fabric fetch error', e.stack || '');
-        try {
-          await new Promise(function(r) { setTimeout(r, 2000); });
-          var retry = await supa.from('fabrics').select('*').order('name');
-          if (retry.data && retry.data.length > 0) {
-            console.log('[HILO] Fabric retry succeeded:', retry.data.length, 'rows');
-            setFabrics(_inlineMapFabrics(retry.data, []));
-          }
-        } catch(e2) { console.error('[HILO] Fabric retry also failed:', e2); }
       }
     })();
 
-    // Wait for both to finish before clearing the syncing spinner
-    Promise.all([masterSync, fabricSync])
-      .finally(function() { setSyncing(false); });
+    Promise.all([masterSync, fabricSync]).catch(function() {});
   }, [userId]);
 
   // Load Stitching Cost Master from Supabase (source of truth).
@@ -390,27 +399,16 @@ const App = () => {
   const isAdmin = myMember?.role === 'admin';
   const allowedTabs = getUserTabs(myMember);
 
-  // Syncing overlay — rendered as a fixed overlay rather than an early return so
-  // that mounted tabs stay in the DOM and keep their state (orders loaded, scroll
-  // position, open editors) during catalogue sync.
   return (
     <OrdersProvider>
     <div className="flex" style={{background:'#f5f4f0', height:'100vh', overflow:'hidden'}}>
-      {syncing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{background:'#0f172a'}}>
-          <div className="text-center">
-            <div className="font-bold text-2xl tracking-widest mb-3" style={{color:'#d4a843'}}>HILO</div>
-            <div className="text-white/30 text-sm">Syncing catalogue…</div>
-          </div>
-        </div>
-      )}
       <Toaster />
-      <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} inboxBadge={stylistInbox.badge} />
+      <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} inboxBadge={stylistInbox.badge} waBadge={whatsappInbox.badge} />
       <main
         className="flex-1 main-content"
         style={{
           position: 'relative',
-          overflow: page === 'stylist-inbox' ? 'hidden' : 'auto',
+          overflow: (page === 'stylist-inbox' || page === 'whatsapp-inbox') ? 'hidden' : 'auto',
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
@@ -419,7 +417,7 @@ const App = () => {
       >
         <MobileHeader page={page} user={user} onLogout={handleLogout} />
         {/* Refresh button — top right of content area */}
-        {page !== 'stylist-inbox' && (
+        {page !== 'stylist-inbox' && page !== 'whatsapp-inbox' && (
         <button
           onClick={refreshCurrentTab}
           title="Refresh tab data"
@@ -493,6 +491,25 @@ const App = () => {
             />
           )}
         </div>
+        <div style={{display: page === 'whatsapp-inbox' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
+          {mountedTabs.has('whatsapp-inbox') && allowedTabs.includes('whatsapp-inbox') && (
+            <WhatsAppInboxTab
+              key={refreshKeys['whatsapp-inbox']||0}
+              requests={whatsappInbox.requests}
+              human={whatsappInbox.human}
+              ai={whatsappInbox.ai}
+              closed={whatsappInbox.closed}
+              me={whatsappInbox.me}
+              accessError={whatsappInbox.accessError}
+              accept={whatsappInbox.accept}
+              takeover={whatsappInbox.takeover}
+              acceptingId={whatsappInbox.acceptingId}
+              joiningId={whatsappInbox.joiningId}
+              focusId={waFocusId}
+              onFocusConsumed={() => setWaFocusId(null)}
+            />
+          )}
+        </div>
         <div style={{display: page === 'delayed'     ? '' : 'none'}}>
           {mountedTabs.has('delayed')     && allowedTabs.includes('delayed')     && <DelayedReportingTab key={refreshKeys.delayed||0} user={user} stitchingMaster={stitching} />}
         </div>
@@ -549,6 +566,30 @@ const App = () => {
             await stylistInbox.accept(id)
             setStylistFocusId(id)
             navigateTo('stylist-inbox')
+          } catch {
+            // toast already shown
+          }
+        }}
+      />
+      <WaHandoffModal
+        item={whatsappInbox.modalItem}
+        accepting={whatsappInbox.acceptingId === whatsappInbox.modalItem?.id}
+        joining={whatsappInbox.joiningId === whatsappInbox.modalItem?.id}
+        onDismiss={whatsappInbox.dismissModal}
+        onJoinNow={async (id) => {
+          try {
+            await whatsappInbox.takeover(id)
+            setWaFocusId(id)
+            navigateTo('whatsapp-inbox')
+          } catch {
+            // toast already shown
+          }
+        }}
+        onAccept={async (id) => {
+          try {
+            await whatsappInbox.accept(id)
+            setWaFocusId(id)
+            navigateTo('whatsapp-inbox')
           } catch {
             // toast already shown
           }

@@ -3,7 +3,7 @@ import Icon from './Icon'
 import ProfilePopover, { getAvatarUrl, getDisplayName, getUserRole } from './ProfilePopover'
 import { ALL_TABS, ALL_NAV } from '../lib/constants'
 
-const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allowedTabs, isAdmin, inboxBadge = 0 }) => {
+const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allowedTabs, isAdmin, inboxBadge = 0, waBadge = 0 }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [mobileAppOpen, setMobileAppOpen] = useState(false);
 
@@ -57,6 +57,9 @@ const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allo
                             {sub.id === 'stylist-inbox' && inboxBadge > 0 && (
                               <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-bold" style={{fontSize:'10px'}}>{inboxBadge}</span>
                             )}
+                            {sub.id === 'whatsapp-inbox' && waBadge > 0 && (
+                              <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-bold" style={{fontSize:'10px'}}>{waBadge}</span>
+                            )}
                           </button>
                         ))}
                       </div>
@@ -71,6 +74,7 @@ const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allo
                   <Icon name={n.icon} cls="w-4 h-4 flex-shrink-0" />
                   <span className="flex-1">{n.label}</span>
                   {n.id === 'stylist-inbox' && inboxBadge > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-bold" style={{fontSize:'10px'}}>{inboxBadge}</span>}
+                  {n.id === 'whatsapp-inbox' && waBadge > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-bold" style={{fontSize:'10px'}}>{waBadge}</span>}
                 </button>
               );
             }

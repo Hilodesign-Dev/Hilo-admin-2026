@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { C, toast } from '../../lib/designTokens'
+import { aiStaffApi } from '../../lib/aiStaffApi'
 import CatalogueRail from './CatalogueRail'
 import ChatPane, { ShopperContext } from './ChatPane'
 import { formatWait } from './stylistFormat'
@@ -38,12 +39,14 @@ function QueueRow({ item, active, onClick }) {
   )
 }
 
-export function AcceptHandoffModal({ item, accepting, onAccept, onDismiss }) {
+export function AcceptHandoffModal({
+  item, accepting, joining, onAccept, onJoinNow, onDismiss, heading = 'Waiting for a stylist',
+}) {
   if (!item) return null
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(11,25,41,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div style={{ background: '#fff', borderRadius: 16, maxWidth: 440, width: '100%', padding: 24, boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.gold, marginBottom: 8 }}>Waiting for a stylist</div>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.gold, marginBottom: 8 }}>{heading}</div>
         <div style={{ fontSize: 20, fontWeight: 700, color: C.text }}>{item.shopperName || 'Shopper'}</div>
         {item.phone && <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>{item.phone}</div>}
         <div style={{ fontSize: 12, color: C.textMuted, marginTop: 6 }}>Waiting {formatWait(item.waitingSeconds)}</div>
@@ -55,14 +58,24 @@ export function AcceptHandoffModal({ item, accepting, onAccept, onDismiss }) {
             {item.summary}
           </div>
         )}
-        <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
+        <div style={{ display: 'flex', gap: 8, marginTop: 20, flexWrap: 'wrap' }}>
           <button type="button" onClick={onDismiss}
-            style={{ flex: 1, height: 42, borderRadius: 10, border: `1px solid ${C.border}`, background: '#fff', cursor: 'pointer', fontWeight: 600 }}>
+            style={{ flex: 1, minWidth: 90, height: 42, borderRadius: 10, border: `1px solid ${C.border}`, background: '#fff', cursor: 'pointer', fontWeight: 600 }}>
             Later
           </button>
-          <button type="button" disabled={accepting} onClick={() => onAccept(item.id)}
+          {onJoinNow && (
+            <button type="button" disabled={joining || accepting} onClick={() => onJoinNow(item.id)}
+              style={{
+                flex: 1, minWidth: 110, height: 42, borderRadius: 10, border: 'none', background: C.navy, color: '#fff',
+                fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: 12,
+                cursor: 'pointer', opacity: joining ? 0.7 : 1,
+              }}>
+              {joining ? 'Joining…' : 'Join now'}
+            </button>
+          )}
+          <button type="button" disabled={accepting || joining} onClick={() => onAccept(item.id)}
             style={{
-              flex: 1, height: 42, borderRadius: 10, border: 'none', background: C.gold, color: '#fff',
+              flex: 1, minWidth: 110, height: 42, borderRadius: 10, border: 'none', background: C.gold, color: '#fff',
               fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: 12,
               cursor: 'pointer', opacity: accepting ? 0.7 : 1,
             }}>
@@ -208,6 +221,7 @@ export default function StylistInboxTab({
                 <ChatPane
                   sessionId={selectedId}
                   canSend={canSend}
+                  api={aiStaffApi}
                   onPayload={setPayload}
                   attached={attached}
                   onClearAttached={() => setAttached([])}
@@ -234,6 +248,7 @@ export default function StylistInboxTab({
                   onDetach={(id) => setAttached((p) => p.filter((x) => x.id !== id))}
                   Catalogue={(
                     <CatalogueRail
+                      api={aiStaffApi}
                       attached={attached}
                       onAttach={attach}
                       onDetach={(id) => setAttached((p) => p.filter((x) => x.id !== id))}

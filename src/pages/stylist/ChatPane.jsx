@@ -135,8 +135,11 @@ function MessageRow({ msg, session }) {
             <FormattedMessage text={msg.content} />
           </div>
         )}
-        {(msg.products?.length || msg.colours || msg.colourBoard || msg.design || msg.imageUrls?.length) && (
+        {(msg.products?.length || msg.colours || msg.colourBoard || msg.design || msg.imageUrls?.length || msg.orderNumber) && (
           <div style={{ marginTop: hasText ? 6 : 0 }}>
+            {msg.orderNumber && (
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, marginBottom: 6 }}>Order {msg.orderNumber}</div>
+            )}
             <ProductStrip products={msg.products} />
             <ColourBoard colours={msg.colours} colourBoard={msg.colourBoard} />
             <DesignCard design={msg.design} />
@@ -155,6 +158,9 @@ export default function ChatPane({
   onPayload,
   attached = [],
   onClearAttached,
+  api = aiStaffApi,
+  composerHint,
+  pollMs = 2000,
 }) {
   const [payload, setPayload] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -165,44 +171,69 @@ export default function ChatPane({
   const bottomRef = useRef(null)
   const fileRef = useRef(null)
   const idsRef = useRef('')
+  const abortRef = useRef(null)
+  const payloadRef = useRef(null)
+  const inFlightRef = useRef(false)
 
   const load = async () => {
     if (!sessionId) return
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
+    if (inFlightRef.current) return
+    inFlightRef.current = true
+    const ac = new AbortController()
+    abortRef.current = ac
     try {
-      const data = await aiStaffApi.session(sessionId)
-      setPayload(data)
-      onPayload?.(data)
+      const since = payloadRef.current?.session?.updatedAt
+      const data = await api.session(sessionId, { signal: ac.signal, since: since || undefined })
       setLoading(false)
-      const ids = (data.messages || []).map((m) => m.id).join(',')
-      if (ids !== idsRef.current) {
-        idsRef.current = ids
-        requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }))
-      }
+      if (data?.unchanged) return
+      const messages = data.messages || payloadRef.current?.messages || []
+      const session = data.session || payloadRef.current?.session
+      const next = data.messages ? data : { ...payloadRef.current, ...data, messages, session }
+      const ids = `${session?.updatedAt || ''}|${session?.status || ''}|${messages.map((m) => m.id).join(',')}`
+      if (ids === idsRef.current) return
+      idsRef.current = ids
+      payloadRef.current = next
+      setPayload(next)
+      onPayload?.(next)
+      requestAnimationFrame(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }))
     } catch (e) {
+      if (e?.name === 'AbortError') return
       setLoading(false)
       if (e.status === 403 || e.status === 409) onClaimedElsewhere?.(e)
+    } finally {
+      inFlightRef.current = false
     }
   }
 
   useEffect(() => {
     setPayload(null)
+    payloadRef.current = null
     setLoading(true)
     setDraft('')
     setPendingImages([])
     onClearAttached?.()
     idsRef.current = ''
     load()
-    const t = setInterval(load, 2000)
-    return () => clearInterval(t)
+    const t = setInterval(load, pollMs)
+    const onVis = () => {
+      if (document.visibilityState === 'visible') load()
+    }
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      clearInterval(t)
+      document.removeEventListener('visibilitychange', onVis)
+      abortRef.current?.abort()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId])
+  }, [sessionId, api, pollMs])
 
   const send = async () => {
     const content = draft.trim()
     if (!content && !attached.length && !pendingImages.length) return
     setSending(true)
     try {
-      await aiStaffApi.sendMessage(sessionId, {
+      await api.sendMessage(sessionId, {
         ...(content ? { content } : {}),
         ...(pendingImages.length ? { imageUrls: pendingImages } : {}),
         ...(attached.length ? { productIds: attached.map((p) => p.id) } : {}),
@@ -228,7 +259,7 @@ export default function ChatPane({
     }
     setUploading(true)
     try {
-      const url = await aiStaffApi.upload(file)
+      const url = await api.upload(file)
       setPendingImages((prev) => [...prev, url])
     } catch (err) {
       toast(false, err.message || 'Upload failed')
@@ -303,7 +334,9 @@ export default function ChatPane({
                 opacity: sending ? 0.7 : 1, flexShrink: 0,
               }}>{sending ? '…' : 'Send'}</button>
           </div>
-          <div style={{ fontSize: 11, color: C.textLight, marginTop: 6 }}>Enter to send · Shift+Enter for a new line</div>
+          <div style={{ fontSize: 11, color: C.textLight, marginTop: 6 }}>
+            {composerHint || 'Enter to send · Shift+Enter for a new line'}
+          </div>
         </div>
       )}
 
@@ -312,18 +345,23 @@ export default function ChatPane({
           Accept this conversation to reply. Shopper messages still arrive while they wait.
         </div>
       )}
+      {!canSend && session?.status === 'closed' && (
+        <div style={{ padding: 12, borderTop: `1px solid ${C.border}`, background: C.bg, fontSize: 13, color: C.textMuted }}>
+          This thread is closed. Join now to take over if you need to continue.
+        </div>
+      )}
 
     </div>
   )
 }
 
-export function ShopperContext({ payload, attached, onAttach, onDetach, Catalogue }) {
+export function ShopperContext({ payload, attached, onAttach, onDetach, Catalogue, fillHeight = true }) {
   const session = payload?.session
   const memory = payload?.designMemory
   const lastProducts = [...(payload?.messages || [])].reverse().find((m) => m.products?.length)?.products || []
 
   return (
-    <div style={{ padding: 14, overflowY: 'auto', height: '100%', boxSizing: 'border-box' }}>
+    <div style={{ padding: 14, overflowY: fillHeight ? 'auto' : 'visible', height: fillHeight ? '100%' : 'auto', boxSizing: 'border-box' }}>
       <div style={{ fontSize: 16, fontWeight: 700, color: C.text, lineHeight: 1.3 }}>{session?.shopperName || 'Shopper'}</div>
       {session?.phone && <div style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>{session.phone}</div>}
       {session?.reason && (
