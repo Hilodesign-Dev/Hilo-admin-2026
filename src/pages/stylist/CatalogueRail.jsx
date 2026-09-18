@@ -3,7 +3,8 @@ import { C } from '../../lib/designTokens'
 import { aiStaffApi } from '../../lib/aiStaffApi'
 import { rupee } from './stylistFormat'
 
-export default function CatalogueRail({ attached, onAttach, onDetach }) {
+export default function CatalogueRail({ attached, onAttach, onDetach, api = aiStaffApi }) {
+  const client = api
   const [query, setQuery] = useState('')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
@@ -20,7 +21,7 @@ export default function CatalogueRail({ attached, onAttach, onDetach }) {
       setLoading(true)
       setErr('')
       try {
-        const data = await aiStaffApi.suggest(q, 5)
+        const data = await client.suggest(q, 5)
         setItems(data?.items || [])
       } catch (e) {
         setErr(e.message || 'Search failed')
@@ -30,7 +31,7 @@ export default function CatalogueRail({ attached, onAttach, onDetach }) {
       }
     }, 280)
     return () => clearTimeout(t)
-  }, [query])
+  }, [query, client])
 
   const attachedIds = new Set((attached || []).map((p) => p.id))
 

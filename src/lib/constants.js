@@ -23,6 +23,7 @@ export const ALL_NAV = [
   { id: 'growth',       label: 'Marketing',          icon: 'trend' },
   { id: 'production',   label: 'Production',         icon: 'factory' },
   { id: 'fulfillment',  label: 'Fulfillment',        icon: 'truck' },
+  { id: 'whatsapp-inbox', label: 'WhatsApp Support', icon: 'whatsapp' },
   { id: 'app-orders',   label: 'App Orders',         icon: 'bag' },
   { id: 'mobile-cms',   label: 'Mobile CMS',         icon: 'grid' },
   { id: 'app-users',    label: 'App Users',          icon: 'people' },
@@ -51,11 +52,11 @@ export const DEFAULT_TABS = ['pos', 'catalogue']
 export const ROLE_PRESETS = {
   founder:            { label: 'Founder',            tabs: ALL_TABS, locked: true },
   admin:              { label: 'Admin',              tabs: ALL_TABS, locked: true },
-  operations_manager: { label: 'Operations Manager', tabs: ['pos','dashboard','production','fulfillment','app-orders','mobile-cms','app-users','app-support','stylist-inbox','delayed','collections','fabrics','outsource','customers','leads','masters','returns','sync-center'] },
+  operations_manager: { label: 'Operations Manager', tabs: ['pos','dashboard','production','fulfillment','app-orders','mobile-cms','app-users','app-support','stylist-inbox','whatsapp-inbox','delayed','collections','fabrics','outsource','customers','leads','masters','returns','sync-center'] },
   production_manager: { label: 'Production Manager', tabs: ['pos','production','fulfillment','outsource','fabrics','delayed'] },
-  stylist:            { label: 'Stylist',            tabs: ['pos','catalogue','offers','collections','leads','customers','stylist-inbox'] },
+  stylist:            { label: 'Stylist',            tabs: ['pos','catalogue','offers','collections','leads','customers','stylist-inbox','whatsapp-inbox'] },
   designer:           { label: 'Designer',           tabs: ['catalogue','collections','fabrics'] },
-  growth_manager:     { label: 'Growth Manager',     tabs: ['growth','dashboard','leads','offers','customers','app-orders','mobile-cms','app-users','app-support','stylist-inbox','sync-center'] },
+  growth_manager:     { label: 'Growth Manager',     tabs: ['growth','dashboard','leads','offers','customers','app-orders','mobile-cms','app-users','app-support','stylist-inbox','whatsapp-inbox','sync-center'] },
   tailor_lead:        { label: 'Tailor Lead',        tabs: ['pos','production','fulfillment','delayed'] },
   fulfillment_ops:    { label: 'Fulfillment Ops',    tabs: ['pos','fulfillment','delayed'] },
   finance:            { label: 'Finance',            tabs: ['pos','finance','outsource','fabrics','returns'] },
@@ -84,6 +85,7 @@ export const getUserTabs = (member) => {
   const tabs = [...(member.tabs || DEFAULT_TABS), 'tasks', 'inventory']
   if (member.stylist_inbox || String(member.role || '').toLowerCase() === 'stylist') {
     tabs.push('stylist-inbox')
+    tabs.push('whatsapp-inbox')
   }
   return upgradeLegacyTabs(tabs)
 }
