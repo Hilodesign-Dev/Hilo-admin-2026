@@ -62,7 +62,7 @@ function MultiSelectFilter({ label, options, selected, onChange, width = 200 }) 
 
 const parseTags = (raw) => {
   const arr = Array.isArray(raw) ? raw : (typeof raw === 'string' && raw ? raw.split(',').map(t => t.trim()) : [])
-  return arr.map(t => t.replace(/^[\["'\s]+|[\]"'\s]+$/g, '').trim()).filter(Boolean)
+  return arr.map(t => t.replace(/^[[ "'\s]+|[\] "'\s]+$/g, '').trim()).filter(Boolean)
 }
 
 // Per-product rollup of variant COGS review status → V1's bucket vocabulary.
@@ -88,13 +88,13 @@ const rowStats = (row) => {
 
 const CardChip = ({ label, tone = 'gray', mono = false }) => {
   const tones = {
-    gray:  { bg: '#f5f4f0', fg: '#6b7280' },
-    gold:  { bg: '#fef3c7', fg: '#92400e' },
+    gray: { bg: '#f5f4f0', fg: '#6b7280' },
+    gold: { bg: '#fef3c7', fg: '#92400e' },
     green: { bg: '#dcfce7', fg: '#15803d' },
-    red:   { bg: '#fee2e2', fg: '#991b1b' },
+    red: { bg: '#fee2e2', fg: '#991b1b' },
     amber: { bg: '#fef3c7', fg: '#92400e' },
-    blue:  { bg: '#dbeafe', fg: '#1e40af' },
-    purple:{ bg: '#f3e8ff', fg: '#7c3aed' },
+    blue: { bg: '#dbeafe', fg: '#1e40af' },
+    purple: { bg: '#f3e8ff', fg: '#7c3aed' },
   }
   const t = tones[tone] || tones.gray
   return (
@@ -111,7 +111,7 @@ const Stat = ({ label, value, color }) => (
 )
 
 const STATUS_PILL = {
-  pending:   { bg: '#f3f4f6', fg: '#6b7280', label: 'PENDING' },
+  pending: { bg: '#f3f4f6', fg: '#6b7280', label: 'PENDING' },
   in_review: { bg: '#fef3c7', fg: '#92400e', label: 'IN REVIEW' },
   finalized: { bg: '#dcfce7', fg: '#15803d', label: 'FINALIZED' },
 }
@@ -166,7 +166,7 @@ const ProductCardV2 = ({ row, onOpen, onLabel }) => {
                 className="flex items-center gap-1 px-2 py-0.5 rounded-full"
                 style={{ background: 'rgba(201,164,50,0.14)', color: '#795900', border: '1px solid rgba(201,164,50,0.4)', cursor: 'pointer', height: 22 }}
               >
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 14v.01M14 20v.01M17 17v.01M20 17v.01M17 20v.01M20 20v.01"/></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3M20 14v.01M14 20v.01M17 17v.01M20 17v.01M17 20v.01M20 20v.01" /></svg>
                 <span className="text-[9px] font-bold uppercase tracking-tight">Label</span>
               </button>
               {needsReview
@@ -270,13 +270,13 @@ const CatalogueV2 = (props) => {
   // still match products whose `category` / tags equal that name.
   const catTagMap = useMemo(() => {
     const map = {}
-    ;(masterCategories || []).forEach(c => {
-      if (!c.name) return
-      const fromShopify = c.shopify_tag
-        ? c.shopify_tag.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
-        : []
-      map[c.name] = [...new Set([...fromShopify, String(c.name).toLowerCase()])]
-    })
+      ; (masterCategories || []).forEach(c => {
+        if (!c.name) return
+        const fromShopify = c.shopify_tag
+          ? c.shopify_tag.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+          : []
+        map[c.name] = [...new Set([...fromShopify, String(c.name).toLowerCase()])]
+      })
     return map
   }, [masterCategories])
 
@@ -303,7 +303,7 @@ const CatalogueV2 = (props) => {
     if ((masterCategories || []).length > 0) {
       const ordered = []
       groupOrder.forEach(grp => {
-        ;(masterCategories || []).filter(c => (c.group || '') === grp).forEach(c => { if (c.name) ordered.push(c.name) })
+        ; (masterCategories || []).filter(c => (c.group || '') === grp).forEach(c => { if (c.name) ordered.push(c.name) })
       })
       ordered.push('Other')
       names = ordered
@@ -407,11 +407,11 @@ const CatalogueV2 = (props) => {
   }
 
   const reviewTabs = [
-    { key: 'all',       label: 'All',          count: reviewCounts.all,       style: { background: '#c9a432', color: '#fff', borderColor: 'transparent' } },
-    { key: 'pending',   label: 'Pending COGS', count: reviewCounts.pending,   style: { background: '#f3f4f6', color: '#374151', borderColor: '#d1d5db' } },
-    { key: 'in_review', label: 'In Review',    count: reviewCounts.in_review, style: { background: '#fffbeb', color: '#b45309', borderColor: '#fcd34d' } },
-    { key: 'finalized', label: 'Finalized',    count: reviewCounts.finalized, style: { background: '#f0fdf4', color: '#15803d', borderColor: '#86efac' } },
-    { key: 'inactive',  label: 'Inactive',     count: reviewCounts.inactive,  style: { background: '#f5f5f4', color: '#57534e', borderColor: '#a8a29e' } },
+    { key: 'all', label: 'All', count: reviewCounts.all, style: { background: '#c9a432', color: '#fff', borderColor: 'transparent' } },
+    { key: 'pending', label: 'Pending COGS', count: reviewCounts.pending, style: { background: '#f3f4f6', color: '#374151', borderColor: '#d1d5db' } },
+    { key: 'in_review', label: 'In Review', count: reviewCounts.in_review, style: { background: '#fffbeb', color: '#b45309', borderColor: '#fcd34d' } },
+    { key: 'finalized', label: 'Finalized', count: reviewCounts.finalized, style: { background: '#f0fdf4', color: '#15803d', borderColor: '#86efac' } },
+    { key: 'inactive', label: 'Inactive', count: reviewCounts.inactive, style: { background: '#f5f5f4', color: '#57534e', borderColor: '#a8a29e' } },
   ]
 
   const dropdownCls = (active) => 'border rounded-lg px-2.5 py-1.5 text-xs flex-shrink-0 ' + (active ? 'bg-amber-50 text-amber-700' : 'border-gray-200 text-gray-500')
@@ -503,10 +503,10 @@ const CatalogueV2 = (props) => {
       <div className="flex items-center justify-between mt-1 mb-3">
         <div className="flex gap-1 p-1 rounded-full" style={{ background: '#f5f4f0' }}>
           {[
-            ['cards','Cards','Image-first grid'],
-            ['rows','Rows','One row per variant, click to edit'],
-            ['quick','Quick Entry','All rows pre-expanded for fast COGS entry'],
-          ].map(([k,label,tip]) => {
+            ['cards', 'Cards', 'Image-first grid'],
+            ['rows', 'Rows', 'One row per variant, click to edit'],
+            ['quick', 'Quick Entry', 'All rows pre-expanded for fast COGS entry'],
+          ].map(([k, label, tip]) => {
             const active = viewMode === k
             return (
               <button key={k} onClick={() => setViewMode(k)} title={tip}

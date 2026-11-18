@@ -92,6 +92,21 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: true,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('@supabase')) {
+                return 'vendor-supabase'
+              }
+              if (id.includes('react-easy-crop') || id.includes('qrcode')) {
+                return 'vendor-media'
+              }
+              return 'vendor'
+            }
+          },
+        },
+      },
     },
   }
 })

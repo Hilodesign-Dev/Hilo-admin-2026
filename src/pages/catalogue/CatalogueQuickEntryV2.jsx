@@ -15,18 +15,18 @@ import ImageLightbox from './ImageLightbox'
    - Image: clickable thumbnail → ImageLightbox carousel. */
 
 const blank = (v) => (v === '' || v === undefined ? null : v)
-const numOrNull = (v) => (v === '' || v == null) ? null : Number(String(v).replace(/[^0-9.\-]/g, '')) || null
+const numOrNull = (v) => (v === '' || v == null) ? null : Number(String(v).replace(/[^0-9.-]/g, '')) || null
 
 const VARIANT_FIELDS = [
-  'is_set','set_components','category',
-  'cogs','embroidery','embroidery_type','stitching','total_dye','accessories','bottom_cogs',
-  'fabric_id','fabric_name','fabric_sku','fabric_grade','fabric_tag',
-  'metres','cost_per_metre','dye_id','dye_per_metre',
-  'proposed_mrp','cogs_notes',
+  'is_set', 'set_components', 'category',
+  'cogs', 'embroidery', 'embroidery_type', 'stitching', 'total_dye', 'accessories', 'bottom_cogs',
+  'fabric_id', 'fabric_name', 'fabric_sku', 'fabric_grade', 'fabric_tag',
+  'metres', 'cost_per_metre', 'dye_id', 'dye_per_metre',
+  'proposed_mrp', 'cogs_notes',
 ]
 
 const emptyPiece = () => ({
-  id: 'p_' + Math.random().toString(36).slice(2,9),
+  id: 'p_' + Math.random().toString(36).slice(2, 9),
   name: '', category: '', fabricId: '', fabricName: '',
   metres: 0, costPerMetre: 0, dyeId: '', dyePerMetre: 0,
   stitching: 0, embroidery: 0, embroidery_type: '', accessories: 0,
@@ -36,9 +36,9 @@ const emptyPiece = () => ({
 const initFromVariant = (v) => {
   const o = {}
   VARIANT_FIELDS.forEach(k => {
-    if (k === 'is_set')         o[k] = !!v?.[k]
+    if (k === 'is_set') o[k] = !!v?.[k]
     else if (k === 'set_components') o[k] = Array.isArray(v?.set_components) ? v.set_components : []
-    else                        o[k] = v?.[k] ?? null
+    else o[k] = v?.[k] ?? null
   })
   return o
 }
@@ -118,10 +118,10 @@ const SmallToggle = ({ value, onChange, labelOn = 'Yes', labelOff = 'No' }) => (
 
 const Pill = ({ children, tone = 'gray', mono = false }) => {
   const tones = {
-    gray:'bg-gray-100 text-gray-600', gold:'bg-amber-50 text-amber-700',
-    green:'bg-green-50 text-green-700', red:'bg-red-50 text-red-700',
-    amber:'bg-amber-50 text-amber-700', blue:'bg-blue-50 text-blue-700',
-    purple:'bg-purple-50 text-purple-700', indigo:'bg-indigo-50 text-indigo-700',
+    gray: 'bg-gray-100 text-gray-600', gold: 'bg-amber-50 text-amber-700',
+    green: 'bg-green-50 text-green-700', red: 'bg-red-50 text-red-700',
+    amber: 'bg-amber-50 text-amber-700', blue: 'bg-blue-50 text-blue-700',
+    purple: 'bg-purple-50 text-purple-700', indigo: 'bg-indigo-50 text-indigo-700',
   }
   return <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${tones[tone]} ${mono ? 'font-mono' : ''}`}>{children}</span>
 }
@@ -240,7 +240,7 @@ const RowCard = ({
 
   // ---- DERIVED --------------------------------------------------------------
 
-  const sizes  = variant?.sizes || []
+  const sizes = variant?.sizes || []
   const sizeCount = sizes.length
   const pr = variantPriceRange(variant)
   const totalCogs = liveCogs(state)
@@ -265,7 +265,7 @@ const RowCard = ({
       VARIANT_FIELDS.forEach(k => {
         if (k === 'is_set') next[k] = !!state.is_set
         else if (k === 'set_components') next[k] = Array.isArray(state.set_components) ? state.set_components : []
-        else if (['cogs','embroidery','stitching','total_dye','accessories','bottom_cogs','metres','cost_per_metre','dye_per_metre','proposed_mrp'].includes(k)) next[k] = numOrNull(state[k])
+        else if (['cogs', 'embroidery', 'stitching', 'total_dye', 'accessories', 'bottom_cogs', 'metres', 'cost_per_metre', 'dye_per_metre', 'proposed_mrp'].includes(k)) next[k] = numOrNull(state[k])
         else next[k] = blank(state[k])
       })
       next.cogs = +totalCogs.toFixed(2) || null
@@ -300,7 +300,7 @@ const RowCard = ({
               className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 hover:border-amber-400 hover:shadow-md transition-all relative"
               title={images.length > 1 ? `View ${images.length} photos` : 'View photo'}
             >
-              <img src={product.image_url} alt="" className="w-full h-full object-cover" onError={e => e.target.style.display='none'} />
+              <img src={product.image_url} alt="" className="w-full h-full object-cover" onError={e => e.target.style.display = 'none'} />
               {images.length > 1 && (
                 <span className="absolute bottom-0 right-0 bg-black/60 text-white text-[8px] px-1 rounded-tl">{images.length}</span>
               )}
@@ -316,16 +316,16 @@ const RowCard = ({
         </div>
         <div className="col-span-2 flex items-center gap-1.5 flex-wrap">
           <Pill tone={status === 'finalized' ? 'green' : status === 'in_review' ? 'amber' : status === 'rejected' ? 'red' : 'gray'}>
-            {status.replace('_',' ')}
+            {status.replace('_', ' ')}
           </Pill>
           {state.category && <Pill tone="indigo">{state.category}</Pill>}
           <Pill tone="gray">{sizeCount} sz</Pill>
-          {state.is_set && <Pill tone="blue">set · {(state.set_components||[]).length}</Pill>}
+          {state.is_set && <Pill tone="blue">set · {(state.set_components || []).length}</Pill>}
         </div>
         <div className="col-span-4 grid grid-cols-3 gap-2 text-center">
           <div>
             <div className="text-[9px] text-gray-400">COGS</div>
-            <div className="text-xs font-bold" style={{ color:'#494bd6' }}>{totalCogs > 0 ? '₹' + fmt(n(totalCogs).toFixed(0)) : '—'}</div>
+            <div className="text-xs font-bold" style={{ color: '#494bd6' }}>{totalCogs > 0 ? '₹' + fmt(n(totalCogs).toFixed(0)) : '—'}</div>
           </div>
           <div>
             <div className="text-[9px] text-gray-400">MRP</div>
@@ -334,7 +334,7 @@ const RowCard = ({
           <div>
             <div className="text-[9px] text-gray-400">GM%</div>
             <div className="text-xs font-bold" style={{ color: gm > 0.5 ? '#16a34a' : gm > 0.3 ? '#d97706' : '#dc2626' }}>
-              {totalCogs > 0 ? (gm*100).toFixed(1) + '%' : '—'}
+              {totalCogs > 0 ? (gm * 100).toFixed(1) + '%' : '—'}
             </div>
           </div>
         </div>
@@ -370,11 +370,11 @@ const RowCard = ({
                 <div className="col-span-1 text-right">COGS</div>
               </div>
               {(state.set_components || []).map((p, i) => {
-                const pCogs = calcPieceCogs({ metres:+p.metres||0, costPerMetre:+p.costPerMetre||0, dyePerMetre:+p.dyePerMetre||0, stitching:+p.stitching||0, embroidery:+p.embroidery||0, accessories:+p.accessories||0 })
+                const pCogs = calcPieceCogs({ metres: +p.metres || 0, costPerMetre: +p.costPerMetre || 0, dyePerMetre: +p.dyePerMetre || 0, stitching: +p.stitching || 0, embroidery: +p.embroidery || 0, accessories: +p.accessories || 0 })
                 return (
                   <div key={p.id || i} className="grid grid-cols-12 gap-1.5 items-center bg-white rounded p-1.5">
                     <div className="col-span-2 space-y-1">
-                      <Inp value={p.name} onChange={v => setPiece(i, { name: v })} placeholder={`Piece ${i+1}`} w="w-full" />
+                      <Inp value={p.name} onChange={v => setPiece(i, { name: v })} placeholder={`Piece ${i + 1}`} w="w-full" />
                       <Sel value={p.category} onChange={c => pickPieceCategory(i, c)} options={categoryOptions} placeholder="garment" w="w-full" />
                     </div>
                     <div className="col-span-3">
@@ -494,9 +494,9 @@ const RowCard = ({
           <div className="mt-2 pt-2 border-t border-gray-100 flex flex-wrap items-center gap-1.5">
             <span className="text-[10px] text-gray-400 mr-1">Workflow:</span>
             <button onClick={() => updateStatus('pending_entry')} disabled={busy} className="text-[10px] px-2 py-0.5 rounded border border-gray-200 hover:bg-white">Save draft</button>
-            <button onClick={() => updateStatus('in_review', { cogs_entered_at: new Date().toISOString() })} disabled={busy} className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background:'#fef3c7', color:'#92400e' }}>Submit for review</button>
-            <button onClick={() => updateStatus('finalized', { cogs_finalized_at: new Date().toISOString() })} disabled={busy} className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background:'#dcfce7', color:'#15803d' }}>Finalize</button>
-            <button onClick={() => { const note = window.prompt('Reject reason:', ''); if (note != null) updateStatus('rejected', { cogs_rejection_note: note }) }} disabled={busy} className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background:'#fee2e2', color:'#991b1b' }}>Reject</button>
+            <button onClick={() => updateStatus('in_review', { cogs_entered_at: new Date().toISOString() })} disabled={busy} className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: '#fef3c7', color: '#92400e' }}>Submit for review</button>
+            <button onClick={() => updateStatus('finalized', { cogs_finalized_at: new Date().toISOString() })} disabled={busy} className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: '#dcfce7', color: '#15803d' }}>Finalize</button>
+            <button onClick={() => { const note = window.prompt('Reject reason:', ''); if (note != null) updateStatus('rejected', { cogs_rejection_note: note }) }} disabled={busy} className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ background: '#fee2e2', color: '#991b1b' }}>Reject</button>
           </div>
         </div>
       )}

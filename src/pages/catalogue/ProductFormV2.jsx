@@ -14,13 +14,13 @@ import { fmt } from '../../lib/helpers'
    onSaved(updatedRow) so the parent can refresh. */
 
 const TONES = {
-  gray:  { bg: '#f5f4f0', fg: '#6b7280' },
-  gold:  { bg: '#fef3c7', fg: '#92400e' },
+  gray: { bg: '#f5f4f0', fg: '#6b7280' },
+  gold: { bg: '#fef3c7', fg: '#92400e' },
   green: { bg: '#dcfce7', fg: '#15803d' },
-  red:   { bg: '#fee2e2', fg: '#991b1b' },
+  red: { bg: '#fee2e2', fg: '#991b1b' },
   amber: { bg: '#fef3c7', fg: '#92400e' },
-  blue:  { bg: '#dbeafe', fg: '#1e40af' },
-  purple:{ bg: '#ede9fe', fg: '#5b21b6' },
+  blue: { bg: '#dbeafe', fg: '#1e40af' },
+  purple: { bg: '#ede9fe', fg: '#5b21b6' },
 }
 const Pill = ({ children, tone = 'gray' }) => {
   const t = TONES[tone] || TONES.gray
@@ -28,9 +28,9 @@ const Pill = ({ children, tone = 'gray' }) => {
 }
 
 const STATUS_TONE = {
-  finalized:     'green',
-  in_review:     'amber',
-  rejected:      'red',
+  finalized: 'green',
+  in_review: 'amber',
+  rejected: 'red',
   pending_entry: 'gray',
 }
 
@@ -64,7 +64,7 @@ const NumInput = ({ value, onChange, placeholder, ...rest }) => (
     onChange={e => {
       const v = e.target.value
       if (v === '') return onChange(null)
-      const n = Number(v.replace(/[^0-9.\-]/g, ''))
+      const n = Number(v.replace(/[^0-9.-]/g, ''))
       onChange(isFinite(n) ? n : null)
     }}
     placeholder={placeholder}
@@ -113,8 +113,8 @@ const SaveBar = ({ dirty, busy, msg, onSave, onReset }) => (
       className="text-xs px-3 py-1.5 rounded-lg font-medium"
       style={{
         background: !dirty || busy ? '#e5e7eb' : '#c9a432',
-        color:      !dirty || busy ? '#9ca3af' : '#fff',
-        cursor:     !dirty || busy ? 'not-allowed' : 'pointer',
+        color: !dirty || busy ? '#9ca3af' : '#fff',
+        cursor: !dirty || busy ? 'not-allowed' : 'pointer',
       }}
     >
       {busy ? 'Saving…' : (dirty ? 'Save' : 'Saved')}
@@ -317,12 +317,12 @@ export const VariantSurfaceForm = ({ row, variantIdx, onChangeIdx, onSaved, user
     const o = {}
     VARIANT_FIELDS.forEach(k => { o[k] = v[k] ?? (k === 'is_set' ? false : null) })
     // workflow fields kept read-only on the form (set by buttons)
-    o.cogs_review_status   = v.cogs_review_status   || 'pending_entry'
-    o.cogs_entered_by      = v.cogs_entered_by      || null
-    o.cogs_entered_at      = v.cogs_entered_at      || null
-    o.cogs_finalized_by    = v.cogs_finalized_by    || null
-    o.cogs_finalized_at    = v.cogs_finalized_at    || null
-    o.cogs_rejection_note  = v.cogs_rejection_note  || null
+    o.cogs_review_status = v.cogs_review_status || 'pending_entry'
+    o.cogs_entered_by = v.cogs_entered_by || null
+    o.cogs_entered_at = v.cogs_entered_at || null
+    o.cogs_finalized_by = v.cogs_finalized_by || null
+    o.cogs_finalized_at = v.cogs_finalized_at || null
+    o.cogs_rejection_note = v.cogs_rejection_note || null
     return o
   }, [row, variantIdx])
   const [form, setForm] = useState(original)
@@ -374,25 +374,25 @@ export const VariantSurfaceForm = ({ row, variantIdx, onChangeIdx, onSaved, user
   }
 
   const now = () => new Date().toISOString()
-  const me  = userEmail || 'system'
+  const me = userEmail || 'system'
 
   const draft = () => setWorkflow({ cogs_review_status: 'pending_entry' })
   const submit = () => setWorkflow({
     cogs_review_status: 'in_review',
-    cogs_entered_by:   me,
-    cogs_entered_at:   now(),
+    cogs_entered_by: me,
+    cogs_entered_at: now(),
   })
   const finalize = () => setWorkflow({
-    cogs_review_status:  'finalized',
-    cogs_finalized_by:   me,
-    cogs_finalized_at:   now(),
+    cogs_review_status: 'finalized',
+    cogs_finalized_by: me,
+    cogs_finalized_at: now(),
   }, 'Finalize this variant\'s COGS? This will mark the review complete.')
   const reject = async () => {
     const note = window.prompt('Reject reason (visible in the review queue):', '')
     if (note === null) return
     setWorkflow({
-      cogs_review_status:   'rejected',
-      cogs_rejection_note:  note || '(no reason given)',
+      cogs_review_status: 'rejected',
+      cogs_rejection_note: note || '(no reason given)',
     })
   }
 
@@ -466,18 +466,18 @@ export const VariantSurfaceForm = ({ row, variantIdx, onChangeIdx, onSaved, user
 
       <Label>COGS workflow</Label>
       <div className="flex flex-wrap items-center gap-2 mb-1">
-        <button onClick={draft}    className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50">Save draft</button>
-        <button onClick={submit}   className="text-xs px-3 py-1.5 rounded-lg" style={{ background: '#fef3c7', color: '#92400e' }}>Submit for review</button>
+        <button onClick={draft} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50">Save draft</button>
+        <button onClick={submit} className="text-xs px-3 py-1.5 rounded-lg" style={{ background: '#fef3c7', color: '#92400e' }}>Submit for review</button>
         <button onClick={finalize} className="text-xs px-3 py-1.5 rounded-lg" style={{ background: '#dcfce7', color: '#15803d' }}>Finalize</button>
-        <button onClick={reject}   className="text-xs px-3 py-1.5 rounded-lg" style={{ background: '#fee2e2', color: '#991b1b' }}>Reject</button>
+        <button onClick={reject} className="text-xs px-3 py-1.5 rounded-lg" style={{ background: '#fee2e2', color: '#991b1b' }}>Reject</button>
       </div>
       <div className="text-[11px] text-gray-400 mb-2">
         Workflow buttons save the variant THEN stamp the new status. They don't need an explicit "Save" first.
       </div>
       {(form.cogs_entered_by || form.cogs_finalized_by || form.cogs_rejection_note) && (
         <div className="text-[11px] text-gray-500 grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2 p-2 bg-gray-50 rounded-lg">
-          {form.cogs_entered_by   && <div><span className="text-gray-400">Entered by:</span> {form.cogs_entered_by}</div>}
-          {form.cogs_entered_at   && <div><span className="text-gray-400">Entered at:</span> {new Date(form.cogs_entered_at).toLocaleString()}</div>}
+          {form.cogs_entered_by && <div><span className="text-gray-400">Entered by:</span> {form.cogs_entered_by}</div>}
+          {form.cogs_entered_at && <div><span className="text-gray-400">Entered at:</span> {new Date(form.cogs_entered_at).toLocaleString()}</div>}
           {form.cogs_finalized_by && <div><span className="text-gray-400">Finalized by:</span> {form.cogs_finalized_by}</div>}
           {form.cogs_finalized_at && <div><span className="text-gray-400">Finalized at:</span> {new Date(form.cogs_finalized_at).toLocaleString()}</div>}
           {form.cogs_rejection_note && <div className="col-span-2 sm:col-span-3"><span className="text-gray-400">Rejection note:</span> {form.cogs_rejection_note}</div>}
@@ -503,11 +503,11 @@ export const SizeGridForm = ({ row, variantIdx, onSaved }) => {
       const o = {}
       SIZE_FIELDS.forEach(k => { o[k] = s[k] ?? (k === 'active' ? true : null) })
       o.shopify_variant_id = s.shopify_variant_id
-      o.label              = s.label
+      o.label = s.label
       o.option1 = s.option1; o.option2 = s.option2; o.option3 = s.option3
-      o.weight  = s.weight;  o.weight_unit = s.weight_unit
+      o.weight = s.weight; o.weight_unit = s.weight_unit
       o.position = s.position
-      o.image    = s.image
+      o.image = s.image
       return o
     })
   }, [v])
@@ -524,7 +524,7 @@ export const SizeGridForm = ({ row, variantIdx, onSaved }) => {
     const next = { ...s, ...patch }
     if ('mrp' in patch || 'selling_price' in patch) {
       const mrp = Number(next.mrp) || 0
-      const sp  = Number(next.selling_price) || 0
+      const sp = Number(next.selling_price) || 0
       next.discount = Math.max(0, mrp - sp)
     }
     return next

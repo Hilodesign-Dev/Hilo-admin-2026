@@ -7,7 +7,7 @@ const Sidebar = ({ page, setPage, productCount, offerCount, onLogout, user, allo
   const [showProfile, setShowProfile] = useState(false);
   const [mobileAppOpen, setMobileAppOpen] = useState(false);
 
-  const mobileSubIds = ['app-orders', 'mobile-cms', 'app-users', 'app-support', 'stylist-inbox'];
+  const mobileSubIds = ['app-orders', 'app-appointments', 'mobile-cms', 'app-collections', 'app-users', 'app-support', 'stylist-inbox', 'push-marketing'];
 
   // Auto-expand if active page is a mobile sub-page
   useEffect(() => {

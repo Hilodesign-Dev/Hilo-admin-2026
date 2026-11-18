@@ -94,36 +94,36 @@ export const LeadsDashboard = ({ leads = [], teamMembers = [] }) => {
     if (!convIds.length) { setOrderRev({}); return }
     const ownerOf = Object.fromEntries(convLeads.map(l => [l.id, String(l.assigned_to)]))
     let cancelled = false
-    ;(async () => {
-      try {
-        // links for these leads (chunk the IN list to stay well under limits)
-        let links = []
-        for (let i = 0; i < convIds.length; i += 200) {
-          const { data } = await supa.from('lead_orders').select('lead_id, order_id').in('lead_id', convIds.slice(i, i + 200))
-          links = links.concat(data || [])
-        }
-        const orderIds = [...new Set(links.map(r => r.order_id))]
-        if (!orderIds.length) { if (!cancelled) setOrderRev({}); return }
-        let orders = []
-        for (let i = 0; i < orderIds.length; i += 200) {
-          const { data } = await supa.from('shopify_orders').select('id, total_price, stylist, created_at').in('id', orderIds.slice(i, i + 200))
-          orders = orders.concat(data || [])
-        }
-        const oMap = Object.fromEntries(orders.map(o => [o.id, o]))
-        const map = {}
-        for (const lk of links) {
-          const o = oMap[lk.order_id]; if (!o) continue
-          // Credit the linked order's revenue to the LEAD's owner (the stylist whose
-          // lead converted), regardless of who rang the order at POS. Each order is
-          // linked to one lead, so there is no double-counting across stylists.
-          const val = Number(o.total_price) || 0
-          if (!map[lk.lead_id]) map[lk.lead_id] = { rev: 0, todayRev: 0 }
-          map[lk.lead_id].rev += val
-          if ((o.created_at || '').split('T')[0] === todayStr) map[lk.lead_id].todayRev += val
-        }
-        if (!cancelled) setOrderRev(map)
-      } catch (e) { if (!cancelled) setOrderRev({}) }
-    })()
+      ; (async () => {
+        try {
+          // links for these leads (chunk the IN list to stay well under limits)
+          let links = []
+          for (let i = 0; i < convIds.length; i += 200) {
+            const { data } = await supa.from('lead_orders').select('lead_id, order_id').in('lead_id', convIds.slice(i, i + 200))
+            links = links.concat(data || [])
+          }
+          const orderIds = [...new Set(links.map(r => r.order_id))]
+          if (!orderIds.length) { if (!cancelled) setOrderRev({}); return }
+          let orders = []
+          for (let i = 0; i < orderIds.length; i += 200) {
+            const { data } = await supa.from('shopify_orders').select('id, total_price, stylist, created_at').in('id', orderIds.slice(i, i + 200))
+            orders = orders.concat(data || [])
+          }
+          const oMap = Object.fromEntries(orders.map(o => [o.id, o]))
+          const map = {}
+          for (const lk of links) {
+            const o = oMap[lk.order_id]; if (!o) continue
+            // Credit the linked order's revenue to the LEAD's owner (the stylist whose
+            // lead converted), regardless of who rang the order at POS. Each order is
+            // linked to one lead, so there is no double-counting across stylists.
+            const val = Number(o.total_price) || 0
+            if (!map[lk.lead_id]) map[lk.lead_id] = { rev: 0, todayRev: 0 }
+            map[lk.lead_id].rev += val
+            if ((o.created_at || '').split('T')[0] === todayStr) map[lk.lead_id].todayRev += val
+          }
+          if (!cancelled) setOrderRev(map)
+        } catch (e) { if (!cancelled) setOrderRev({}) }
+      })()
     return () => { cancelled = true }
   }, [filtered, todayStr])
 
@@ -192,7 +192,7 @@ export const LeadsDashboard = ({ leads = [], teamMembers = [] }) => {
     const breakdown = { 'High Quality': 0, 'Good': 0, 'Avg': 0, 'Bad': 0 }
     filtered.forEach(lead => {
       const q = lead.lead_quality || 'Avg'
-      if (breakdown.hasOwnProperty(q)) breakdown[q]++
+      if (Object.prototype.hasOwnProperty.call(breakdown, q)) breakdown[q]++
     })
     return breakdown
   }, [filtered])
@@ -331,19 +331,19 @@ export const LeadsDashboard = ({ leads = [], teamMembers = [] }) => {
     const ids = stylistLeads.filter(l => l.status === 'Converted').map(l => l.id)
     if (!ids.length) { setTimelineRev({}); return }
     let cancelled = false
-    ;(async () => {
-      try {
-        let links = []
-        for (let i = 0; i < ids.length; i += 200) { const { data } = await supa.from('lead_orders').select('lead_id, order_id').in('lead_id', ids.slice(i, i + 200)); links = links.concat(data || []) }
-        const oids = [...new Set(links.map(l => l.order_id))]
-        if (!oids.length) { if (!cancelled) setTimelineRev({}); return }
-        let orders = []
-        for (let i = 0; i < oids.length; i += 200) { const { data } = await supa.from('shopify_orders').select('id, total_price').in('id', oids.slice(i, i + 200)); orders = orders.concat(data || []) }
-        const omap = Object.fromEntries(orders.map(o => [o.id, Number(o.total_price) || 0]))
-        const map = {}; links.forEach(l => { map[l.lead_id] = (map[l.lead_id] || 0) + (omap[l.order_id] || 0) })
-        if (!cancelled) setTimelineRev(map)
-      } catch { if (!cancelled) setTimelineRev({}) }
-    })()
+      ; (async () => {
+        try {
+          let links = []
+          for (let i = 0; i < ids.length; i += 200) { const { data } = await supa.from('lead_orders').select('lead_id, order_id').in('lead_id', ids.slice(i, i + 200)); links = links.concat(data || []) }
+          const oids = [...new Set(links.map(l => l.order_id))]
+          if (!oids.length) { if (!cancelled) setTimelineRev({}); return }
+          let orders = []
+          for (let i = 0; i < oids.length; i += 200) { const { data } = await supa.from('shopify_orders').select('id, total_price').in('id', oids.slice(i, i + 200)); orders = orders.concat(data || []) }
+          const omap = Object.fromEntries(orders.map(o => [o.id, Number(o.total_price) || 0]))
+          const map = {}; links.forEach(l => { map[l.lead_id] = (map[l.lead_id] || 0) + (omap[l.order_id] || 0) })
+          if (!cancelled) setTimelineRev(map)
+        } catch { if (!cancelled) setTimelineRev({}) }
+      })()
     return () => { cancelled = true }
   }, [stylistConvKey]) // eslint-disable-line
   const timelineRows = useMemo(() => timelineMonths.map(mo => {
