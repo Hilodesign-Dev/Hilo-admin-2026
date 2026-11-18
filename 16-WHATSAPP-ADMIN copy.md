@@ -10,7 +10,7 @@ Full admin-frontend handover (features, polling, settings, orders, optimisation)
 | WhatsApp handover | `/api/v1/wa/staff/*` | `channel = whatsapp` only |
 
 Do **not** mix the two. A session id from one list 404s on the other. App Accept never sends WhatsApp messages. WhatsApp Accept/send fans out to Cloud API only.
-
+hi
 Auth is the **same** as app staff: `Authorization: Bearer` Supabase Auth access token (`handleStaffAuth`). Envelope `{ success, message, data }`.
 
 Shopper WhatsApp webhook stays at `GET|POST /api/v1/webhooks/whatsapp` ([15](./15-WHATSAPP-STYLIST.md)). Stylists never use personal WhatsApp.
