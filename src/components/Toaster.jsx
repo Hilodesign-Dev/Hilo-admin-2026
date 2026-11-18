@@ -46,23 +46,33 @@ const Toaster = () => {
 
   if (!toasts.length) return null;
   return (
-    <div className="fixed bottom-24 right-4 z-50 flex flex-col gap-2 sm:bottom-8 max-w-sm">
+    <div
+      className="fixed top-5 right-5 sm:top-6 sm:right-6 flex flex-col gap-2.5 max-w-sm sm:max-w-md w-full pointer-events-none"
+      style={{ zIndex: 999999 }}
+    >
       {toasts.map(t => (
         <div key={t.id}
-          className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl shadow-lg text-sm font-medium transition-all animate-fade-in ${t.ok ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}
+          className={`pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-2xl shadow-2xl text-sm font-medium transition-all animate-fade-in border ${
+            t.ok
+              ? 'bg-emerald-600 border-emerald-500 text-white shadow-emerald-950/25'
+              : 'bg-red-600 border-red-500 text-white shadow-red-950/35'
+          }`}
           style={{ animation: 'fadeSlideIn 0.25s ease-out' }}>
           {t.ok ? (
             <>
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-              <span className="flex-1">{t.msg}</span>
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+              <span className="flex-1 leading-snug">{t.msg}</span>
             </>
           ) : (
             <>
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <span className="flex-1">{t.msg}</span>
-              {t.key && <button onClick={() => retry(t)} className="ml-1 underline text-white/80 hover:text-white text-xs">Retry</button>}
-              <button onClick={() => dismiss(t.id)} className="ml-1 text-white/60 hover:text-white flex-shrink-0">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div className="flex-1 leading-snug">
+                <div className="font-bold text-xs uppercase tracking-wider text-red-100 mb-0.5">Notification Alert</div>
+                <div>{t.msg}</div>
+              </div>
+              {t.key && <button onClick={() => retry(t)} className="ml-1 underline text-white/90 hover:text-white text-xs font-semibold">Retry</button>}
+              <button onClick={() => dismiss(t.id)} className="ml-1 text-white/70 hover:text-white flex-shrink-0 p-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </>
           )}

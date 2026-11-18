@@ -3,11 +3,14 @@ import { C, toast } from '../../lib/designTokens'
 import { aiStaffApi } from '../../lib/aiStaffApi'
 import CatalogueRail from './CatalogueRail'
 import ChatPane, { ShopperContext } from './ChatPane'
-import { formatWait } from './stylistFormat'
+import { formatWait, formatLastMessageDate, formatFullDateTime } from './stylistFormat'
 
 const HEADER_H = 52
 
 function QueueRow({ item, active, onClick }) {
+  const lastDate = formatLastMessageDate(item.updatedAt)
+  const fullDate = formatFullDateTime(item.updatedAt)
+
   return (
     <button
       type="button"
@@ -25,6 +28,31 @@ function QueueRow({ item, active, onClick }) {
         </span>
         <span style={{ fontSize: 11, color: C.textMuted, flexShrink: 0 }}>{formatWait(item.waitingSeconds)}</span>
       </div>
+      {(item.phone || lastDate) && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 2, gap: 6 }}>
+          {item.phone ? (
+            <span style={{ fontSize: 11, color: C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {item.phone}
+            </span>
+          ) : <span />}
+          {lastDate && (
+            <span
+              title={fullDate}
+              style={{
+                fontSize: 10,
+                color: 'rgba(27,28,26,0.38)',
+                flexShrink: 0,
+                marginLeft: 'auto',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.01em',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {lastDate}
+            </span>
+          )}
+        </div>
+      )}
       {item.summary && (
         <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {item.summary}

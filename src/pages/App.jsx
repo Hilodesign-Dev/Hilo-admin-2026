@@ -30,11 +30,15 @@ import OutsourceVendorsTab from './outsource/OutsourceVendorsTab'
 import OrdersTab from './orders/OrdersTab'
 import AppOrdersTab from './orders/AppOrdersTab'
 import MobileCmsTab from './cms/MobileCmsTab'
+import AppCollectionsTab from './appCollections/AppCollectionsTab'
+import AppointmentsTab from './appointments/AppointmentsTab'
 import AppUsersTab from './customers/AppUsersTab'
 import AppSupportTab from './support/AppSupportTab'
 import StylistInboxTab, { AcceptHandoffModal } from './stylist/StylistInboxTab'
 import { useStylistInbox } from './stylist/useStylistInbox'
 import WhatsAppInboxTab from './whatsapp/WhatsAppInboxTab'
+import WhatsAppMarketingTab from './marketing/WhatsAppMarketingTab'
+import PushMarketingTab from './pushMarketing/PushMarketingTab'
 import { useWhatsAppInbox } from './whatsapp/useWhatsAppInbox'
 import WaHandoffModal from './whatsapp/WaHandoffModal'
 import { unlockWaAlertSound } from './whatsapp/waAlertSound'
@@ -402,13 +406,12 @@ const App = () => {
   return (
     <OrdersProvider>
     <div className="flex" style={{background:'#f5f4f0', height:'100vh', overflow:'hidden'}}>
-      <Toaster />
       <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} inboxBadge={stylistInbox.badge} waBadge={whatsappInbox.badge} />
       <main
         className="flex-1 main-content"
         style={{
           position: 'relative',
-          overflow: (page === 'stylist-inbox' || page === 'whatsapp-inbox') ? 'hidden' : 'auto',
+          overflow: (page === 'stylist-inbox' || page === 'whatsapp-inbox' || page === 'whatsapp-marketing' || page === 'push-marketing') ? 'hidden' : 'auto',
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
@@ -417,7 +420,7 @@ const App = () => {
       >
         <MobileHeader page={page} user={user} onLogout={handleLogout} />
         {/* Refresh button — top right of content area */}
-        {page !== 'stylist-inbox' && page !== 'whatsapp-inbox' && (
+        {page !== 'stylist-inbox' && page !== 'whatsapp-inbox' && page !== 'whatsapp-marketing' && page !== 'push-marketing' && (
         <button
           onClick={refreshCurrentTab}
           title="Refresh tab data"
@@ -471,6 +474,12 @@ const App = () => {
         <div style={{display: page === 'mobile-cms' ? '' : 'none'}}>
           {mountedTabs.has('mobile-cms') && allowedTabs.includes('mobile-cms') && <MobileCmsTab key={refreshKeys['mobile-cms']||0} />}
         </div>
+        <div style={{display: page === 'app-appointments' ? '' : 'none'}}>
+          {mountedTabs.has('app-appointments') && allowedTabs.includes('app-appointments') && <AppointmentsTab key={refreshKeys['app-appointments']||0} />}
+        </div>
+        <div style={{display: page === 'app-collections' ? '' : 'none'}}>
+          {mountedTabs.has('app-collections') && allowedTabs.includes('app-collections') && <AppCollectionsTab key={refreshKeys['app-collections']||0} />}
+        </div>
         <div style={{display: page === 'app-users' ? '' : 'none'}}>
           {mountedTabs.has('app-users') && allowedTabs.includes('app-users') && <AppUsersTab key={refreshKeys['app-users']||0} />}
         </div>
@@ -507,6 +516,21 @@ const App = () => {
               joiningId={whatsappInbox.joiningId}
               focusId={waFocusId}
               onFocusConsumed={() => setWaFocusId(null)}
+            />
+          )}
+        </div>
+        <div style={{display: page === 'whatsapp-marketing' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
+          {mountedTabs.has('whatsapp-marketing') && allowedTabs.includes('whatsapp-marketing') && (
+            <WhatsAppMarketingTab
+              key={refreshKeys['whatsapp-marketing']||0}
+              onNavigateToInbox={() => navigateTo('whatsapp-inbox')}
+            />
+          )}
+        </div>
+        <div style={{display: page === 'push-marketing' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
+          {mountedTabs.has('push-marketing') && allowedTabs.includes('push-marketing') && (
+            <PushMarketingTab
+              key={refreshKeys['push-marketing']||0}
             />
           )}
         </div>
@@ -595,6 +619,7 @@ const App = () => {
           }
         }}
       />
+      <Toaster />
     </div>
     </OrdersProvider>
   );

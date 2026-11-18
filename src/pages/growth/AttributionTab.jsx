@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { supa } from '../../lib/supabase'
 import { fmt, n } from '../../lib/helpers'
 import Icon from '../../components/Icon'
+import { toast } from '../../lib/designTokens'
 
 /*
  * AttributionTab — editable inline table for order attribution.
@@ -11,7 +12,7 @@ import Icon from '../../components/Icon'
  * Accepts `orders` from parent (GrowthView) so it shares the same date range.
  */
 
-const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', dateTo = '', setDateFrom = () => {}, setDateTo = () => {} }) => {
+const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', dateTo = '', setDateFrom = () => { }, setDateTo = () => { } }) => {
   // ── Master lists from DB ──
   const [leadSources, setLeadSources] = useState([])
   const [occasions, setOccasions] = useState([])
@@ -115,7 +116,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
       if (search) {
         const q = search.toLowerCase()
         return (o.order_number || '').toLowerCase().includes(q) ||
-               (o.customer_name || '').toLowerCase().includes(q)
+          (o.customer_name || '').toLowerCase().includes(q)
       }
       return true
     })
@@ -201,10 +202,10 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
     // Normalise the channel pick to the constraint-valid set
     const _ch = String(editDraft.channel_override || '').trim()
     const channelCanonical = /^in[- ]?store|^store$/i.test(_ch) ? 'In-store'
-                            : /^online assist$/i.test(_ch) ? 'Online Assist'
-                            : /^online store$|^online$/i.test(_ch) ? 'Online'
-                            : /^marketplace$/i.test(_ch) ? 'Marketplace'
-                            : null
+      : /^online assist$/i.test(_ch) ? 'Online Assist'
+        : /^online store$|^online$/i.test(_ch) ? 'Online'
+          : /^marketplace$/i.test(_ch) ? 'Marketplace'
+            : null
     const updates = {
       lead_source: editDraft.lead_source || null,
       stylist: editDraft.stylist || null,
@@ -219,7 +220,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
     const { error } = await supa.from('shopify_orders').update(updates).eq('id', orderId)
     if (error) {
       console.error('saveEdit failed:', error)
-      try { (await import('../../lib/designTokens')).toast(false, 'Save failed: ' + error.message) } catch (_) {}
+      try { toast(false, 'Save failed: ' + error.message) } catch (_) { }
       setSaving(prev => { const n = new Set(prev); n.delete(orderId); return n })
       return
     }
@@ -234,24 +235,28 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
           linked_by: 'attribution',
         }]).select('id')
         if (data?.[0]) {
-          setOrderLeadMap(prev => ({...prev, [orderId]: {
-            junction_id: data[0].id,
-            lead_id: editDraft.lead_id,
-            client_name: editDraft.lead_name || '',
-          }}))
+          setOrderLeadMap(prev => ({
+            ...prev, [orderId]: {
+              junction_id: data[0].id,
+              lead_id: editDraft.lead_id,
+              client_name: editDraft.lead_name || '',
+            }
+          }))
         }
       } else if (editDraft.lead_id && existingLink && existingLink.lead_id !== editDraft.lead_id) {
         // Update existing link to different lead
         await supa.from('lead_orders').update({ lead_id: editDraft.lead_id }).eq('id', existingLink.junction_id)
-        setOrderLeadMap(prev => ({...prev, [orderId]: {
-          ...prev[orderId],
-          lead_id: editDraft.lead_id,
-          client_name: editDraft.lead_name || '',
-        }}))
+        setOrderLeadMap(prev => ({
+          ...prev, [orderId]: {
+            ...prev[orderId],
+            lead_id: editDraft.lead_id,
+            client_name: editDraft.lead_name || '',
+          }
+        }))
       } else if (!editDraft.lead_id && existingLink) {
         // Remove link
         await supa.from('lead_orders').delete().eq('id', existingLink.junction_id)
-        setOrderLeadMap(prev => { const m = {...prev}; delete m[orderId]; return m })
+        setOrderLeadMap(prev => { const m = { ...prev }; delete m[orderId]; return m })
       }
 
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updates } : o))
@@ -276,12 +281,12 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
   // Pushed/Failed once the edge function writes meta_capi_status.
   const CAPI_ELIGIBLE_CHANNELS = ['In-store', 'Online Assist']
   const CAPI_SKIP_COPY = {
-    channel_Online:      'Online order — Facebook pixel already captured this',
+    channel_Online: 'Online order — Facebook pixel already captured this',
     channel_Marketplace: 'Marketplace order — no Meta attribution path',
-    channel_null:        'Channel not set — fix in order edit',
-    no_contact:          'No email or phone captured — add contact to enable push',
-    too_old:             'Order older than 62 days — Meta won’t accept',
-    zero_value:          'Zero or refunded value — no conversion to push',
+    channel_null: 'Channel not set — fix in order edit',
+    no_contact: 'No email or phone captured — add contact to enable push',
+    too_old: 'Order older than 62 days — Meta won’t accept',
+    zero_value: 'Zero or refunded value — no conversion to push',
   }
   const capiBadge = (order) => {
     const st = order.meta_capi_status
@@ -307,7 +312,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
     }
     // 2. No push yet → derive from the eligibility gates
     const ch = order.channel
-    if (ch === 'Online')   return { bg: '#f1f5f9', color: '#64748b', label: 'Pixel-covered', title: 'Online order — Facebook pixel already captured this' }
+    if (ch === 'Online') return { bg: '#f1f5f9', color: '#64748b', label: 'Pixel-covered', title: 'Online order — Facebook pixel already captured this' }
     if (!CAPI_ELIGIBLE_CHANNELS.includes(ch))
       return { bg: '#f3f4f6', color: '#9ca3af', label: 'N/A', title: ch ? `${ch} — no Meta attribution path` : 'Channel not set — fix in order edit' }
     if (!(order.customer_email || order.delivery_phone))
@@ -422,28 +427,28 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                       <td className="px-3 py-2 text-gray-700 font-medium">{order.customer_name || 'Guest'}</td>
                       <td className="px-3 py-2 text-right font-bold text-gray-800">{fmt((order.total_price || 0).toFixed(0))}</td>
                       <td className="px-3 py-1">
-                        <select value={editDraft.lead_source} onChange={e => setEditDraft(d => ({...d, lead_source: e.target.value}))}
+                        <select value={editDraft.lead_source} onChange={e => setEditDraft(d => ({ ...d, lead_source: e.target.value }))}
                           className="border border-gray-200 rounded px-2 py-1 text-xs w-full min-w-[120px]">
                           <option value="">— Select —</option>
                           {leadSources.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </td>
                       <td className="px-3 py-1">
-                        <select value={editDraft.stylist} onChange={e => setEditDraft(d => ({...d, stylist: e.target.value}))}
+                        <select value={editDraft.stylist} onChange={e => setEditDraft(d => ({ ...d, stylist: e.target.value }))}
                           className="border border-gray-200 rounded px-2 py-1 text-xs w-full min-w-[100px]">
                           <option value="">— Select —</option>
                           {stylists.map(t => <option key={t.id} value={String(t.id)}>{t.name}</option>)}
                         </select>
                       </td>
                       <td className="px-3 py-1">
-                        <select value={editDraft.occasion} onChange={e => setEditDraft(d => ({...d, occasion: e.target.value}))}
+                        <select value={editDraft.occasion} onChange={e => setEditDraft(d => ({ ...d, occasion: e.target.value }))}
                           className="border border-gray-200 rounded px-2 py-1 text-xs w-full min-w-[110px]">
                           <option value="">— Select —</option>
                           {occasions.map(o => <option key={o} value={o}>{o}</option>)}
                         </select>
                       </td>
                       <td className="px-3 py-1">
-                        <select value={editDraft.channel_override} onChange={e => setEditDraft(d => ({...d, channel_override: e.target.value}))}
+                        <select value={editDraft.channel_override} onChange={e => setEditDraft(d => ({ ...d, channel_override: e.target.value }))}
                           className="border border-gray-200 rounded px-2 py-1 text-xs w-full min-w-[110px]">
                           <option value="">—</option>
                           <option value="In-store">In-store</option>
@@ -454,12 +459,12 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                       </td>
                       <td className="px-3 py-1">
                         <div className="flex flex-col gap-1">
-                          <select value={editDraft.country} onChange={e => setEditDraft(d => ({...d, country: e.target.value, city: ''}))}
+                          <select value={editDraft.country} onChange={e => setEditDraft(d => ({ ...d, country: e.target.value, city: '' }))}
                             className="border border-gray-200 rounded px-2 py-1 text-xs w-full min-w-[90px]">
                             <option value="">Country</option>
                             {countries.map(c => <option key={c} value={c}>{c}</option>)}
                           </select>
-                          <select value={editDraft.city} onChange={e => setEditDraft(d => ({...d, city: e.target.value}))}
+                          <select value={editDraft.city} onChange={e => setEditDraft(d => ({ ...d, city: e.target.value }))}
                             className="border border-gray-200 rounded px-2 py-1 text-xs w-full min-w-[90px]">
                             <option value="">City</option>
                             {filteredLocations.map(l => <option key={l} value={l}>{l}</option>)}
@@ -467,7 +472,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                         </div>
                       </td>
                       <td className="px-3 py-1 text-center">
-                        <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{background: badge.bg, color: badge.color}}>
+                        <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: badge.bg, color: badge.color }}>
                           {badge.label}
                         </span>
                         {/* Lead linking */}
@@ -477,7 +482,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                               <span className="text-xs text-green-600 font-medium" title={editDraft.lead_name}>
                                 🔗 {editDraft.lead_name || 'Linked'}
                               </span>
-                              <button onClick={() => setEditDraft(d => ({...d, lead_id: null, lead_name: ''}))}
+                              <button onClick={() => setEditDraft(d => ({ ...d, lead_id: null, lead_name: '' }))}
                                 className="text-gray-400 hover:text-red-500 text-xs">✕</button>
                             </div>
                           ) : (
@@ -490,7 +495,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                                   {leadResults.map(lead => (
                                     <button key={lead.id}
                                       onClick={() => {
-                                        setEditDraft(d => ({...d, lead_id: lead.id, lead_name: lead.client_name}))
+                                        setEditDraft(d => ({ ...d, lead_id: lead.id, lead_name: lead.client_name }))
                                         setLeadSearch('')
                                         setLeadResults([])
                                       }}
@@ -507,7 +512,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                         </div>
                       </td>
                       <td className="px-3 py-2 text-center">
-                        <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{background: cb.bg, color: cb.color}} title={cb.title}>
+                        <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: cb.bg, color: cb.color }} title={cb.title}>
                           {cb.label}
                         </span>
                       </td>
@@ -541,12 +546,11 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                     <td className="px-3 py-2.5 text-gray-600">{order.occasion || <span className="text-gray-300">—</span>}</td>
                     <td className="px-3 py-2.5">
                       {order.channel ? (
-                        <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${
-                          order.channel === 'In-store'      ? 'bg-purple-50 text-purple-700' :
-                          order.channel === 'Online Assist' ? 'bg-amber-50 text-amber-700'   :
-                          order.channel === 'Marketplace'   ? 'bg-orange-50 text-orange-700' :
-                          'bg-sky-50 text-sky-700'
-                        }`}>{order.channel}{order.channel === 'Marketplace' && order.marketplace_name ? ` · ${order.marketplace_name}` : ''}</span>
+                        <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${order.channel === 'In-store' ? 'bg-purple-50 text-purple-700' :
+                            order.channel === 'Online Assist' ? 'bg-amber-50 text-amber-700' :
+                              order.channel === 'Marketplace' ? 'bg-orange-50 text-orange-700' :
+                                'bg-sky-50 text-sky-700'
+                          }`}>{order.channel}{order.channel === 'Marketplace' && order.marketplace_name ? ` · ${order.marketplace_name}` : ''}</span>
                       ) : <span className="text-gray-300">—</span>}
                     </td>
                     <td className="px-3 py-2.5 text-gray-600">
@@ -555,7 +559,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                       ) : <span className="text-gray-300">—</span>}
                     </td>
                     <td className="px-3 py-2.5 text-center">
-                      <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{background: badge.bg, color: badge.color}}>
+                      <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: badge.bg, color: badge.color }}>
                         {badge.label}
                       </span>
                       {orderLeadMap[order.id] && (
@@ -565,7 +569,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                       )}
                     </td>
                     <td className="px-3 py-2.5 text-center">
-                      <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{background: cb.bg, color: cb.color}} title={cb.title}>
+                      <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: cb.bg, color: cb.color }} title={cb.title}>
                         {cb.label}
                       </span>
                     </td>
@@ -575,7 +579,7 @@ const AttributionTab = ({ orders: parentOrders, user = null, dateFrom = '', date
                       ) : <button onClick={() => startEdit(order)}
                         className="text-gray-400 hover:text-amber-600 p-1 rounded transition-colors" title="Edit attribution">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                       </button>}
                     </td>

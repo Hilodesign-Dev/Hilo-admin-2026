@@ -8,8 +8,8 @@ import { supa } from '../../lib/supabase'
 const GOLD = '#c9a432', INK = '#1b1c1a', SUB = '#6b7280', LINE = '#ebe7df', GOOD = '#16a34a', BAD = '#b91c1c', AMBER = '#d97706'
 const inr = n => '₹' + Math.round(Number(n) || 0).toLocaleString('en-IN')
 const STATUS = {
-  reconciled:   ['✓ Reconciled', GOOD, '#dcfce7'],
-  reconciling:  ['◑ Reconciling', AMBER, '#fef3c7'],
+  reconciled: ['✓ Reconciled', GOOD, '#dcfce7'],
+  reconciling: ['◑ Reconciling', AMBER, '#fef3c7'],
   unreconciled: ['• Due', BAD, '#fee2e2'],
 }
 
@@ -171,8 +171,8 @@ function ReconcilePanel({ marketplaces, onDone }) {
     let gross = 0, fees = 0, net = 0
     const lines = grid.rows.map(r => {
       const ref = (r[ri] || '').trim()
-      const paid = Number(String(r[pi] || '0').replace(/[^0-9.\-]/g, '')) || 0
-      const fee = fi >= 0 ? (Number(String(r[fi] || '0').replace(/[^0-9.\-]/g, '')) || 0) : 0
+      const paid = Number(String(r[pi] || '0').replace(/[^0-9.-]/g, '')) || 0
+      const fee = fi >= 0 ? (Number(String(r[fi] || '0').replace(/[^0-9.-]/g, '')) || 0) : 0
       net += paid; fees += fee; gross += paid + fee
       return { ref, paid, fee, raw: Object.fromEntries(grid.headers.map((h, i) => [h, r[i]])) }
     }).filter(l => l.ref)

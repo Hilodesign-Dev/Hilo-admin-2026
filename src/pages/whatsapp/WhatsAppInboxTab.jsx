@@ -3,12 +3,15 @@ import { C, toast } from '../../lib/designTokens'
 import { waStaffApi } from '../../lib/aiStaffApi'
 import CatalogueRail from '../stylist/CatalogueRail'
 import ChatPane, { ShopperContext } from '../stylist/ChatPane'
-import { formatWait } from '../stylist/stylistFormat'
+import { formatWait, formatLastMessageDate, formatFullDateTime } from '../stylist/stylistFormat'
 import WaControlPanel from './WaControlPanel'
 
 const HEADER_H = 52
 
 function QueueRow({ item, active, onClick, meta }) {
+  const lastDate = formatLastMessageDate(item.updatedAt)
+  const fullDate = formatFullDateTime(item.updatedAt)
+
   return (
     <button
       type="button"
@@ -26,8 +29,30 @@ function QueueRow({ item, active, onClick, meta }) {
         </span>
         <span style={{ fontSize: 11, color: C.textMuted, flexShrink: 0 }}>{meta || formatWait(item.waitingSeconds)}</span>
       </div>
-      {item.phone && (
-        <div style={{ fontSize: 11, color: C.textMuted, marginTop: 2 }}>{item.phone}</div>
+      {(item.phone || lastDate) && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 2, gap: 6 }}>
+          {item.phone ? (
+            <span style={{ fontSize: 11, color: C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {item.phone}
+            </span>
+          ) : <span />}
+          {lastDate && (
+            <span
+              title={fullDate}
+              style={{
+                fontSize: 10,
+                color: 'rgba(27,28,26,0.38)',
+                flexShrink: 0,
+                marginLeft: 'auto',
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.01em',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {lastDate}
+            </span>
+          )}
+        </div>
       )}
       {item.assignedStylistName && item.status === 'with_stylist' && (
         <div style={{ fontSize: 11, color: C.navy, marginTop: 2 }}>{item.assignedStylistName}</div>

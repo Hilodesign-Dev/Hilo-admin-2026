@@ -1,5 +1,6 @@
 import { supa } from '../../lib/supabase'
 import { cartTotals, lineMath } from './cartHelpers'
+import { _logChange } from '../../lib/logger'
 
 /**
  * Order creation pipeline used by both the POS New Order flow and the
@@ -145,9 +146,9 @@ export const createPosOrder = async ({ customer, orderMeta = {}, cart, stylist, 
   // website sync) and never 'marketplace' (that's the marketplace wizard).
   // See HIOS00053, June 2026, for the bug this prevents.
   const channelId =
-    channel === 'In-store'      ? 'in-store'      :
-    channel === 'Online Assist' ? 'online-assist' :
-    null
+    channel === 'In-store' ? 'in-store' :
+      channel === 'Online Assist' ? 'online-assist' :
+        null
   const total = +totals.saleTotal.toFixed(2)
   // Shopify-convention mirrors of the discount info so the invoice generator,
   // dashboards, and any other consumer that reads subtotal_price + total_discounts
@@ -155,9 +156,9 @@ export const createPosOrder = async ({ customer, orderMeta = {}, cart, stylist, 
   const subtotalGross = +Number(totals.gross || 0).toFixed(2)
   const totalDiscountsAll = +(
     Number(totals.lineDiscountTotal || 0) +
-    Number(totals.orderDiscount     || 0) +
-    Number(totals.couponDiscount    || 0) +
-    Number(totals.loyaltyDiscount   || 0)
+    Number(totals.orderDiscount || 0) +
+    Number(totals.couponDiscount || 0) +
+    Number(totals.loyaltyDiscount || 0)
   ).toFixed(2)
 
   // Defensive: resolve a store_id from the channel if the caller didn't pass one.
@@ -172,11 +173,11 @@ export const createPosOrder = async ({ customer, orderMeta = {}, cart, stylist, 
   }
   if (!resolvedStore.id) {
     const channelKey =
-      channel === 'In-store'      ? 'in-store' :
-      channel === 'Online Assist' ? 'online-assist' :
-      channel === 'Online'        ? 'online' :
-      channel === 'Marketplace'   ? 'in-store' :  // marketplaces issued from the in-store legal entity
-      null
+      channel === 'In-store' ? 'in-store' :
+        channel === 'Online Assist' ? 'online-assist' :
+          channel === 'Online' ? 'online' :
+            channel === 'Marketplace' ? 'in-store' :  // marketplaces issued from the in-store legal entity
+              null
     if (channelKey) {
       try {
         const { data: fb } = await supa
@@ -213,7 +214,7 @@ export const createPosOrder = async ({ customer, orderMeta = {}, cart, stylist, 
     payment_collected: 0,
     payment_balance: total,
     payment_status: 'unpaid',
-    store_id:  resolvedStore.id   || null,
+    store_id: resolvedStore.id || null,
     pos_store: resolvedStore.name || null,
     event_date: orderMeta.event_date || null,
     delivery_type: orderMeta.delivery_type || null,
@@ -244,85 +245,85 @@ export const createPosOrder = async ({ customer, orderMeta = {}, cart, stylist, 
   }
   try {
 
-  for (const li of cart) {
-    const m = lineMath(li)
-    const lineId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-    const isMtf = li.size === 'MTF'
-    const measurementStatus = isMtf ? 'pending' : 'not_required'
-    const wearerCustomerId = li.customer_id || buyerCustomerId
+    for (const li of cart) {
+      const m = lineMath(li)
+      const lineId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+      const isMtf = li.size === 'MTF'
+      const measurementStatus = isMtf ? 'pending' : 'not_required'
+      const wearerCustomerId = li.customer_id || buyerCustomerId
 
-    const lineRow = {
-      id: lineId,
-      order_id: orderId,
-      order_number: orderNumber,
-      customer_id: wearerCustomerId,
-      title: li.title,
-      sku: li.sku || '',
-      quantity: li.quantity || 1,
-      unit_price: Number(li.mrp || 0),
-      product_type: li.type === 'catalog' ? 'catalog' : 'custom',
-      type: li.is_set ? 'Custom' : (li.type === 'custom' || li.type === 'custom_set' ? 'Custom' : 'General'),
-      size: li.size || null,
-      production_stage: 'pending',
-      stylist: (stylist?.id != null ? String(stylist.id) : null),
-      garment_category: li.garment_category || li.category || null,
-garment_type: li.garment_type || null,
-      discount_type: li.discountType || null,
-      discount_value: li.discountValue == null ? null : Number(li.discountValue),
-      discount_amount: m.discountAmount,
-      sale_price: m.salePrice,
-      gst_rate: m.gstRate,
-      gst_amount: m.gstAmount,
-      measurement_status: measurementStatus,
-      confirmation_status: quotationId ? 'confirmed' : 'incomplete',
-      is_set_component: false,
-    }
-    const { error: liErr } = await supa.from('order_line_items').insert([lineRow])
-    if (liErr) throw liErr
+      const lineRow = {
+        id: lineId,
+        order_id: orderId,
+        order_number: orderNumber,
+        customer_id: wearerCustomerId,
+        title: li.title,
+        sku: li.sku || '',
+        quantity: li.quantity || 1,
+        unit_price: Number(li.mrp || 0),
+        product_type: li.type === 'catalog' ? 'catalog' : 'custom',
+        type: li.is_set ? 'Custom' : (li.type === 'custom' || li.type === 'custom_set' ? 'Custom' : 'General'),
+        size: li.size || null,
+        production_stage: 'pending',
+        stylist: (stylist?.id != null ? String(stylist.id) : null),
+        garment_category: li.garment_category || li.category || null,
+        garment_type: li.garment_type || null,
+        discount_type: li.discountType || null,
+        discount_value: li.discountValue == null ? null : Number(li.discountValue),
+        discount_amount: m.discountAmount,
+        sale_price: m.salePrice,
+        gst_rate: m.gstRate,
+        gst_amount: m.gstAmount,
+        measurement_status: measurementStatus,
+        confirmation_status: quotationId ? 'confirmed' : 'incomplete',
+        is_set_component: false,
+      }
+      const { error: liErr } = await supa.from('order_line_items').insert([lineRow])
+      if (liErr) throw liErr
 
-    if (li.is_set && Array.isArray(li.set_components)) {
-      for (const comp of li.set_components) {
-        const compId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-        const compRow = {
-          id: compId,
-          order_id: orderId,
-          order_number: orderNumber,
-          customer_id: comp.customer_id || wearerCustomerId,
-          title: comp.name || comp.category,
-          sku: '',
-          quantity: 1,
-          unit_price: 0,
-          product_type: 'custom',
-          type: 'Custom',
-          size: 'MTF',
-          production_stage: 'pending',
-          stylist: (stylist?.id != null ? String(stylist.id) : null),
-          garment_category: comp.garment_category || comp.category || null,
-garment_type: comp.garment_type || null,
-          discount_amount: 0,
-          sale_price: 0,
-          gst_rate: m.gstRate,
-          gst_amount: 0,
-          measurement_status: 'pending',
-          confirmation_status: quotationId ? 'confirmed' : 'incomplete',
-          is_set_component: true,
-          set_parent_id: lineId,
+      if (li.is_set && Array.isArray(li.set_components)) {
+        for (const comp of li.set_components) {
+          const compId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+          const compRow = {
+            id: compId,
+            order_id: orderId,
+            order_number: orderNumber,
+            customer_id: comp.customer_id || wearerCustomerId,
+            title: comp.name || comp.category,
+            sku: '',
+            quantity: 1,
+            unit_price: 0,
+            product_type: 'custom',
+            type: 'Custom',
+            size: 'MTF',
+            production_stage: 'pending',
+            stylist: (stylist?.id != null ? String(stylist.id) : null),
+            garment_category: comp.garment_category || comp.category || null,
+            garment_type: comp.garment_type || null,
+            discount_amount: 0,
+            sale_price: 0,
+            gst_rate: m.gstRate,
+            gst_amount: 0,
+            measurement_status: 'pending',
+            confirmation_status: quotationId ? 'confirmed' : 'incomplete',
+            is_set_component: true,
+            set_parent_id: lineId,
+          }
+          const { error: compErr } = await supa.from('order_line_items').insert([compRow])
+          if (compErr) throw compErr
         }
-        const { error: compErr } = await supa.from('order_line_items').insert([compRow])
-        if (compErr) throw compErr
       }
     }
-  }
 
-  // Confirmed orders (from quotation) skip pending → move to fabrication immediately
-  if (quotationId) {
-    await supa.from('order_line_items')
-      .update({ production_stage: 'fabrication', confirmation_status: 'confirmed' })
-      .eq('order_id', orderId)
-    await supa.from('shopify_orders')
-      .update({ order_status: 'confirmed', confirmed_at: new Date().toISOString(), confirmed_by: stylist?.name || null })
-      .eq('id', orderId)
-  }
+    // Confirmed orders (from quotation) skip pending → move to fabrication immediately
+    if (quotationId) {
+      await supa.from('order_line_items')
+        .update({ production_stage: 'fabrication', confirmation_status: 'confirmed' })
+        .eq('order_id', orderId)
+      await supa.from('shopify_orders')
+        .update({ order_status: 'confirmed', confirmed_at: new Date().toISOString(), confirmed_by: stylist?.name || null })
+        .eq('id', orderId)
+    }
 
   } catch (e) { await rollback(e) }
 
@@ -401,8 +402,8 @@ export const savePosPayments = async (orderId, total, splits, { stylist, isParti
   const status = balance <= 0.01 ? 'paid' : (newCollected > 0 ? 'partial' : 'unpaid')
   await supa.from('shopify_orders').update({
     payment_collected: newCollected,
-    payment_balance:   Math.max(0, balance),
-    payment_status:    status,
+    payment_balance: Math.max(0, balance),
+    payment_status: status,
   }).eq('id', orderId)
 
   return { collected: newCollected, balance, status }
@@ -462,7 +463,7 @@ export const editOrder = async ({ orderId, orderPatch = {}, addedItems = [], mod
 
   // 3. Added items
   for (const li of addedItems) {
-    const lineId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2,8)}`
+    const lineId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
     const m = lineMath(li)
     const lineRow = {
       id: lineId,
@@ -478,7 +479,7 @@ export const editOrder = async ({ orderId, orderPatch = {}, addedItems = [], mod
       production_stage: 'pending',
       stylist: order.stylist,
       garment_category: li.garment_category || li.category || null,
-garment_type: li.garment_type || null,
+      garment_type: li.garment_type || null,
       discount_type: li.discountType || null,
       discount_value: li.discountValue == null ? null : Number(li.discountValue),
       discount_amount: m.discountAmount,
@@ -496,7 +497,7 @@ garment_type: li.garment_type || null,
   // 4. Removed items — pending = delete, else mark cancelled (proper cancel comes via cancelOrder in P3)
   if (removedItemIds.length) {
     const { data: rows } = await supa.from('order_line_items').select('id, production_stage').in('id', removedItemIds)
-    const pendingIds    = (rows || []).filter(r => r.production_stage === 'pending').map(r => r.id)
+    const pendingIds = (rows || []).filter(r => r.production_stage === 'pending').map(r => r.id)
     const inProgressIds = (rows || []).filter(r => r.production_stage !== 'pending').map(r => r.id)
     if (pendingIds.length) {
       await supa.from('order_line_items').delete().in('id', pendingIds)
@@ -515,11 +516,11 @@ garment_type: li.garment_type || null,
   // 5. Recompute totals from living items
   const { data: items } = await supa.from('order_line_items')
     .select('sale_price, gst_amount').eq('order_id', orderId).neq('production_stage', 'cancelled')
-  const total   = (items || []).reduce((acc, i) => acc + Number(i.sale_price || 0), 0)
-  const gstSum  = (items || []).reduce((acc, i) => acc + Number(i.gst_amount  || 0), 0)
+  const total = (items || []).reduce((acc, i) => acc + Number(i.sale_price || 0), 0)
+  const gstSum = (items || []).reduce((acc, i) => acc + Number(i.gst_amount || 0), 0)
   const collected = Number(order.payment_collected || 0)
-  const balance   = +(total - collected).toFixed(2)
-  const status    = total <= 0 ? 'cancelled' : balance <= 0.01 ? 'paid' : collected > 0 ? 'partial' : 'unpaid'
+  const balance = +(total - collected).toFixed(2)
+  const status = total <= 0 ? 'cancelled' : balance <= 0.01 ? 'paid' : collected > 0 ? 'partial' : 'unpaid'
 
   await supa.from('shopify_orders').update({
     total_price: +total.toFixed(2),
@@ -544,14 +545,14 @@ export const rebuildOrderPaymentTotals = async (orderId) => {
   const total = Number(order?.total_price || 0)
   const balance = +(total - collected).toFixed(2)
   const status =
-    total <= 0          ? 'cancelled' :
-    balance <= 0.01     ? 'paid' :
-    collected > 0       ? 'partial' :
-                          'unpaid'
+    total <= 0 ? 'cancelled' :
+      balance <= 0.01 ? 'paid' :
+        collected > 0 ? 'partial' :
+          'unpaid'
   await supa.from('shopify_orders').update({
     payment_collected: collected,
-    payment_balance:   Math.max(0, balance),
-    payment_status:    status,
+    payment_balance: Math.max(0, balance),
+    payment_status: status,
   }).eq('id', orderId)
   return { collected, balance: Math.max(0, balance), status }
 }
@@ -690,7 +691,6 @@ export const cancelOrder = async ({
 
   // 6. Audit
   try {
-    const { _logChange } = await import('../../lib/logger')
     _logChange?.('cancel', isWhole ? 'order' : 'order_line', orderId, order.order_number, {
       reason, notes,
       write_off: writeOff,
@@ -698,7 +698,7 @@ export const cancelOrder = async ({
       cancelled_item_ids: targetItems.map(i => i.id),
       approving_user_id: approvingUserId,
     })
-  } catch {}
+  } catch { }
 
   return { ok: true }
 }
@@ -913,7 +913,7 @@ export const createMarketplaceOrder = async (opts) => {
         stylist: MP_DEFAULT_STYLIST,
         product_executive: productionExecutive || null,
         garment_category: li.garment_category || null,
-garment_type: li.garment_type || null,
+        garment_type: li.garment_type || null,
         discount_amount: 0,
         sale_price: salePrice,
         gst_rate: gstRate,
