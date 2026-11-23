@@ -22,17 +22,17 @@ const isWalkin = (l) => !!l && l.channel === 'In-store'  // a lead on the In-sto
 const fmtYMD = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
 const STATUS_COLORS = {
-  'New':                  { color: '#92400e', bg: 'rgba(254,243,199,0.5)' },
-  'Yet to Connect':       { color: '#92400e', bg: 'rgba(254,243,199,0.5)' },
-  'Follow-up 1':          { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
-  'Follow-up 2':          { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
-  'Follow-up 3':          { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
-  'Store Visit Booked':   { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
-  'Store visit follow-up':{ color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
-  'To be Closed':         { color: '#C9A84C', bg: 'rgba(201,168,76,0.1)' },
-  'Lost':                 { color: '#dc2626', bg: 'rgba(254,226,226,0.5)' },
-  'Not Qualified':        { color: '#dc2626', bg: 'rgba(254,226,226,0.5)' },
-  'Converted':            { color: '#16a34a', bg: 'rgba(220,252,231,0.5)' },
+  'New': { color: '#92400e', bg: 'rgba(254,243,199,0.5)' },
+  'Yet to Connect': { color: '#92400e', bg: 'rgba(254,243,199,0.5)' },
+  'Follow-up 1': { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
+  'Follow-up 2': { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
+  'Follow-up 3': { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
+  'Store Visit Booked': { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
+  'Store visit follow-up': { color: '#2563eb', bg: 'rgba(219,234,254,0.5)' },
+  'To be Closed': { color: '#C9A84C', bg: 'rgba(201,168,76,0.1)' },
+  'Lost': { color: '#dc2626', bg: 'rgba(254,226,226,0.5)' },
+  'Not Qualified': { color: '#dc2626', bg: 'rgba(254,226,226,0.5)' },
+  'Converted': { color: '#16a34a', bg: 'rgba(220,252,231,0.5)' },
 }
 
 const getStatusColor = (status) => STATUS_COLORS[status] || { color: '#6b7280', bg: 'rgba(107,114,128,0.1)' }
@@ -51,17 +51,18 @@ const RowActions = ({ lead, onLog, onEditLead, onLinkOrder, linkedIds, logLabel 
   const converted = lead.status === 'Converted'
   const needsLink = converted && !lead.order_id && !!onLinkOrder && !(linkedIds && linkedIds.has(lead.id))
   return (
-  <div className="flex items-center gap-1.5 justify-end">
-    {(!isTerminal(lead.status) || logLabel === 'Close')
-      ? <button onClick={() => onLog?.(lead)} className="text-[10px] px-2.5 py-1 rounded-lg font-bold" style={{ background: C.gold, color: '#fff', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>{logLabel}</button>
-      : needsLink
-        ? <button onClick={() => onLinkOrder(lead)} title="Converted but no order linked — link it so revenue matches POS" className="text-[10px] px-2.5 py-1 rounded-lg font-bold" style={{ background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>🔗 Link order</button>
-        : <span className="text-[10px] px-2 py-1 rounded-lg font-bold" style={{ background: converted ? 'rgba(22,163,74,0.1)' : 'rgba(220,38,38,0.08)', color: converted ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap' }}>{converted ? '✓ Closed' : '✕ ' + lead.status}</span>}
-    <button onClick={() => onEditLead?.(lead)} title="Edit — all fields" className="p-1 rounded hover:bg-gray-100" style={{ color: C.textMuted, cursor: 'pointer' }}>
-      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-    </button>
-  </div>
-) }
+    <div className="flex items-center gap-1.5 justify-end">
+      {(!isTerminal(lead.status) || logLabel === 'Close')
+        ? <button onClick={() => onLog?.(lead)} className="text-[10px] px-2.5 py-1 rounded-lg font-bold" style={{ background: C.gold, color: '#fff', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>{logLabel}</button>
+        : needsLink
+          ? <button onClick={() => onLinkOrder(lead)} title="Converted but no order linked — link it so revenue matches POS" className="text-[10px] px-2.5 py-1 rounded-lg font-bold" style={{ background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>🔗 Link order</button>
+          : <span className="text-[10px] px-2 py-1 rounded-lg font-bold" style={{ background: converted ? 'rgba(22,163,74,0.1)' : 'rgba(220,38,38,0.08)', color: converted ? '#16a34a' : '#dc2626', whiteSpace: 'nowrap' }}>{converted ? '✓ Closed' : '✕ ' + lead.status}</span>}
+      <button onClick={() => onEditLead?.(lead)} title="Edit — all fields" className="p-1 rounded hover:bg-gray-100" style={{ color: C.textMuted, cursor: 'pointer' }}>
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+      </button>
+    </div>
+  )
+}
 
 const isPending = (status) => status === 'New' || status === 'Yet to Connect'
 const isFollowUp = (status) => ['Follow-up 1', 'Follow-up 2', 'Follow-up 3'].includes(status)
@@ -96,11 +97,11 @@ export const StoreWalkinsView = ({ leads = [], teamMembers = [], onRefresh, onLo
     const ids = leads.filter(l => l.channel === 'In-store' && l.status === 'Converted' && !l.order_id).map(l => l.id)
     if (!ids.length) { setLinkedIds(new Set()); return }
     let live = true
-    ;(async () => {
-      let rows = []
-      for (let i = 0; i < ids.length; i += 200) { const { data } = await supa.from('lead_orders').select('lead_id').in('lead_id', ids.slice(i, i + 200)); rows = rows.concat(data || []) }
-      if (live) setLinkedIds(new Set(rows.map(r => r.lead_id)))
-    })()
+      ; (async () => {
+        let rows = []
+        for (let i = 0; i < ids.length; i += 200) { const { data } = await supa.from('lead_orders').select('lead_id').in('lead_id', ids.slice(i, i + 200)); rows = rows.concat(data || []) }
+        if (live) setLinkedIds(new Set(rows.map(r => r.lead_id)))
+      })()
     return () => { live = false }
   }, [leads])
   const [expandedLeadId, setExpandedLeadId] = useState(null)
@@ -246,286 +247,286 @@ export const StoreWalkinsView = ({ leads = [], teamMembers = [], onRefresh, onLo
       ) : wkView === 'analytics' ? (
         <WalkinAnalytics leads={leads} teamMembers={teamMembers} />
       ) : (
-      <>
-      {/* ── Focus-leads nudge for the logged-in stylist ── */}
-      {(() => {
-        if (focusDismiss) return null
-        const myId = String((typeof window !== 'undefined' && window._currentUserId) || '')
-        if (!myId) return null
-        const mine = leads.filter(l => isWalkin(l) && String(l.assigned_to) === myId && needsAttention(l))
-        if (!mine.length) return null
-        const hq = mine.filter(l => ['High Quality', 'Good'].includes(l.lead_quality)).length
-        const toClose = mine.filter(l => FOCUS_STATUSES.includes(l.status)).length
-        return (
-          <div className="mb-4 rounded-xl p-3 sm:p-4 flex flex-wrap items-center gap-3" style={{ background: 'linear-gradient(90deg, rgba(201,168,76,0.14), rgba(201,168,76,0.03))', border: '1px solid rgba(201,168,76,0.45)' }}>
-            <span style={{ fontSize: 22 }}>📞</span>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div className="font-bold text-sm" style={{ color: C.text }}>You have {mine.length} focus lead{mine.length === 1 ? '' : 's'} to close</div>
-              <div className="text-xs" style={{ color: C.textMuted }}>{hq} high/good quality{toClose ? ` · ${toClose} to-be-closed` : ''} · keep following up till each is won or lost.</div>
+        <>
+          {/* ── Focus-leads nudge for the logged-in stylist ── */}
+          {(() => {
+            if (focusDismiss) return null
+            const myId = String((typeof window !== 'undefined' && window._currentUserId) || '')
+            if (!myId) return null
+            const mine = leads.filter(l => isWalkin(l) && String(l.assigned_to) === myId && needsAttention(l))
+            if (!mine.length) return null
+            const hq = mine.filter(l => ['High Quality', 'Good'].includes(l.lead_quality)).length
+            const toClose = mine.filter(l => FOCUS_STATUSES.includes(l.status)).length
+            return (
+              <div className="mb-4 rounded-xl p-3 sm:p-4 flex flex-wrap items-center gap-3" style={{ background: 'linear-gradient(90deg, rgba(201,168,76,0.14), rgba(201,168,76,0.03))', border: '1px solid rgba(201,168,76,0.45)' }}>
+                <span style={{ fontSize: 22 }}>📞</span>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div className="font-bold text-sm" style={{ color: C.text }}>You have {mine.length} focus lead{mine.length === 1 ? '' : 's'} to close</div>
+                  <div className="text-xs" style={{ color: C.textMuted }}>{hq} high/good quality{toClose ? ` · ${toClose} to-be-closed` : ''} · keep following up till each is won or lost.</div>
+                </div>
+                <button onClick={() => { setFocusStaff(myId); setWkView('register') }} className="text-xs font-bold px-4 py-2 rounded-lg" style={{ background: C.gold, color: '#fff', whiteSpace: 'nowrap' }}>Open follow-ups →</button>
+                <button onClick={() => setFocusDismiss(true)} className="text-xs font-bold px-2" style={{ color: C.textMuted }}>Dismiss</button>
+              </div>
+            )
+          })()}
+          {/* ── Section A: Daily Footfall Summary ──────────────────────────── */}
+          <div className="mb-4 sm:mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h2 className="text-base sm:text-lg font-bold" style={{ color: C.text }}>
+                Store Walk-ins
+              </h2>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={e => setSelectedDate(e.target.value)}
+                className="text-sm px-3 py-1.5 rounded-lg outline-none"
+                style={{ background: C.cardBg, border: `1px solid ${C.border}`, color: C.text }}
+              />
             </div>
-            <button onClick={() => { setFocusStaff(myId); setWkView('register') }} className="text-xs font-bold px-4 py-2 rounded-lg" style={{ background: C.gold, color: '#fff', whiteSpace: 'nowrap' }}>Open follow-ups →</button>
-            <button onClick={() => setFocusDismiss(true)} className="text-xs font-bold px-2" style={{ color: C.textMuted }}>Dismiss</button>
-          </div>
-        )
-      })()}
-      {/* ── Section A: Daily Footfall Summary ──────────────────────────── */}
-      <div className="mb-4 sm:mb-6">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h2 className="text-base sm:text-lg font-bold" style={{ color: C.text }}>
-            Store Walk-ins
-          </h2>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
-            className="text-sm px-3 py-1.5 rounded-lg outline-none"
-            style={{ background: C.cardBg, border: `1px solid ${C.border}`, color: C.text }}
-          />
-        </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
-          <KpiCard label="Walk-ins" value={stats.total} />
-          <KpiCard label="People" value={stats.people} />
-          <KpiCard label="Converted" value={stats.converted} color="#16a34a" />
-          <KpiCard label="Following Up" value={stats.followingUp} color="#2563eb" />
-          <KpiCard label="Lost" value={stats.lost} color="#dc2626" />
-          <KpiCard label="Conv Rate" value={`${stats.convRate}%`} color={C.gold} />
-        </div>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
+              <KpiCard label="Walk-ins" value={stats.total} />
+              <KpiCard label="People" value={stats.people} />
+              <KpiCard label="Converted" value={stats.converted} color="#16a34a" />
+              <KpiCard label="Following Up" value={stats.followingUp} color="#2563eb" />
+              <KpiCard label="Lost" value={stats.lost} color="#dc2626" />
+              <KpiCard label="Conv Rate" value={`${stats.convRate}%`} color={C.gold} />
+            </div>
 
-        {/* Staff Breakdown Toggle */}
-        <button
-          onClick={() => setShowStaffBreakdown(!showStaffBreakdown)}
-          className="mt-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
-          style={{ color: C.textMuted, background: showStaffBreakdown ? C.bg : 'transparent', border: `1px solid ${C.border}` }}
-        >
-          Staff {showStaffBreakdown ? '▾' : '▸'}
-        </button>
-        {showStaffBreakdown && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {staffBreakdown.map(s => (
-              <span key={s.name} className="text-xs px-3 py-1.5 rounded-lg font-bold" style={{ background: C.cardBg, border: `1px solid ${C.border}`, color: C.text }}>
-                {s.name}: <span style={{ color: C.gold }}>{s.count}</span>
-              </span>
-            ))}
-            {staffBreakdown.length === 0 && <span className="text-xs" style={{ color: C.textMuted }}>No walk-ins yet</span>}
-          </div>
-        )}
-      </div>
-
-      {/* ── Section B: Quick Entry Row ─────────────────────────────────── */}
-      <div className="mb-4 rounded-xl overflow-hidden" style={{ border: `1.5px solid ${C.gold}40`, background: C.cardBg }}>
-        <div className={`p-3 flex ${isMobile ? 'flex-col gap-2' : 'items-end gap-3 flex-wrap'}`}>
-          {/* Phone */}
-          <div className={isMobile ? 'w-full' : 'flex-1 min-w-[240px]'}>
-            <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Phone</label>
-            <PhoneInput
-              value={qe.phone}
-              onChange={v => setQe(prev => ({ ...prev, phone: v }))}
-              countryCodes={lists.country_codes || {}}
-              countries={lists.countries || []}
-              placeholder="98765 43210"
-            />
-            {returningCount !== null && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: 'rgba(37,99,235,0.1)', color: '#2563eb' }}>
-                Returning — visited {returningCount}x
-              </span>
+            {/* Staff Breakdown Toggle */}
+            <button
+              onClick={() => setShowStaffBreakdown(!showStaffBreakdown)}
+              className="mt-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+              style={{ color: C.textMuted, background: showStaffBreakdown ? C.bg : 'transparent', border: `1px solid ${C.border}` }}
+            >
+              Staff {showStaffBreakdown ? '▾' : '▸'}
+            </button>
+            {showStaffBreakdown && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {staffBreakdown.map(s => (
+                  <span key={s.name} className="text-xs px-3 py-1.5 rounded-lg font-bold" style={{ background: C.cardBg, border: `1px solid ${C.border}`, color: C.text }}>
+                    {s.name}: <span style={{ color: C.gold }}>{s.count}</span>
+                  </span>
+                ))}
+                {staffBreakdown.length === 0 && <span className="text-xs" style={{ color: C.textMuted }}>No walk-ins yet</span>}
+              </div>
             )}
           </div>
 
-          {/* Name */}
-          <div className={isMobile ? 'w-full' : 'flex-1 min-w-[140px]'}>
-            <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Name</label>
-            <input
-              type="text"
-              placeholder="Client name"
-              value={qe.name}
-              onChange={e => setQe(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full text-sm px-3 py-2 rounded-lg outline-none"
-              style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.text }}
-            />
-          </div>
-
-          {/* Party Size + Staff row */}
-          <div className={isMobile ? 'flex gap-2 w-full' : 'contents'}>
-            <div className={isMobile ? 'w-[90px]' : 'w-[80px]'}>
-              <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Party</label>
-              <div className="flex items-center rounded-lg overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
-                <button
-                  onClick={() => setQe(prev => ({ ...prev, partySize: Math.max(1, prev.partySize - 1) }))}
-                  className="px-2 py-2 text-sm font-bold"
-                  style={{ background: C.bg, color: C.text, border: 'none' }}
-                >−</button>
-                <span className="px-2 py-2 text-sm font-bold text-center flex-1" style={{ background: C.cardBg, color: C.text }}>{qe.partySize}</span>
-                <button
-                  onClick={() => setQe(prev => ({ ...prev, partySize: Math.min(20, prev.partySize + 1) }))}
-                  className="px-2 py-2 text-sm font-bold"
-                  style={{ background: C.bg, color: C.text, border: 'none' }}
-                >+</button>
+          {/* ── Section B: Quick Entry Row ─────────────────────────────────── */}
+          <div className="mb-4 rounded-xl overflow-hidden" style={{ border: `1.5px solid ${C.gold}40`, background: C.cardBg }}>
+            <div className={`p-3 flex ${isMobile ? 'flex-col gap-2' : 'items-end gap-3 flex-wrap'}`}>
+              {/* Phone */}
+              <div className={isMobile ? 'w-full' : 'flex-1 min-w-[240px]'}>
+                <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Phone</label>
+                <PhoneInput
+                  value={qe.phone}
+                  onChange={v => setQe(prev => ({ ...prev, phone: v }))}
+                  countryCodes={lists.country_codes || {}}
+                  countries={lists.countries || []}
+                  placeholder="98765 43210"
+                />
+                {returningCount !== null && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: 'rgba(37,99,235,0.1)', color: '#2563eb' }}>
+                    Returning — visited {returningCount}x
+                  </span>
+                )}
               </div>
-            </div>
 
-            <div className={isMobile ? 'flex-1' : 'w-[140px]'}>
-              <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Staff</label>
-              <select
-                value={qe.staffId}
-                onChange={e => setQe(prev => ({ ...prev, staffId: e.target.value }))}
-                className="w-full text-sm px-2 py-2 rounded-lg outline-none"
-                style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.text }}
-              >
-                <option value="">Select Staff</option>
-                {filterStylists(teamMembers).map(tm => <option key={tm.id} value={tm.id}>{tm.name}</option>)}
-              </select>
-            </div>
-          </div>
+              {/* Name */}
+              <div className={isMobile ? 'w-full' : 'flex-1 min-w-[140px]'}>
+                <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Name</label>
+                <input
+                  type="text"
+                  placeholder="Client name"
+                  value={qe.name}
+                  onChange={e => setQe(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full text-sm px-3 py-2 rounded-lg outline-none"
+                  style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.text }}
+                />
+              </div>
 
-          {/* Log Button */}
-          <div className={isMobile ? 'w-full' : ''}>
-            <button
-              onClick={handleLogWalkin}
-              disabled={saving}
-              className={`${isMobile ? 'w-full' : ''} px-5 py-2 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-40`}
-              style={{ background: C.gold }}
-            >
-              {saving ? '...' : '+ Log Walk-in'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Section C: Outcome Panel (inline, for expanded lead) ───────── */}
-      {expandedLeadId && (
-        <OutcomePanel
-          lead={dayLeads.find(l => l.id === expandedLeadId) || leads.find(l => l.id === expandedLeadId)}
-          teamMembers={teamMembers}
-          staffName={staffName}
-          onClose={() => setExpandedLeadId(null)}
-          onSave={() => { setExpandedLeadId(null); onRefresh?.() }}
-          isMobile={isMobile}
-        />
-      )}
-
-      {/* ── Section D: Today's Walk-in Log ─────────────────────────────── */}
-      <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${C.border}`, background: C.cardBg }}>
-        <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${C.border}` }}>
-          <h3 className="font-bold text-sm" style={{ color: C.text }}>
-            {selectedDate === todayStr ? "Today's Walk-ins" : `Walk-ins — ${new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`}
-          </h3>
-          <span className="text-xs font-bold" style={{ color: C.textMuted }}>{dayLeads.length} entries</span>
-        </div>
-
-        {dayLeads.length === 0 ? (
-          <div className="px-4 py-10 text-center text-sm" style={{ color: C.textMuted }}>
-            No walk-ins logged for {selectedDate === todayStr ? 'today' : 'this date'}. Use the Quick Entry above to log the first one.
-          </div>
-        ) : isMobile ? (
-          /* Mobile: Card Layout */
-          <div className="divide-y" style={{ borderColor: C.border }}>
-            {dayLeads.map((lead, idx) => {
-              const sc = getStatusColor(lead.status)
-              const qc = QUALITY_COLORS[lead.lead_quality] || QUALITY_COLORS['Avg']
-              const pending = isPending(lead.status)
-              return (
-                <div
-                  key={lead.id}
-                  className="p-3"
-                  style={{ borderLeft: pending ? `4px solid #d97706` : 'none', background: expandedLeadId === lead.id ? 'rgba(201,168,76,0.04)' : 'transparent' }}
-                >
-                  <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <div>
-                      <span className="text-sm font-bold" style={{ color: C.text }}>{lead.client_name || '—'}</span>
-                      {lead.phone && (
-                        <a href={`tel:${lead.phone}`} className="ml-2 text-xs" style={{ color: '#2563eb' }}>{lead.phone}</a>
-                      )}
-                    </div>
-                    <span className="text-[10px]" style={{ color: C.textMuted }}>{fmtTime(lead.created_at)}</span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: sc.bg, color: sc.color }}>{lead.status}</span>
-                    <Badge color={qc.color} bg={qc.bg}>{lead.lead_quality || 'Avg'}</Badge>
-                    <span className="text-[10px]" style={{ color: C.textMuted }}>Party: {lead.party_size || 1}</span>
-                    <span className="text-[10px]" style={{ color: C.textMuted }}>Staff: {staffName(lead.assigned_to)}</span>
-                  </div>
-                  {lead.client_requirements && (
-                    <div className="text-[10px] mb-1.5" style={{ color: C.textMuted }}>Reason: {lead.client_requirements}</div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <RowActions lead={lead} onEditLead={onEditLead} onLinkOrder={setLinkLead} linkedIds={linkedIds} logLabel={expandedLeadId === lead.id ? 'Close' : 'Log Walk-in'}
-                      onLog={(l) => setExpandedLeadId(expandedLeadId === l.id ? null : l.id)} />
+              {/* Party Size + Staff row */}
+              <div className={isMobile ? 'flex gap-2 w-full' : 'contents'}>
+                <div className={isMobile ? 'w-[90px]' : 'w-[80px]'}>
+                  <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Party</label>
+                  <div className="flex items-center rounded-lg overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
                     <button
-                      onClick={() => handleDelete(lead.id)}
-                      disabled={deletingId === lead.id}
-                      className="text-[10px] px-2 py-0.5 rounded font-semibold"
-                      style={{ background: 'rgba(239,68,68,0.08)', color: '#dc2626', border: 'none', cursor: 'pointer', opacity: deletingId === lead.id ? 0.5 : 1 }}
-                    >
-                      {deletingId === lead.id ? '...' : 'Delete'}
-                    </button>
+                      onClick={() => setQe(prev => ({ ...prev, partySize: Math.max(1, prev.partySize - 1) }))}
+                      className="px-2 py-2 text-sm font-bold"
+                      style={{ background: C.bg, color: C.text, border: 'none' }}
+                    >−</button>
+                    <span className="px-2 py-2 text-sm font-bold text-center flex-1" style={{ background: C.cardBg, color: C.text }}>{qe.partySize}</span>
+                    <button
+                      onClick={() => setQe(prev => ({ ...prev, partySize: Math.min(20, prev.partySize + 1) }))}
+                      className="px-2 py-2 text-sm font-bold"
+                      style={{ background: C.bg, color: C.text, border: 'none' }}
+                    >+</button>
                   </div>
                 </div>
-              )
-            })}
+
+                <div className={isMobile ? 'flex-1' : 'w-[140px]'}>
+                  <label className="block text-[10px] font-bold uppercase mb-1" style={{ color: C.textMuted }}>Staff</label>
+                  <select
+                    value={qe.staffId}
+                    onChange={e => setQe(prev => ({ ...prev, staffId: e.target.value }))}
+                    className="w-full text-sm px-2 py-2 rounded-lg outline-none"
+                    style={{ background: C.bg, border: `1px solid ${C.border}`, color: C.text }}
+                  >
+                    <option value="">Select Staff</option>
+                    {filterStylists(teamMembers).map(tm => <option key={tm.id} value={tm.id}>{tm.name}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Log Button */}
+              <div className={isMobile ? 'w-full' : ''}>
+                <button
+                  onClick={handleLogWalkin}
+                  disabled={saving}
+                  className={`${isMobile ? 'w-full' : ''} px-5 py-2 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-40`}
+                  style={{ background: C.gold }}
+                >
+                  {saving ? '...' : '+ Log Walk-in'}
+                </button>
+              </div>
+            </div>
           </div>
-        ) : (
-          /* Desktop: Table Layout */
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
-              <thead>
-                <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                  {['#', 'Time', 'Client', 'Phone', 'Party', 'Staff', 'Reason', 'Quality', 'Status', 'Action', ''].map(h => (
-                    <th key={h} style={{ padding: '0.75rem 0.5rem', textAlign: 'left', fontSize: '0.6875rem', fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
+
+          {/* ── Section C: Outcome Panel (inline, for expanded lead) ───────── */}
+          {expandedLeadId && (
+            <OutcomePanel
+              lead={dayLeads.find(l => l.id === expandedLeadId) || leads.find(l => l.id === expandedLeadId)}
+              teamMembers={teamMembers}
+              staffName={staffName}
+              onClose={() => setExpandedLeadId(null)}
+              onSave={() => { setExpandedLeadId(null); onRefresh?.() }}
+              isMobile={isMobile}
+            />
+          )}
+
+          {/* ── Section D: Today's Walk-in Log ─────────────────────────────── */}
+          <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${C.border}`, background: C.cardBg }}>
+            <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${C.border}` }}>
+              <h3 className="font-bold text-sm" style={{ color: C.text }}>
+                {selectedDate === todayStr ? "Today's Walk-ins" : `Walk-ins — ${new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`}
+              </h3>
+              <span className="text-xs font-bold" style={{ color: C.textMuted }}>{dayLeads.length} entries</span>
+            </div>
+
+            {dayLeads.length === 0 ? (
+              <div className="px-4 py-10 text-center text-sm" style={{ color: C.textMuted }}>
+                No walk-ins logged for {selectedDate === todayStr ? 'today' : 'this date'}. Use the Quick Entry above to log the first one.
+              </div>
+            ) : isMobile ? (
+              /* Mobile: Card Layout */
+              <div className="divide-y" style={{ borderColor: C.border }}>
                 {dayLeads.map((lead, idx) => {
                   const sc = getStatusColor(lead.status)
                   const qc = QUALITY_COLORS[lead.lead_quality] || QUALITY_COLORS['Avg']
                   const pending = isPending(lead.status)
                   return (
-                    <tr
+                    <div
                       key={lead.id}
-                      style={{
-                        borderBottom: `1px solid ${C.border}`,
-                        borderLeft: pending ? `4px solid #d97706` : '4px solid transparent',
-                        background: expandedLeadId === lead.id ? 'rgba(201,168,76,0.04)' : 'transparent',
-                      }}
+                      className="p-3"
+                      style={{ borderLeft: pending ? `4px solid #d97706` : 'none', background: expandedLeadId === lead.id ? 'rgba(201,168,76,0.04)' : 'transparent' }}
                     >
-                      <td style={{ padding: '0.5rem', color: C.textMuted, fontSize: '0.75rem' }}>{dayLeads.length - idx}</td>
-                      <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.textMuted }}>{fmtTime(lead.created_at)}</td>
-                      <td style={{ padding: '0.5rem', fontWeight: 600, color: C.text }}>{lead.client_name || '—'}</td>
-                      <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.textMuted }}>
-                        {lead.phone ? <a href={`tel:${lead.phone}`} style={{ color: '#2563eb', textDecoration: 'none' }}>{lead.phone}</a> : 'No number'}
-                      </td>
-                      <td style={{ padding: '0.5rem', textAlign: 'center', fontWeight: 700, color: C.text }}>{lead.party_size || 1}</td>
-                      <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.text }}>{staffName(lead.assigned_to)}</td>
-                      <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.textMuted, maxWidth: '130px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.client_requirements || '—'}</td>
-                      <td style={{ padding: '0.5rem' }}><Badge color={qc.color} bg={qc.bg}>{lead.lead_quality || 'Avg'}</Badge></td>
-                      <td style={{ padding: '0.5rem' }}>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: sc.bg, color: sc.color }}>{lead.status}</span>
-                      </td>
-                      <td style={{ padding: '0.5rem' }}>
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <div>
+                          <span className="text-sm font-bold" style={{ color: C.text }}>{lead.client_name || '—'}</span>
+                          {lead.phone && (
+                            <a href={`tel:${lead.phone}`} className="ml-2 text-xs" style={{ color: '#2563eb' }}>{lead.phone}</a>
+                          )}
+                        </div>
+                        <span className="text-[10px]" style={{ color: C.textMuted }}>{fmtTime(lead.created_at)}</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: sc.bg, color: sc.color }}>{lead.status}</span>
+                        <Badge color={qc.color} bg={qc.bg}>{lead.lead_quality || 'Avg'}</Badge>
+                        <span className="text-[10px]" style={{ color: C.textMuted }}>Party: {lead.party_size || 1}</span>
+                        <span className="text-[10px]" style={{ color: C.textMuted }}>Staff: {staffName(lead.assigned_to)}</span>
+                      </div>
+                      {lead.client_requirements && (
+                        <div className="text-[10px] mb-1.5" style={{ color: C.textMuted }}>Reason: {lead.client_requirements}</div>
+                      )}
+                      <div className="flex items-center gap-2">
                         <RowActions lead={lead} onEditLead={onEditLead} onLinkOrder={setLinkLead} linkedIds={linkedIds} logLabel={expandedLeadId === lead.id ? 'Close' : 'Log Walk-in'}
                           onLog={(l) => setExpandedLeadId(expandedLeadId === l.id ? null : l.id)} />
-                      </td>
-                      <td style={{ padding: '0.5rem' }}>
                         <button
                           onClick={() => handleDelete(lead.id)}
                           disabled={deletingId === lead.id}
                           className="text-[10px] px-2 py-0.5 rounded font-semibold"
                           style={{ background: 'rgba(239,68,68,0.08)', color: '#dc2626', border: 'none', cursor: 'pointer', opacity: deletingId === lead.id ? 0.5 : 1 }}
-                          title="Delete walk-in"
                         >
-                          {deletingId === lead.id ? '...' : '✕'}
+                          {deletingId === lead.id ? '...' : 'Delete'}
                         </button>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   )
                 })}
-              </tbody>
-            </table>
+              </div>
+            ) : (
+              /* Desktop: Table Layout */
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `1px solid ${C.border}` }}>
+                      {['#', 'Time', 'Client', 'Phone', 'Party', 'Staff', 'Reason', 'Quality', 'Status', 'Action', ''].map(h => (
+                        <th key={h} style={{ padding: '0.75rem 0.5rem', textAlign: 'left', fontSize: '0.6875rem', fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dayLeads.map((lead, idx) => {
+                      const sc = getStatusColor(lead.status)
+                      const qc = QUALITY_COLORS[lead.lead_quality] || QUALITY_COLORS['Avg']
+                      const pending = isPending(lead.status)
+                      return (
+                        <tr
+                          key={lead.id}
+                          style={{
+                            borderBottom: `1px solid ${C.border}`,
+                            borderLeft: pending ? `4px solid #d97706` : '4px solid transparent',
+                            background: expandedLeadId === lead.id ? 'rgba(201,168,76,0.04)' : 'transparent',
+                          }}
+                        >
+                          <td style={{ padding: '0.5rem', color: C.textMuted, fontSize: '0.75rem' }}>{dayLeads.length - idx}</td>
+                          <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.textMuted }}>{fmtTime(lead.created_at)}</td>
+                          <td style={{ padding: '0.5rem', fontWeight: 600, color: C.text }}>{lead.client_name || '—'}</td>
+                          <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.textMuted }}>
+                            {lead.phone ? <a href={`tel:${lead.phone}`} style={{ color: '#2563eb', textDecoration: 'none' }}>{lead.phone}</a> : 'No number'}
+                          </td>
+                          <td style={{ padding: '0.5rem', textAlign: 'center', fontWeight: 700, color: C.text }}>{lead.party_size || 1}</td>
+                          <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.text }}>{staffName(lead.assigned_to)}</td>
+                          <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: C.textMuted, maxWidth: '130px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.client_requirements || '—'}</td>
+                          <td style={{ padding: '0.5rem' }}><Badge color={qc.color} bg={qc.bg}>{lead.lead_quality || 'Avg'}</Badge></td>
+                          <td style={{ padding: '0.5rem' }}>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: sc.bg, color: sc.color }}>{lead.status}</span>
+                          </td>
+                          <td style={{ padding: '0.5rem' }}>
+                            <RowActions lead={lead} onEditLead={onEditLead} onLinkOrder={setLinkLead} linkedIds={linkedIds} logLabel={expandedLeadId === lead.id ? 'Close' : 'Log Walk-in'}
+                              onLog={(l) => setExpandedLeadId(expandedLeadId === l.id ? null : l.id)} />
+                          </td>
+                          <td style={{ padding: '0.5rem' }}>
+                            <button
+                              onClick={() => handleDelete(lead.id)}
+                              disabled={deletingId === lead.id}
+                              className="text-[10px] px-2 py-0.5 rounded font-semibold"
+                              style={{ background: 'rgba(239,68,68,0.08)', color: '#dc2626', border: 'none', cursor: 'pointer', opacity: deletingId === lead.id ? 0.5 : 1 }}
+                              title="Delete walk-in"
+                            >
+                              {deletingId === lead.id ? '...' : '✕'}
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      </>
+        </>
       )}
     </div>
   )
@@ -567,9 +568,7 @@ const OutcomePanel = ({ lead, teamMembers, staffName, onClose, onSave, isMobile 
     return d.toISOString().split('T')[0]
   })
 
-  if (!lead) return null
-
-  const currentStatus = lead.status
+  const currentStatus = lead?.status
   const pending = isPending(currentStatus)
   const followUp = isFollowUp(currentStatus)
 
@@ -604,6 +603,8 @@ const OutcomePanel = ({ lead, teamMembers, staffName, onClose, onSave, isMobile 
     const timer = setTimeout(() => { if (orderSearch) searchOrders(orderSearch) }, 400)
     return () => clearTimeout(timer)
   }, [orderSearch])
+
+  if (!lead) return null
 
   // ── Save handlers ──────────────────────────────────────────────────────
   const handleSaveLost = async () => {
@@ -1017,7 +1018,7 @@ const WalkinRegister = ({ leads = [], teamMembers = [], onRefresh, isMobile, onE
     // include any active stylists from the roster too, so all can be picked even before they log a walk-in
     const rosterStylists = filterStylists(teamMembers)
     const rosterAll = (rosterStylists.length ? rosterStylists : teamMembers).map(tm => ({ id: String(tm.id), name: tm.name })).filter(x => x.name)
-    const map = {}; [...named, ...rosterAll].forEach(x => { if (!map[x.id]) map[x.id] = x.name })
+    const map = {};[...named, ...rosterAll].forEach(x => { if (!map[x.id]) map[x.id] = x.name })
     return Object.entries(map).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
   }, [allWalkins, teamMembers])
   const qRank = (q) => { const i = LEAD_QUALITIES.indexOf(q || 'Avg'); return i < 0 ? 99 : i }
@@ -1056,9 +1057,11 @@ const WalkinRegister = ({ leads = [], teamMembers = [], onRefresh, isMobile, onE
     const following = rangeRows.filter(l => isFollowUp(l.status)).length
     const dueFollowups = rangeRows.filter(l => isFollowUp(l.status) && l.follow_up_date && l.follow_up_date <= todayStr).length
     const returning = rangeRows.filter(isReturning).length
-    return { total, people, converted, lost, following, dueFollowups,
+    return {
+      total, people, converted, lost, following, dueFollowups,
       convRate: total ? Math.round(converted / total * 100) : 0,
-      returnRate: total ? Math.round(returning / total * 100) : 0 }
+      returnRate: total ? Math.round(returning / total * 100) : 0
+    }
   }, [rangeRows, todayStr])
 
   const setPreset = (which) => {
@@ -1167,7 +1170,7 @@ const WalkinRegister = ({ leads = [], teamMembers = [], onRefresh, isMobile, onE
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
               <thead>
                 <tr style={{ borderBottom: `1px solid ${C.border}` }}>
-                  {[['Date','date'],['Time',null],['Client','client'],['Phone',null],['Party','party'],['Staff','staff'],['Store','store'],['Source','source'],['Quality','quality'],['Reason',null],['Status','status'],['Follow-up','followup'],['Age','age'],['',null]].map(([h, key], hi) => (
+                  {[['Date', 'date'], ['Time', null], ['Client', 'client'], ['Phone', null], ['Party', 'party'], ['Staff', 'staff'], ['Store', 'store'], ['Source', 'source'], ['Quality', 'quality'], ['Reason', null], ['Status', 'status'], ['Follow-up', 'followup'], ['Age', 'age'], ['', null]].map(([h, key], hi) => (
                     <th key={(h || 'act') + hi} onClick={key ? () => toggleSort(key) : undefined} style={{ padding: '0.6rem 0.5rem', textAlign: 'left', fontSize: '0.65rem', fontWeight: 700, color: sortCol === key && key ? C.gold : C.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', cursor: key ? 'pointer' : 'default', userSelect: 'none' }}>{h}{key ? sortArrow(key) : ''}</th>
                   ))}
                 </tr>
@@ -1314,19 +1317,19 @@ const WalkinAnalytics = ({ leads = [], teamMembers = [] }) => {
     const ids = conv.map(l => l.id)
     if (!ids.length) { setRev({}); return }
     let cancelled = false
-    ;(async () => {
-      try {
-        let links = []
-        for (let i = 0; i < ids.length; i += 200) { const { data } = await supa.from('lead_orders').select('lead_id, order_id').in('lead_id', ids.slice(i, i + 200)); links = links.concat(data || []) }
-        const oids = [...new Set(links.map(l => l.order_id))]
-        if (!oids.length) { if (!cancelled) setRev({}); return }
-        let orders = []
-        for (let i = 0; i < oids.length; i += 200) { const { data } = await supa.from('shopify_orders').select('id, total_price').in('id', oids.slice(i, i + 200)); orders = orders.concat(data || []) }
-        const omap = Object.fromEntries(orders.map(o => [o.id, Number(o.total_price) || 0]))
-        const map = {}; links.forEach(l => { map[l.lead_id] = (map[l.lead_id] || 0) + (omap[l.order_id] || 0) })
-        if (!cancelled) setRev(map)
-      } catch { if (!cancelled) setRev({}) }
-    })()
+      ; (async () => {
+        try {
+          let links = []
+          for (let i = 0; i < ids.length; i += 200) { const { data } = await supa.from('lead_orders').select('lead_id, order_id').in('lead_id', ids.slice(i, i + 200)); links = links.concat(data || []) }
+          const oids = [...new Set(links.map(l => l.order_id))]
+          if (!oids.length) { if (!cancelled) setRev({}); return }
+          let orders = []
+          for (let i = 0; i < oids.length; i += 200) { const { data } = await supa.from('shopify_orders').select('id, total_price').in('id', oids.slice(i, i + 200)); orders = orders.concat(data || []) }
+          const omap = Object.fromEntries(orders.map(o => [o.id, Number(o.total_price) || 0]))
+          const map = {}; links.forEach(l => { map[l.lead_id] = (map[l.lead_id] || 0) + (omap[l.order_id] || 0) })
+          if (!cancelled) setRev(map)
+        } catch { if (!cancelled) setRev({}) }
+      })()
     return () => { cancelled = true }
   }, [convKey]) // eslint-disable-line
 
@@ -1336,11 +1339,13 @@ const WalkinAnalytics = ({ leads = [], teamMembers = [] }) => {
     const converted = conv.length
     const revenue = conv.reduce((s, l) => s + (rev[l.id] || 0), 0)
     const returning = rows.filter(isReturningLead).length
-    return { total, people, converted, revenue,
+    return {
+      total, people, converted, revenue,
       convRate: total ? Math.round(converted / total * 100) : 0,
       aov: converted ? Math.round(revenue / converted) : 0,
       avgParty: total ? (people / total).toFixed(1) : 0,
-      returnRate: total ? Math.round(returning / total * 100) : 0 }
+      returnRate: total ? Math.round(returning / total * 100) : 0
+    }
   }, [rows, conv, rev])
 
   const qmix = useMemo(() => {

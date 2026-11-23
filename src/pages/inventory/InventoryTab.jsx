@@ -17,7 +17,7 @@ const P = {
 const Sym = ({ i, s = 20, c, style }) => <span className="material-symbols-outlined" style={{ fontSize: s, color: c, verticalAlign: 'middle', ...style }}>{i}</span>
 const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'MTF', 'OS']
 const GRID = [['XS', 'qty_xs'], ['S', 'qty_s'], ['M', 'qty_m'], ['L', 'qty_l'], ['XL', 'qty_xl'], ['XXL', 'qty_xxl'], ['XXXL', 'qty_xxxl'], ['MTF', 'qty_mtf'], ['OS', 'qty_os']]
-const KID_ORDER = ['2-3 YEARS','3-4 YEARS','4-5 YEARS','5-6 YEARS','6-7 YEARS','7-8 YEARS','8-9 YEARS','9-10 YEARS','10-11 YEARS','11-12 YEARS']
+const KID_ORDER = ['2-3 YEARS', '3-4 YEARS', '4-5 YEARS', '5-6 YEARS', '6-7 YEARS', '7-8 YEARS', '8-9 YEARS', '9-10 YEARS', '10-11 YEARS', '11-12 YEARS']
 const sizeRank = (sz) => { const u = String(sz || '').toUpperCase(); let i = SIZE_ORDER.indexOf(u); if (i >= 0) return i; i = KID_ORDER.indexOf(u); if (i >= 0) return 100 + i; const n = parseInt(u, 10); if (!isNaN(n) && /^[0-9]/.test(u)) return 200 + n; return 400 }
 const orderSizes = (arr) => [...arr].sort((a, b) => sizeRank(a) - sizeRank(b))
 const sizeLabel = (sz, sole) => (sole && String(sz).toUpperCase() === 'OS') ? 'Qty' : sz
@@ -27,7 +27,7 @@ const inr = (n) => '₹' + fmt(Math.round(Number(n) || 0))
 const initials = (n) => (n || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
 const parseTags = (raw) => {
   const arr = Array.isArray(raw) ? raw : (typeof raw === 'string' && raw ? raw.split(',').map(t => t.trim()) : [])
-  return arr.map(t => t.replace(/^[\["'\s]+|[\]"'\s]+$/g, '').trim()).filter(Boolean)
+  return arr.map(t => t.replace(/^[[ "'\s]+|[\] "'\s]+$/g, '').trim()).filter(Boolean)
 }
 const MTYPE = {
   receipt: { l: 'Receipt', i: 'archive', pos: true }, sale: { l: 'Sale', i: 'shopping_bag', pos: false },
@@ -146,17 +146,19 @@ function ProductDrawer({ product, locationId, locName, onClose, onSaved }) {
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: P.outline, marginBottom: 10 }}>All additions &amp; sales · {locName}</div>
               {loading ? <div className="py-6 text-center" style={{ color: P.onVar }}>Loading…</div> : moves.length === 0 ? <div style={{ fontSize: 13, color: P.outline }}>No stock changes yet.</div> : (
                 <div className="space-y-3">
-                  {moves.map(mv => { const t = MTYPE[mv.movement_type] || { l: mv.movement_type, i: 'circle' }; const up = mv.qty_delta > 0; return (
-                    <div key={mv.id} className="flex items-center gap-3">
-                      <div style={{ width: 34, height: 34, borderRadius: 999, border: `1px solid ${P.outlineVar}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sym i={t.i} s={18} c={P.brass} /></div>
-                      <div className="flex-1 min-w-0">
-                        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: P.brass }}>{t.l}{mv.inventory_skus?.size ? ` · ${mv.inventory_skus.size}` : ''}</div>
-                        <div className="flex items-center gap-1.5" style={{ fontSize: 11, color: P.onVar }}><Avatar name={mv.created_by_name} s={16} />{mv.created_by_name || 'system'} · {new Date(mv.movement_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
-                        {mv.reason && <div style={{ fontSize: 11, color: P.outline }}>{mv.reason}</div>}
+                  {moves.map(mv => {
+                    const t = MTYPE[mv.movement_type] || { l: mv.movement_type, i: 'circle' }; const up = mv.qty_delta > 0; return (
+                      <div key={mv.id} className="flex items-center gap-3">
+                        <div style={{ width: 34, height: 34, borderRadius: 999, border: `1px solid ${P.outlineVar}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sym i={t.i} s={18} c={P.brass} /></div>
+                        <div className="flex-1 min-w-0">
+                          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: P.brass }}>{t.l}{mv.inventory_skus?.size ? ` · ${mv.inventory_skus.size}` : ''}</div>
+                          <div className="flex items-center gap-1.5" style={{ fontSize: 11, color: P.onVar }}><Avatar name={mv.created_by_name} s={16} />{mv.created_by_name || 'system'} · {new Date(mv.movement_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                          {mv.reason && <div style={{ fontSize: 11, color: P.outline }}>{mv.reason}</div>}
+                        </div>
+                        <span style={{ fontFamily: FH, fontWeight: 700, fontSize: 15, color: up ? P.green : P.error }}>{up ? '+' : ''}{mv.qty_delta}</span>
                       </div>
-                      <span style={{ fontFamily: FH, fontWeight: 700, fontSize: 15, color: up ? P.green : P.error }}>{up ? '+' : ''}{mv.qty_delta}</span>
-                    </div>
-                  )})}
+                    )
+                  })}
                 </div>
               )}
             </>
@@ -169,7 +171,7 @@ function ProductDrawer({ product, locationId, locName, onClose, onSaved }) {
 
 export const InventoryTab = () => {
   const [tab, setTab] = useState(() => { try { return sessionStorage.getItem('hilo_inv_subtab') || 'stock' } catch { return 'stock' } })
-  const setSub = (v) => { setTab(v); try { sessionStorage.setItem('hilo_inv_subtab', v) } catch {} }
+  const setSub = (v) => { setTab(v); try { sessionStorage.setItem('hilo_inv_subtab', v) } catch { } }
   const [locations, setLocations] = useState([]); const [locId, setLocId] = useState(null)
   const [summary, setSummary] = useState([]); const [matrix, setMatrix] = useState([]); const [movements, setMovements] = useState([])
   const [cats, setCats] = useState([])
@@ -231,7 +233,7 @@ export const InventoryTab = () => {
     const { data: stock } = ids.length ? await supa.from('inventory_stock').select('sku_id, quantity_on_hand').in('sku_id', ids).eq('location_id', locId) : { data: [] }
     const smap = Object.fromEntries((stock || []).map(s => [s.sku_id, s.quantity_on_hand]))
     const em = {}, ev = {}
-    ;(sk || []).forEach(s => { em[s.size] = { sku_id: s.id, onhand: smap[s.id] || 0 }; ev[s.size] = String(smap[s.id] || 0) })
+      ; (sk || []).forEach(s => { em[s.size] = { sku_id: s.id, onhand: smap[s.id] || 0 }; ev[s.size] = String(smap[s.id] || 0) })
     setEditMap(em); setEditVals(ev)
   }
   const cancelEdit = () => { setEditId(null); setEditMap({}); setEditVals({}) }
@@ -246,7 +248,7 @@ export const InventoryTab = () => {
         let skuId = editMap[sz]?.sku_id
         if (!skuId) { const { data, error } = await supa.rpc('get_or_create_sku', { p_product_id: editId, p_size: sz }); if (error) throw error; skuId = data }
         mvs.push({ sku_id: skuId, location_id: locId, qty_delta: Number(v) - onhand, movement_type: 'adjustment', reference_type: 'manual_adjust', reason: 'Inline stock update', notes: `${sz}: ${onhand}→${v}`, created_by_name: me() })
-        
+
         await supa.from('inventory_stock').upsert({
           sku_id: skuId,
           location_id: locId,
@@ -311,7 +313,7 @@ export const InventoryTab = () => {
     })
     if (sortBy !== 'default') list = [...list].sort((a, b) =>
       sortBy === 'mrp_desc' ? b.mrp - a.mrp : sortBy === 'mrp_asc' ? a.mrp - b.mrp :
-      sortBy === 'qty_desc' ? b.total_qty - a.total_qty : sortBy === 'qty_asc' ? a.total_qty - b.total_qty : 0)
+        sortBy === 'qty_desc' ? b.total_qty - a.total_qty : sortBy === 'qty_asc' ? a.total_qty - b.total_qty : 0)
     return list
   }, [matrix, catFilter, statusFilter, setFilter, tagFilter, stockFilter, invMode, search, sortBy, matchesCat])
 
@@ -323,7 +325,7 @@ export const InventoryTab = () => {
   const statusBadge = (t) => t <= 0
     ? <span style={{ fontSize: 11, fontWeight: 700, color: P.error }}>Out of stock</span>
     : t < 4 ? <span style={{ fontSize: 11, fontWeight: 700, color: P.amber }}>● Low</span>
-    : <span style={{ fontSize: 11, fontWeight: 700, color: P.green }}>● In stock</span>
+      : <span style={{ fontSize: 11, fontWeight: 700, color: P.green }}>● In stock</span>
 
   return (
     <div className="h-full flex flex-col" style={{ background: P.surface, fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -364,8 +366,10 @@ export const InventoryTab = () => {
 
             {/* category chips */}
             <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
-              {availableCats.map(c => { const n = c === 'All' ? matrix.length : matrix.filter(m => matchesCat(m, c)).length; if (c !== 'All' && c !== 'Other' && n === 0) return null
-                return <button key={c} onClick={() => setCatFilter(c)} style={{ padding: '5px 14px', borderRadius: 999, fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', background: catFilter === c ? P.brass : P.white, color: catFilter === c ? '#fff' : P.onVar, border: catFilter === c ? 'none' : `1px solid ${P.outlineVar}` }}>{c} <span style={{ opacity: 0.6, marginLeft: 2 }}>{n}</span></button> })}
+              {availableCats.map(c => {
+                const n = c === 'All' ? matrix.length : matrix.filter(m => matchesCat(m, c)).length; if (c !== 'All' && c !== 'Other' && n === 0) return null
+                return <button key={c} onClick={() => setCatFilter(c)} style={{ padding: '5px 14px', borderRadius: 999, fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', background: catFilter === c ? P.brass : P.white, color: catFilter === c ? '#fff' : P.onVar, border: catFilter === c ? 'none' : `1px solid ${P.outlineVar}` }}>{c} <span style={{ opacity: 0.6, marginLeft: 2 }}>{n}</span></button>
+              })}
             </div>
 
             {/* dropdown filters */}
@@ -449,16 +453,18 @@ export const InventoryTab = () => {
                     </div>
                   </div>
                 ))}
-                {filtered.length > PAGE_SIZE && (() => { const tp = Math.ceil(filtered.length / PAGE_SIZE); return (
-                  <div className="flex items-center justify-between pt-3" style={{ fontSize: 13, color: P.onVar }}>
-                    <span>Showing {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} of {filtered.length}</span>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} style={{ fontSize: 13, fontWeight: 700, padding: '7px 14px', borderRadius: 999, background: P.white, color: P.brass, border: `1px solid ${P.outlineVar}`, opacity: page === 0 ? 0.4 : 1 }}>‹ Prev</button>
-                      <span>Page {page + 1} of {tp}</span>
-                      <button onClick={() => setPage(p => Math.min(tp - 1, p + 1))} disabled={page >= tp - 1} style={{ fontSize: 13, fontWeight: 700, padding: '7px 14px', borderRadius: 999, background: P.white, color: P.brass, border: `1px solid ${P.outlineVar}`, opacity: page >= tp - 1 ? 0.4 : 1 }}>Next ›</button>
+                {filtered.length > PAGE_SIZE && (() => {
+                  const tp = Math.ceil(filtered.length / PAGE_SIZE); return (
+                    <div className="flex items-center justify-between pt-3" style={{ fontSize: 13, color: P.onVar }}>
+                      <span>Showing {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} of {filtered.length}</span>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} style={{ fontSize: 13, fontWeight: 700, padding: '7px 14px', borderRadius: 999, background: P.white, color: P.brass, border: `1px solid ${P.outlineVar}`, opacity: page === 0 ? 0.4 : 1 }}>‹ Prev</button>
+                        <span>Page {page + 1} of {tp}</span>
+                        <button onClick={() => setPage(p => Math.min(tp - 1, p + 1))} disabled={page >= tp - 1} style={{ fontSize: 13, fontWeight: 700, padding: '7px 14px', borderRadius: 999, background: P.white, color: P.brass, border: `1px solid ${P.outlineVar}`, opacity: page >= tp - 1 ? 0.4 : 1 }}>Next ›</button>
+                      </div>
                     </div>
-                  </div>
-                ) })()}
+                  )
+                })()}
               </div>
             )}
           </>
@@ -484,18 +490,20 @@ export const InventoryTab = () => {
 
         {tab === 'movements' && (
           <div className="space-y-1" style={{ maxWidth: 640 }}>
-            {movements.length === 0 ? <div className="text-center py-16" style={{ color: P.outline }}>No movements yet.</div> : movements.map(mv => { const t = MTYPE[mv.movement_type] || { l: mv.movement_type, i: 'circle' }; const up = mv.qty_delta > 0; return (
-              <div key={mv.id} className="flex items-center gap-3 py-3" style={{ borderBottom: `1px solid ${P.cHigh}` }}>
-                <div style={{ width: 40, height: 40, borderRadius: 999, border: `1px solid ${P.outlineVar}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sym i={t.i} s={20} c={P.brass} /></div>
-                <div className="flex-1 min-w-0">
-                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: P.brass }}>{t.l}</div>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: P.onSurface }}>{mv.inventory_skus?.variant_label || '—'}</div>
-                  <div style={{ fontSize: 11, color: P.outline }}>SKU {mv.inventory_skus?.sku_code || ''}{mv.inventory_skus?.size ? ` · ${mv.inventory_skus.size}` : ''}</div>
-                  <div className="flex items-center gap-1.5 mt-0.5" style={{ fontSize: 11, color: P.onVar }}><Avatar name={mv.created_by_name} s={18} />{mv.created_by_name || 'system'} · {new Date(mv.movement_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+            {movements.length === 0 ? <div className="text-center py-16" style={{ color: P.outline }}>No movements yet.</div> : movements.map(mv => {
+              const t = MTYPE[mv.movement_type] || { l: mv.movement_type, i: 'circle' }; const up = mv.qty_delta > 0; return (
+                <div key={mv.id} className="flex items-center gap-3 py-3" style={{ borderBottom: `1px solid ${P.cHigh}` }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 999, border: `1px solid ${P.outlineVar}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Sym i={t.i} s={20} c={P.brass} /></div>
+                  <div className="flex-1 min-w-0">
+                    <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: P.brass }}>{t.l}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: P.onSurface }}>{mv.inventory_skus?.variant_label || '—'}</div>
+                    <div style={{ fontSize: 11, color: P.outline }}>SKU {mv.inventory_skus?.sku_code || ''}{mv.inventory_skus?.size ? ` · ${mv.inventory_skus.size}` : ''}</div>
+                    <div className="flex items-center gap-1.5 mt-0.5" style={{ fontSize: 11, color: P.onVar }}><Avatar name={mv.created_by_name} s={18} />{mv.created_by_name || 'system'} · {new Date(mv.movement_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                  </div>
+                  <span style={{ fontFamily: FH, fontWeight: 700, fontSize: 20, color: up ? P.green : P.error, flexShrink: 0 }}>{up ? '+' : ''}{mv.qty_delta}</span>
                 </div>
-                <span style={{ fontFamily: FH, fontWeight: 700, fontSize: 20, color: up ? P.green : P.error, flexShrink: 0 }}>{up ? '+' : ''}{mv.qty_delta}</span>
-              </div>
-            )})}
+              )
+            })}
           </div>
         )}
       </div>

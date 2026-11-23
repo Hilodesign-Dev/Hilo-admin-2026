@@ -21,15 +21,15 @@ const SERVICES = [
   { value: 'other', label: 'Other' },
 ]
 const SERVICE_MAP = Object.fromEntries(SERVICES.map(s => [s.value, s.label]))
-const SERVICE_TYPE_CODE = { stitching:'ST', embroidery_hand:'EM', embroidery_machine:'EM', dyeing:'DY', hand_painting:'HP', accessories:'AC', dhoti:'DH', finishing:'FN', other:'OT' }
+const SERVICE_TYPE_CODE = { stitching: 'ST', embroidery_hand: 'EM', embroidery_machine: 'EM', dyeing: 'DY', hand_painting: 'HP', accessories: 'AC', dhoti: 'DH', finishing: 'FN', other: 'OT' }
 const TYPE_TO_SERVICE_MAP = { 'Tailoring': 'stitching', 'Dyeing': 'dyeing', 'Hand Embroidery': 'embroidery_hand', 'Machine Embroidery': 'embroidery_machine', 'Hand Painting': 'hand_painting', 'Accessories': 'accessories', 'Dhoti': 'dhoti', 'Finishing': 'finishing', 'Other': 'other' }
 const OUTSOURCE_TYPES = ['Tailoring', 'Dyeing', 'Hand Embroidery', 'Machine Embroidery', 'Hand Painting', 'Accessories', 'Dhoti', 'Finishing', 'Other']
 const TYPE_TO_SERVICE = { 'Tailoring': 'stitching', 'Dyeing': 'dyeing', 'Hand Embroidery': 'embroidery_hand', 'Machine Embroidery': 'embroidery_machine', 'Hand Painting': 'hand_painting', 'Accessories': 'accessories', 'Dhoti': 'dhoti', 'Finishing': 'finishing', 'Other': 'other' }
 const WORK_STATUSES = ['pending', 'in_progress', 'completed', 'delivered']
-const STATUS_COLORS = { pending:'#d97706', in_progress:'#3b82f6', completed:'#16a34a', delivered:'#7c3aed' }
+const STATUS_COLORS = { pending: '#d97706', in_progress: '#3b82f6', completed: '#16a34a', delivered: '#7c3aed' }
 const PAYMENT_METHODS = ['bank_transfer', 'cash', 'upi', 'cheque', 'tds_govt']
-const METHOD_LABEL = { bank_transfer:'Bank Transfer', cash:'Cash', upi:'UPI', cheque:'Cheque', tds_govt:'TDS Payment (Govt)' }
-const STITCHING_CATEGORIES_FALLBACK = ['Kurta','Kurta Set','Nehru Jacket','Indowestern','Bandhgala','Bling Blazer','Pattu Set','Sherwani','Bottom','Ethnic Pants','Shirt','Shirt Set','Shacket','Blazer','Trouser','Kids Fashion','Pagdi','Shoes','Jewellery','Other']
+const METHOD_LABEL = { bank_transfer: 'Bank Transfer', cash: 'Cash', upi: 'UPI', cheque: 'Cheque', tds_govt: 'TDS Payment (Govt)' }
+const STITCHING_CATEGORIES_FALLBACK = ['Kurta', 'Kurta Set', 'Nehru Jacket', 'Indowestern', 'Bandhgala', 'Bling Blazer', 'Pattu Set', 'Sherwani', 'Bottom', 'Ethnic Pants', 'Shirt', 'Shirt Set', 'Shacket', 'Blazer', 'Trouser', 'Kids Fashion', 'Pagdi', 'Shoes', 'Jewellery', 'Other']
 const BILL_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'MTF']
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
@@ -47,7 +47,7 @@ const C = {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—'
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
 const fmtCurrency = (v) => {
   const num = n(v)
   if (!num) return '₹0'
@@ -199,7 +199,7 @@ const OutsourceVendorsTab = ({ stitchingMaster: stitchingMasterProp, setStitchin
         })))
       })
       // Embroidery cost map from catalogue (design_products)
-      fetchAllProductsLegacy().then(function(data) {
+      fetchAllProductsLegacy().then(function (data) {
         if (data && Array.isArray(data)) {
           const costMap = {}
           data.forEach(p => {
@@ -207,7 +207,7 @@ const OutsourceVendorsTab = ({ stitchingMaster: stitchingMasterProp, setStitchin
           })
           setCatalogueCostMap(costMap)
         }
-      }).catch(() => {})
+      }).catch(() => { })
     }
     if (isDyeing) {
       // Load fabrics for fabric picker
@@ -567,8 +567,8 @@ const OutsourceVendorsTab = ({ stitchingMaster: stitchingMasterProp, setStitchin
                   {confirmDelete.type === 'bill'
                     ? `${confirmDelete.item.bill_number || 'Bill'} — ${fmtCurrency(confirmDelete.item.total_cost)}`
                     : confirmDelete.type === 'closing'
-                    ? `Statement closed on ${fmtDate(confirmDelete.item.close_date)} · Carry forward: ${fmtCurrency(confirmDelete.item.carry_forward)}`
-                    : `${confirmDelete.item.id} — ${fmtCurrency(confirmDelete.item.amount)}`
+                      ? `Statement closed on ${fmtDate(confirmDelete.item.close_date)} · Carry forward: ${fmtCurrency(confirmDelete.item.carry_forward)}`
+                      : `${confirmDelete.item.id} — ${fmtCurrency(confirmDelete.item.amount)}`
                   }
                 </div>
                 {confirmDelete.type === 'bill' && n(confirmDelete.item.amount_paid) > 0 && (
@@ -1674,7 +1674,8 @@ const WorkEntryModal = ({ entry, vendor, orders, vendorPricing, catalogueProduct
           </div>
 
           {/* Order selection — per line item now, hide top-level */}
-          {false && <Field label="Link to Order (optional)">
+          {/*
+          <Field label="Link to Order (optional)">
             <div className="relative">
               {form.order_number ? (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: C.cream }}>
@@ -1701,7 +1702,8 @@ const WorkEntryModal = ({ entry, vendor, orders, vendorPricing, catalogueProduct
                 </div>
               )}
             </div>
-          </Field>}
+          </Field>
+          */}
 
           {/* Line Items */}
           <div>
@@ -1719,12 +1721,12 @@ const WorkEntryModal = ({ entry, vendor, orders, vendorPricing, catalogueProduct
               gridTemplateColumns: isStitchingType
                 ? '28px 110px 1fr 65px 1fr 60px 80px 80px 28px'
                 : isEmbroideryType
-                ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
-                : isAccessoriesType
-                ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
-                : isDyeingType
-                ? '28px 120px 1fr 110px 70px 120px 85px 90px 28px'
-                : '28px 120px 1fr 70px 90px 90px 28px'
+                  ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
+                  : isAccessoriesType
+                    ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
+                    : isDyeingType
+                      ? '28px 120px 1fr 110px 70px 120px 85px 90px 28px'
+                      : '28px 120px 1fr 70px 90px 90px 28px'
             }}>
               <div />
               <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: C.textMuted }}>
@@ -1761,12 +1763,12 @@ const WorkEntryModal = ({ entry, vendor, orders, vendorPricing, catalogueProduct
                     gridTemplateColumns: isStitchingType
                       ? '28px 110px 1fr 65px 1fr 60px 80px 80px 28px'
                       : isEmbroideryType
-                      ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
-                      : isAccessoriesType
-                      ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
-                      : isDyeingType
-                      ? '28px 120px 1fr 110px 70px 120px 85px 90px 28px'
-                      : '28px 120px 1fr 70px 90px 90px 28px'
+                        ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
+                        : isAccessoriesType
+                          ? '28px 110px 1fr 1fr 60px 80px 80px 28px'
+                          : isDyeingType
+                            ? '28px 120px 1fr 110px 70px 120px 85px 90px 28px'
+                            : '28px 120px 1fr 70px 90px 90px 28px'
                   }}>
                     {/* # */}
                     <div className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold" style={{ background: C.goldLight, color: C.goldDark }}>{idx + 1}</div>
@@ -2650,18 +2652,18 @@ const generateReceiptCanvas = (receipt, vendor, settledEntries) => {
   y += 38; ctx.font = '800 36px sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText(fmtCurrency(receipt.amount), cx, y)
   y += 28; const mt = METHOD_LABEL[receipt.method] || receipt.method; ctx.font = '500 12px sans-serif'
   const mw = ctx.measureText(mt).width + 24; ctx.fillStyle = 'rgba(255,255,255,0.08)'
-  ctx.beginPath(); const rr = (x, ry, w, h, r) => { ctx.moveTo(x+r,ry); ctx.lineTo(x+w-r,ry); ctx.quadraticCurveTo(x+w,ry,x+w,ry+r); ctx.lineTo(x+w,ry+h-r); ctx.quadraticCurveTo(x+w,ry+h,x+w-r,ry+h); ctx.lineTo(x+r,ry+h); ctx.quadraticCurveTo(x,ry+h,x,ry+h-r); ctx.lineTo(x,ry+r); ctx.quadraticCurveTo(x,ry,x+r,ry); ctx.closePath() }
-  rr(cx-mw/2, y-12, mw, 24, 12); ctx.fill()
+  ctx.beginPath(); const rr = (x, ry, w, h, r) => { ctx.moveTo(x + r, ry); ctx.lineTo(x + w - r, ry); ctx.quadraticCurveTo(x + w, ry, x + w, ry + r); ctx.lineTo(x + w, ry + h - r); ctx.quadraticCurveTo(x + w, ry + h, x + w - r, ry + h); ctx.lineTo(x + r, ry + h); ctx.quadraticCurveTo(x, ry + h, x, ry + h - r); ctx.lineTo(x, ry + r); ctx.quadraticCurveTo(x, ry, x + r, ry); ctx.closePath() }
+  rr(cx - mw / 2, y - 12, mw, 24, 12); ctx.fill()
   ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillText(mt, cx, y + 4)
 
-  y += 32; ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.beginPath(); rr(pad, y, W-pad*2, 140, 12); ctx.fill()
+  y += 32; ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.beginPath(); rr(pad, y, W - pad * 2, 140, 12); ctx.fill()
   const dY = y + 20
-  const drawR = (l, v, ry) => { ctx.textAlign='left'; ctx.font='400 12px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fillText(l,pad+16,ry); ctx.textAlign='right'; ctx.font='500 12px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.fillText(v,W-pad-16,ry) }
-  drawR('Paid To', vendor.name, dY); drawR('Vendor ID', vendor.id, dY+lineH)
-  drawR(receipt.reference ? 'Reference' : 'Bills', receipt.reference || `${settledEntries.length} settled`, dY+lineH*2)
-  drawR('Date', fmtDate(receipt.cutoff_date), dY+lineH*3)
+  const drawR = (l, v, ry) => { ctx.textAlign = 'left'; ctx.font = '400 12px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fillText(l, pad + 16, ry); ctx.textAlign = 'right'; ctx.font = '500 12px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.fillText(v, W - pad - 16, ry) }
+  drawR('Paid To', vendor.name, dY); drawR('Vendor ID', vendor.id, dY + lineH)
+  drawR(receipt.reference ? 'Reference' : 'Bills', receipt.reference || `${settledEntries.length} settled`, dY + lineH * 2)
+  drawR('Date', fmtDate(receipt.cutoff_date), dY + lineH * 3)
 
-  ctx.textAlign='center'; ctx.font='400 10px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.fillText('Hilo Design Studio · hilodesign.co', cx, H-16)
+  ctx.textAlign = 'center'; ctx.font = '400 10px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fillText('Hilo Design Studio · hilodesign.co', cx, H - 16)
   return canvas
 }
 
@@ -2686,12 +2688,12 @@ const ReceiptModal = ({ receipt, vendor, entries, onClose }) => {
       const blob = await new Promise(r => c.toBlob(r, 'image/png'))
       const f = new File([blob], `receipt-${receipt.id}.png`, { type: 'image/png' })
       if (navigator.canShare?.({ files: [f] })) { await navigator.share({ files: [f], title: `Receipt ${receipt.id}` }); return }
-    } catch {}
+    } catch { }
     // Desktop: copy image to clipboard silently, then open WhatsApp
     try {
       const blob = await new Promise(r => c.toBlob(r, 'image/png'))
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-    } catch {}
+    } catch { }
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
   }
 

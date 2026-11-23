@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import FabricPicker from '../../components/FabricPicker'
-import { GARMENT_APPROX_METRES, buildGarmentTypeOptions, categoryFromGarmentType, stitchCostFromGarmentType } from './constants'
+import { GARMENT_CATEGORIES, GARMENT_APPROX_METRES, buildGarmentTypeOptions, categoryFromGarmentType, stitchCostFromGarmentType } from './constants'
 import { POS_T, MIcon } from './tokens'
 
 /**
@@ -16,19 +16,19 @@ import { POS_T, MIcon } from './tokens'
  */
 const QuotationCogsPanel = ({ value = {}, defaultCategory, fabrics = [], stitchingMaster = [], onChange }) => {
   const [v, setV] = useState({
-    garment_type:     value.garment_type     || '',
+    garment_type: value.garment_type || '',
     garment_category: value.garment_category || defaultCategory || '',
-    fabricId:         value.fabricId || '',
-    fabricName:       value.fabricName || '',
-    fabricPrice:      value.fabricPrice ?? '',
-    metres:           value.metres ?? (GARMENT_APPROX_METRES[defaultCategory] || ''),
-    dye:              value.dye ?? '',
-    embroidery:       value.embroidery ?? '',
-    stitching:        value.stitching ?? '',
-    accessories:      value.accessories ?? '',
-    colour:           value.colour || '',
-    notes:            value.notes || '',
-    refImageUrl:      value.refImageUrl || '',
+    fabricId: value.fabricId || '',
+    fabricName: value.fabricName || '',
+    fabricPrice: value.fabricPrice ?? '',
+    metres: value.metres ?? (GARMENT_APPROX_METRES[defaultCategory] || ''),
+    dye: value.dye ?? '',
+    embroidery: value.embroidery ?? '',
+    stitching: value.stitching ?? '',
+    accessories: value.accessories ?? '',
+    colour: value.colour || '',
+    notes: value.notes || '',
+    refImageUrl: value.refImageUrl || '',
   })
 
   // Helper — compute total from current values
@@ -50,7 +50,7 @@ const QuotationCogsPanel = ({ value = {}, defaultCategory, fabrics = [], stitchi
       // Try to find a stitching entry matching the category
       const directCost = stitchCostFromGarmentType(stitchingMaster, patch.garment_type)
       const stitchMatch = directCost > 0 ? { cost: directCost } : (stitchingMaster || []).find(s =>
-        (s.category || s.name || '').toLowerCase() === (patch.garment_category||'').toLowerCase()
+        (s.category || s.name || '').toLowerCase() === (patch.garment_category || '').toLowerCase()
       )
       if (stitchMatch && (!v.stitching || v.stitching === '')) {
         next.stitching = stitchMatch.cost || stitchMatch.price || ''
@@ -65,7 +65,7 @@ const QuotationCogsPanel = ({ value = {}, defaultCategory, fabrics = [], stitchi
     const f = (fabrics || []).find(x => String(x.id) === String(fabricId))
     const patch = {
       fabricId,
-      fabricName:  f?.name || v.fabricName,
+      fabricName: f?.name || v.fabricName,
       fabricPrice: f?.costPerMetre || f?.cost_per_metre || v.fabricPrice,
     }
     set(patch)
@@ -119,9 +119,9 @@ const QuotationCogsPanel = ({ value = {}, defaultCategory, fabrics = [], stitchi
 
       {/* Row 4: extras */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Field label="Dye">          <NumInput value={v.dye}         onChange={x => set({ dye: x })} /> </Field>
-        <Field label="Embroidery">   <NumInput value={v.embroidery}  onChange={x => set({ embroidery: x })} placeholder="if known" /> </Field>
-        <Field label="Stitching">    <NumInput value={v.stitching}   onChange={x => set({ stitching: x })} /> </Field>
+        <Field label="Dye">          <NumInput value={v.dye} onChange={x => set({ dye: x })} /> </Field>
+        <Field label="Embroidery">   <NumInput value={v.embroidery} onChange={x => set({ embroidery: x })} placeholder="if known" /> </Field>
+        <Field label="Stitching">    <NumInput value={v.stitching} onChange={x => set({ stitching: x })} /> </Field>
         <Field label="Accessories">  <NumInput value={v.accessories} onChange={x => set({ accessories: x })} /> </Field>
       </div>
 

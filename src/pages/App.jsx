@@ -30,8 +30,18 @@ import OutsourceVendorsTab from './outsource/OutsourceVendorsTab'
 import OrdersTab from './orders/OrdersTab'
 import AppOrdersTab from './orders/AppOrdersTab'
 import MobileCmsTab from './cms/MobileCmsTab'
+import AppCollectionsTab from './appCollections/AppCollectionsTab'
+import AppointmentsTab from './appointments/AppointmentsTab'
 import AppUsersTab from './customers/AppUsersTab'
 import AppSupportTab from './support/AppSupportTab'
+import StylistInboxTab, { AcceptHandoffModal } from './stylist/StylistInboxTab'
+import { useStylistInbox } from './stylist/useStylistInbox'
+import WhatsAppInboxTab from './whatsapp/WhatsAppInboxTab'
+import WhatsAppMarketingTab from './marketing/WhatsAppMarketingTab'
+import PushMarketingTab from './pushMarketing/PushMarketingTab'
+import { useWhatsAppInbox } from './whatsapp/useWhatsAppInbox'
+import WaHandoffModal from './whatsapp/WaHandoffModal'
+import { unlockWaAlertSound } from './whatsapp/waAlertSound'
 import ProductionTab from './production/ProductionTab'
 import FulfillmentTab from './fulfillment/FulfillmentTab'
 import DelayedReportingTab from './delayed/DelayedReportingTab'
@@ -47,7 +57,6 @@ import { OrdersProvider } from '../context/OrdersContext'
 const App = () => {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [syncing, setSyncing] = useState(true);
   // Init page from URL hash if present, else default to 'calculator'
   const [page, setPage] = useState(() => {
     let initial = getHashPage() || 'pos';
@@ -136,6 +145,8 @@ const App = () => {
   const [consumption, setConsumption] = useState([]);
   const [channels, setChannels] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [stylistFocusId, setStylistFocusId] = useState(null);
+  const [waFocusId, setWaFocusId] = useState(null);
 
   // Helper: reload all master data from Supabase
   const reloadFromSupabase = useCallback(async () => {
@@ -160,9 +171,30 @@ const App = () => {
   // Sync from Supabase once per login session (keyed on user ID, not user object).
   // Using user?.id prevents re-syncing on JWT token refreshes — Supabase fires
   // onAuthStateChange with a new user object on TOKEN_REFRESHED, but the UUID
-  // stays the same. Depending on [user] would re-trigger sync (and setSyncing(true))
-  // on every refresh, killing all mounted tab state.
+  // stays the same. Depending on [user] would re-trigger the catalogue load.
   const userId = user?.id;
+
+  const inboxMember = teamMembers.find(m => m.user_id === userId)
+  const inboxEnabled = Boolean(userId && teamMembers.length > 0 && getUserTabs(inboxMember).includes('stylist-inbox'))
+  const stylistInbox = useStylistInbox({ enabled: inboxEnabled })
+  const waEnabled = Boolean(userId && teamMembers.length > 0 && getUserTabs(inboxMember).includes('whatsapp-inbox'))
+  const whatsappInbox = useWhatsAppInbox({ enabled: waEnabled, notify: true })
+
+  useEffect(() => {
+    if (!waEnabled) return
+    if (typeof Notification === 'undefined' || Notification.permission !== 'default') return
+    Notification.requestPermission().catch(() => {})
+  }, [waEnabled])
+
+  useEffect(() => {
+    const unlock = () => unlockWaAlertSound()
+    window.addEventListener('pointerdown', unlock, { once: true })
+    window.addEventListener('keydown', unlock, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+  }, [])
 
   // Load team_members from Supabase after login
   useEffect(() => {
@@ -182,10 +214,8 @@ const App = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (!userId) { setSyncing(false); return; }
-    setSyncing(true);
+    if (!userId) return;
 
-    // 1) Load all master data from dedicated Supabase tables (replaces legacy app_state sync)
     var masterSync = reloadFromSupabase().catch(function(e) {
       console.error('[HILO] Master data sync exception:', e);
       _logError('sync_exception', e.message || 'Unknown sync error', e.stack || '');
@@ -256,20 +286,10 @@ const App = () => {
       } catch(e) {
         console.error('[HILO] Fabric fetch exception:', e);
         _logError('fabric_fetch', e.message || 'Unknown fabric fetch error', e.stack || '');
-        try {
-          await new Promise(function(r) { setTimeout(r, 2000); });
-          var retry = await supa.from('fabrics').select('*').order('name');
-          if (retry.data && retry.data.length > 0) {
-            console.log('[HILO] Fabric retry succeeded:', retry.data.length, 'rows');
-            setFabrics(_inlineMapFabrics(retry.data, []));
-          }
-        } catch(e2) { console.error('[HILO] Fabric retry also failed:', e2); }
       }
     })();
 
-    // Wait for both to finish before clearing the syncing spinner
-    Promise.all([masterSync, fabricSync])
-      .finally(function() { setSyncing(false); });
+    Promise.all([masterSync, fabricSync]).catch(function() {});
   }, [userId]);
 
   // Load Stitching Cost Master from Supabase (source of truth).
@@ -383,25 +403,24 @@ const App = () => {
   const isAdmin = myMember?.role === 'admin';
   const allowedTabs = getUserTabs(myMember);
 
-  // Syncing overlay — rendered as a fixed overlay rather than an early return so
-  // that mounted tabs stay in the DOM and keep their state (orders loaded, scroll
-  // position, open editors) during catalogue sync.
   return (
     <OrdersProvider>
-    <div className="flex min-h-screen" style={{background:'#f5f4f0'}}>
-      {syncing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{background:'#0f172a'}}>
-          <div className="text-center">
-            <div className="font-bold text-2xl tracking-widest mb-3" style={{color:'#d4a843'}}>HILO</div>
-            <div className="text-white/30 text-sm">Syncing catalogue…</div>
-          </div>
-        </div>
-      )}
-      <Toaster />
-      <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} />
-      <main className="flex-1 overflow-auto main-content" style={{position:'relative'}}>
+    <div className="flex" style={{background:'#f5f4f0', height:'100vh', overflow:'hidden'}}>
+      <Sidebar page={page} setPage={navigateTo} productCount={products.length} offerCount={offerCount} user={user} onLogout={handleLogout} allowedTabs={allowedTabs} isAdmin={isAdmin} inboxBadge={stylistInbox.badge} waBadge={whatsappInbox.badge} />
+      <main
+        className="flex-1 main-content"
+        style={{
+          position: 'relative',
+          overflow: (page === 'stylist-inbox' || page === 'whatsapp-inbox' || page === 'whatsapp-marketing' || page === 'push-marketing') ? 'hidden' : 'auto',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+        }}
+      >
         <MobileHeader page={page} user={user} onLogout={handleLogout} />
         {/* Refresh button — top right of content area */}
+        {page !== 'stylist-inbox' && page !== 'whatsapp-inbox' && page !== 'whatsapp-marketing' && page !== 'push-marketing' && (
         <button
           onClick={refreshCurrentTab}
           title="Refresh tab data"
@@ -423,10 +442,8 @@ const App = () => {
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
           </svg>
         </button>
-        {/* ── Keep-alive tab mounting ──────────────────────────────────────────
-            Tabs are mounted on first visit and kept in the DOM (display:none)
-            on subsequent tab switches — state (scroll, open editors, loaded
-            data) is fully preserved across navigation. ────────────────────── */}
+        )}
+        {/* Keep-alive tab mounting */}
         <div style={{display: page === 'overview'   ? '' : 'none'}}>
           {mountedTabs.has('overview')   && allowedTabs.includes('overview')   && <FounderDashboard key={refreshKeys.overview||0} onNavigate={navigateTo} />}
         </div>
@@ -457,11 +474,65 @@ const App = () => {
         <div style={{display: page === 'mobile-cms' ? '' : 'none'}}>
           {mountedTabs.has('mobile-cms') && allowedTabs.includes('mobile-cms') && <MobileCmsTab key={refreshKeys['mobile-cms']||0} />}
         </div>
+        <div style={{display: page === 'app-appointments' ? '' : 'none'}}>
+          {mountedTabs.has('app-appointments') && allowedTabs.includes('app-appointments') && <AppointmentsTab key={refreshKeys['app-appointments']||0} />}
+        </div>
+        <div style={{display: page === 'app-collections' ? '' : 'none'}}>
+          {mountedTabs.has('app-collections') && allowedTabs.includes('app-collections') && <AppCollectionsTab key={refreshKeys['app-collections']||0} />}
+        </div>
         <div style={{display: page === 'app-users' ? '' : 'none'}}>
           {mountedTabs.has('app-users') && allowedTabs.includes('app-users') && <AppUsersTab key={refreshKeys['app-users']||0} />}
         </div>
         <div style={{display: page === 'app-support' ? '' : 'none'}}>
           {mountedTabs.has('app-support') && allowedTabs.includes('app-support') && <AppSupportTab key={refreshKeys['app-support']||0} user={user} />}
+        </div>
+        <div style={{display: page === 'stylist-inbox' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
+          {mountedTabs.has('stylist-inbox') && allowedTabs.includes('stylist-inbox') && (
+            <StylistInboxTab
+              key={refreshKeys['stylist-inbox']||0}
+              waiting={stylistInbox.waiting}
+              mine={stylistInbox.mine}
+              accessError={stylistInbox.accessError}
+              accept={stylistInbox.accept}
+              acceptingId={stylistInbox.acceptingId}
+              focusId={stylistFocusId}
+              onFocusConsumed={() => setStylistFocusId(null)}
+            />
+          )}
+        </div>
+        <div style={{display: page === 'whatsapp-inbox' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
+          {mountedTabs.has('whatsapp-inbox') && allowedTabs.includes('whatsapp-inbox') && (
+            <WhatsAppInboxTab
+              key={refreshKeys['whatsapp-inbox']||0}
+              requests={whatsappInbox.requests}
+              human={whatsappInbox.human}
+              ai={whatsappInbox.ai}
+              closed={whatsappInbox.closed}
+              me={whatsappInbox.me}
+              accessError={whatsappInbox.accessError}
+              accept={whatsappInbox.accept}
+              takeover={whatsappInbox.takeover}
+              acceptingId={whatsappInbox.acceptingId}
+              joiningId={whatsappInbox.joiningId}
+              focusId={waFocusId}
+              onFocusConsumed={() => setWaFocusId(null)}
+            />
+          )}
+        </div>
+        <div style={{display: page === 'whatsapp-marketing' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
+          {mountedTabs.has('whatsapp-marketing') && allowedTabs.includes('whatsapp-marketing') && (
+            <WhatsAppMarketingTab
+              key={refreshKeys['whatsapp-marketing']||0}
+              onNavigateToInbox={() => navigateTo('whatsapp-inbox')}
+            />
+          )}
+        </div>
+        <div style={{display: page === 'push-marketing' ? 'flex' : 'none', flex: 1, minHeight: 0, height: '100%', flexDirection: 'column'}}>
+          {mountedTabs.has('push-marketing') && allowedTabs.includes('push-marketing') && (
+            <PushMarketingTab
+              key={refreshKeys['push-marketing']||0}
+            />
+          )}
         </div>
         <div style={{display: page === 'delayed'     ? '' : 'none'}}>
           {mountedTabs.has('delayed')     && allowedTabs.includes('delayed')     && <DelayedReportingTab key={refreshKeys.delayed||0} user={user} stitchingMaster={stitching} />}
@@ -510,6 +581,45 @@ const App = () => {
         </div>
       </main>
       <BottomNav page={page} setPage={navigateTo} offerCount={offerCount} allowedTabs={allowedTabs} isAdmin={isAdmin} />
+      <AcceptHandoffModal
+        item={stylistInbox.modalItem}
+        accepting={stylistInbox.acceptingId === stylistInbox.modalItem?.id}
+        onDismiss={stylistInbox.dismissModal}
+        onAccept={async (id) => {
+          try {
+            await stylistInbox.accept(id)
+            setStylistFocusId(id)
+            navigateTo('stylist-inbox')
+          } catch {
+            // toast already shown
+          }
+        }}
+      />
+      <WaHandoffModal
+        item={whatsappInbox.modalItem}
+        accepting={whatsappInbox.acceptingId === whatsappInbox.modalItem?.id}
+        joining={whatsappInbox.joiningId === whatsappInbox.modalItem?.id}
+        onDismiss={whatsappInbox.dismissModal}
+        onJoinNow={async (id) => {
+          try {
+            await whatsappInbox.takeover(id)
+            setWaFocusId(id)
+            navigateTo('whatsapp-inbox')
+          } catch {
+            // toast already shown
+          }
+        }}
+        onAccept={async (id) => {
+          try {
+            await whatsappInbox.accept(id)
+            setWaFocusId(id)
+            navigateTo('whatsapp-inbox')
+          } catch {
+            // toast already shown
+          }
+        }}
+      />
+      <Toaster />
     </div>
     </OrdersProvider>
   );

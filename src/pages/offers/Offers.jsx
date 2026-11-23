@@ -98,12 +98,12 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
     if (search) {
       const q = search.toLowerCase();
       list = list.filter(p =>
-        (p.styleCode||'').toLowerCase().includes(q) ||
-        (p.productTitle||'').toLowerCase().includes(q) ||
-        (p.productName||'').toLowerCase().includes(q) ||
-        (p.colourPrimary||'').toLowerCase().includes(q) ||
-        (p.offerNote||'').toLowerCase().includes(q) ||
-        (p.offerGroup||'').toLowerCase().includes(q)
+        (p.styleCode || '').toLowerCase().includes(q) ||
+        (p.productTitle || '').toLowerCase().includes(q) ||
+        (p.productName || '').toLowerCase().includes(q) ||
+        (p.colourPrimary || '').toLowerCase().includes(q) ||
+        (p.offerNote || '').toLowerCase().includes(q) ||
+        (p.offerGroup || '').toLowerCase().includes(q)
       );
     }
 
@@ -178,7 +178,7 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
   const avgGM = offerProducts.length > 0
     ? offerProducts.reduce((s, p) => s + gmPct(p.sellingPrice || p.mrp, calcCogs(p), p.mrp), 0) / offerProducts.length : 0;
   const avgDisc = offerProducts.length > 0
-    ? offerProducts.reduce((s, p) => { const sp = p.sellingPrice || p.mrp; return s + (p.mrp > 0 ? (p.mrp - sp)/p.mrp : 0); }, 0) / offerProducts.length : 0;
+    ? offerProducts.reduce((s, p) => { const sp = p.sellingPrice || p.mrp; return s + (p.mrp > 0 ? (p.mrp - sp) / p.mrp : 0); }, 0) / offerProducts.length : 0;
 
   // Group summaries
   const groupSummaries = useMemo(() => {
@@ -187,7 +187,7 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
       const groupProds = allOfferProducts.filter(p => p.offerGroup === group);
       if (groupProds.length > 0) {
         const avgGMGroup = groupProds.reduce((s, p) => s + gmPct(p.sellingPrice || p.mrp, calcCogs(p), p.mrp), 0) / groupProds.length;
-        const avgDiscGroup = groupProds.reduce((s, p) => { const sp = p.sellingPrice || p.mrp; return s + (p.mrp > 0 ? (p.mrp - sp)/p.mrp : 0); }, 0) / groupProds.length;
+        const avgDiscGroup = groupProds.reduce((s, p) => { const sp = p.sellingPrice || p.mrp; return s + (p.mrp > 0 ? (p.mrp - sp) / p.mrp : 0); }, 0) / groupProds.length;
         summaries[group] = { count: groupProds.length, avgGM: avgGMGroup, avgDisc: avgDiscGroup };
       }
     });
@@ -195,15 +195,15 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
   }, [allUsedGroups, allOfferProducts]);
 
   const activeFiltersCount = [catFilter !== 'All', statusFilter !== 'All', colourFilter !== 'All', groupFilter !== 'All',
-                               priceMinMRP !== '', priceMaxMRP !== '', gmMinPct !== '', gmMaxPct !== '',
-                               discMinPct !== '', discMaxPct !== '', search !== '', sortBy !== 'default'].filter(Boolean).length;
+  priceMinMRP !== '', priceMaxMRP !== '', gmMinPct !== '', gmMaxPct !== '',
+  discMinPct !== '', discMaxPct !== '', search !== '', sortBy !== 'default'].filter(Boolean).length;
 
   return (
     <div className="fade-in p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
         <div>
-          <h1 style={{fontFamily:"Manrope,sans-serif",fontSize:"1.5rem",fontWeight:800,letterSpacing:"-0.02em",color:"#1b1c1a",lineHeight:1.1}} className="sm:text-3xl">Active Offers</h1>
+          <h1 style={{ fontFamily: "Manrope,sans-serif", fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", color: "#1b1c1a", lineHeight: 1.1 }} className="sm:text-3xl">Active Offers</h1>
           <p className="page-subtitle mt-1">Curation</p>
         </div>
         <button onClick={() => { setTagSearch(''); setShowTagPicker(true); }} className="btn-gold px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5">
@@ -216,12 +216,12 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-5">
           {[
             ['On Offer', allOfferProducts.length, '#ef4444'],
-            ['Avg. Discount', `${(avgDisc*100).toFixed(1)}%`, '#f97316'],
-            ['Avg. GM%', `${(avgGM*100).toFixed(1)}%`, avgGM > 0.35 ? '#16a34a' : '#ca8a04'],
-          ].map(([l,v,col]) => (
-            <div key={l} className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4" style={{boxShadow:'0 8px 24px rgba(27,28,26,0.05)'}}>
-              <div style={{fontSize:8,fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(27,28,26,0.4)',marginBottom:6}} className="sm:mb-8">{l}</div>
-              <div style={{fontFamily:'Manrope,sans-serif',fontSize:'1rem',fontWeight:800,color:col,lineHeight:1}} className="sm:text-xl">{v}</div>
+            ['Avg. Discount', `${(avgDisc * 100).toFixed(1)}%`, '#f97316'],
+            ['Avg. GM%', `${(avgGM * 100).toFixed(1)}%`, avgGM > 0.35 ? '#16a34a' : '#ca8a04'],
+          ].map(([l, v, col]) => (
+            <div key={l} className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4" style={{ boxShadow: '0 8px 24px rgba(27,28,26,0.05)' }}>
+              <div style={{ fontSize: 8, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(27,28,26,0.4)', marginBottom: 6 }} className="sm:mb-8">{l}</div>
+              <div style={{ fontFamily: 'Manrope,sans-serif', fontSize: '1rem', fontWeight: 800, color: col, lineHeight: 1 }} className="sm:text-xl">{v}</div>
             </div>
           ))}
         </div>
@@ -241,7 +241,7 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
             <div className="overflow-x-auto -mx-4 sm:mx-0 pb-1 mb-4">
               <div className="flex gap-1.5 px-4 sm:px-0 min-w-max">
                 {allUsedGroups.map(g => {
-                  const summary = summaries[g];
+                  const summary = groupSummaries[g];
                   const count = g === 'All' ? allOfferProducts.length : (summary?.count || 0);
                   return (
                     <button key={g} onClick={() => setGroupFilter(g)}
@@ -291,7 +291,7 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
             <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); }}
               className={`border rounded-lg px-2 py-1.5 text-xs flex-shrink-0 whitespace-nowrap ${statusFilter !== 'All' ? 'border-gold-500 bg-amber-50 text-amber-700' : 'border-gray-200 text-gray-500'}`}>
               <option value="All">Status</option>
-              {['Active','Inactive'].map(s => <option key={s}>{s}</option>)}
+              {['Active', 'Inactive'].map(s => <option key={s}>{s}</option>)}
             </select>
 
             {/* Price range */}
@@ -321,13 +321,13 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
           </div>
 
           {/* Manage Groups section */}
-          {allUsedGroups.length > 1 && Object.keys(summaries).length > 0 && (
+          {allUsedGroups.length > 1 && Object.keys(groupSummaries).length > 0 && (
             <div className="mb-5 bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
               <div className="px-3 sm:px-6 py-3 sm:py-4 border-b">
                 <h3 className="font-semibold text-gray-700 text-xs sm:text-sm">Offer Group Summary</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 p-3 sm:p-6">
-                {Object.entries(summaries).map(([group, stats]) => (
+                {Object.entries(groupSummaries).map(([group, stats]) => (
                   <div key={group} className="border border-gray-200 rounded-lg p-3 sm:p-4">
                     <div className="font-semibold text-gray-800 text-xs sm:text-sm mb-2 sm:mb-3">{group}</div>
                     <div className="space-y-1 sm:space-y-2 text-xs">
@@ -337,12 +337,12 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
                       </div>
                       <div className="flex justify-between text-gray-600">
                         <span>Avg. Discount:</span>
-                        <span className="font-semibold text-orange-600">{(stats.avgDisc*100).toFixed(1)}%</span>
+                        <span className="font-semibold text-orange-600">{(stats.avgDisc * 100).toFixed(1)}%</span>
                       </div>
                       <div className="flex justify-between text-gray-600">
                         <span>Avg. GM%:</span>
                         <span className={`font-semibold ${stats.avgGM > 0.35 ? 'text-green-600' : stats.avgGM > 0.2 ? 'text-amber-600' : 'text-red-600'}`}>
-                          {(stats.avgGM*100).toFixed(1)}%
+                          {(stats.avgGM * 100).toFixed(1)}%
                         </span>
                       </div>
                     </div>
@@ -378,7 +378,7 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
                     <div><div className="text-gray-400 text-[9px] sm:text-xs">MRP</div><div className="font-semibold text-gray-500 line-through text-[10px] sm:text-xs">{fmt(p.mrp)}</div></div>
                     <div><div className="text-red-400 font-medium text-[9px] sm:text-xs">SP</div><div className="font-bold text-red-600 text-[10px] sm:text-xs">{fmt(sp)}</div></div>
                     <div><div className="text-orange-400 text-[9px] sm:text-xs">Disc</div><div className="font-semibold text-orange-600 text-[10px] sm:text-xs">{discPct.toFixed(1)}%</div></div>
-                    <div><div className="text-gray-400 text-[9px] sm:text-xs">GM</div><div className={`font-semibold text-[10px] sm:text-xs ${offerGM > 0.4 ? 'text-green-600' : offerGM > 0.2 ? 'text-amber-600' : 'text-red-500'}`}>{(offerGM*100).toFixed(1)}%</div></div>
+                    <div><div className="text-gray-400 text-[9px] sm:text-xs">GM</div><div className={`font-semibold text-[10px] sm:text-xs ${offerGM > 0.4 ? 'text-green-600' : offerGM > 0.2 ? 'text-amber-600' : 'text-red-500'}`}>{(offerGM * 100).toFixed(1)}%</div></div>
                   </div>
                   <div className="flex gap-2" onClick={e => e.stopPropagation()}>
                     <button onClick={() => setShowOffer(p)} className="flex-1 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 flex items-center justify-center gap-1">
@@ -398,7 +398,7 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
 
           {/* Desktop table */}
           <div className="hidden sm:block bg-white rounded-lg sm:rounded-xl shadow-sm overflow-x-auto">
-            <table className="w-full text-xs sm:text-sm" style={{minWidth:1000}}>
+            <table className="w-full text-xs sm:text-sm" style={{ minWidth: 1000 }}>
               <thead className="bg-gray-50 border-b">
                 <tr className="text-gray-500 text-xs uppercase tracking-wide">
                   <th className="px-4 py-3 text-left">Style Code</th>
@@ -437,7 +437,7 @@ const Offers = ({ fabrics, stitchingMaster, dyes, categories, consumption }) => 
                       <td className="px-4 py-3 text-right font-semibold text-orange-600">{discPct.toFixed(1)}%</td>
                       <td className="px-4 py-3 text-right text-indigo-600 font-medium">{offerEffSP > 0 ? fmt(offerEffSP.toFixed(0)) : '—'}</td>
                       <td className={`px-4 py-3 text-right font-bold ${offerGM > 0.4 ? 'text-green-600' : offerGM > 0.2 ? 'text-amber-600' : 'text-red-500'}`}>
-                        {(offerGM*100).toFixed(1)}%
+                        {(offerGM * 100).toFixed(1)}%
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-400 max-w-xs truncate">{p.offerNote || '—'}</td>
                       <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
