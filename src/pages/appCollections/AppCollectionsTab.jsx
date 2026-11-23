@@ -90,6 +90,7 @@ export default function AppCollectionsTab() {
   const [options, setOptions] = useState({ shopifyCollections: [], productTypes: [] })
   const [preview, setPreview] = useState({ loading: false, total: null, products: [], error: '' })
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [filterTab, setFilterTab] = useState('all') // 'all' | 'nav' | 'cta_only'
   const previewSeq = useRef(0)
 
   const load = useCallback(async () => {
@@ -122,8 +123,25 @@ export default function AppCollectionsTab() {
     api.collectionRuleOptions().then(setOptions).catch(() => {})
   }, [])
 
-  const parents = useMemo(() => rows.filter((r) => !r.parent_handle), [rows])
-  const childrenOf = useCallback((handle) => rows.filter((r) => r.parent_handle === handle), [rows])
+  const parents = useMemo(() => {
+    let list = rows.filter((r) => !r.parent_handle)
+    if (filterTab === 'nav') list = list.filter((r) => r.is_nav_visible !== false)
+    if (filterTab === 'cta_only') list = list.filter((r) => r.is_nav_visible === false)
+    return list
+  }, [rows, filterTab])
+
+  const childrenOf = useCallback((handle) => {
+    let kids = rows.filter((r) => r.parent_handle === handle)
+    if (filterTab === 'nav') kids = kids.filter((r) => r.is_nav_visible !== false)
+    if (filterTab === 'cta_only') kids = kids.filter((r) => r.is_nav_visible === false)
+    return kids
+  }, [rows, filterTab])
+
+  const copyCtaLink = (handle) => {
+    const link = `collection:${handle}`
+    navigator.clipboard?.writeText(link)
+    toast(true, `Copied CTA target: ${link}`)
+  }
 
   const refreshApi = () => api.refreshCollections().catch(() => {})
 
@@ -281,7 +299,11 @@ export default function AppCollectionsTab() {
           <span className="font-bold text-sm" style={{ color: C.text }}>{r.title}</span>
           <span className="font-mono text-[11px]" style={{ color: C.textMuted }}>{r.handle}</span>
           {!r.is_active && <Badge color={C.red}>INACTIVE</Badge>}
-          {r.is_active && !r.is_nav_visible && <Badge color={C.amber}>HIDDEN</Badge>}
+          {r.is_active && !r.is_nav_visible && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+              🔒 CTA ONLY (HIDDEN)
+            </span>
+          )}
           {r.is_featured && <Badge color={C.purple}>FEATURED</Badge>}
         </div>
         <div className="text-xs mt-0.5" style={{ color: C.textMuted }}>
@@ -290,6 +312,26 @@ export default function AppCollectionsTab() {
         </div>
       </div>
       <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => copyCtaLink(r.handle)}
+          title="Copy CTA Link target for banners"
+          className="text-xs px-2.5 py-1 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 font-semibold hover:bg-amber-100 transition-colors"
+        >
+          📋 Copy Link
+        </button>
+        <button
+          type="button"
+          onClick={() => toggle(r, 'is_nav_visible')}
+          title={r.is_nav_visible ? 'Hide from navigation (CTA only)' : 'Show in navigation'}
+          className={`text-xs px-2.5 py-1 rounded-lg border font-semibold transition-colors ${
+            r.is_nav_visible
+              ? 'border-stone-200 bg-stone-50 text-stone-700 hover:bg-stone-100'
+              : 'border-amber-400 bg-amber-500 text-white hover:bg-amber-600'
+          }`}
+        >
+          {r.is_nav_visible ? 'Make CTA Only' : 'Show in Nav'}
+        </button>
         <Btn small disabled={index === 0} onClick={() => move(r, -1)} aria-label="Move up">↑</Btn>
         <Btn small disabled={index === total - 1} onClick={() => move(r, 1)} aria-label="Move down">↓</Btn>
         {!child && <Btn small onClick={() => openCreate(r.handle)}>+ Sub</Btn>}
@@ -310,7 +352,45 @@ export default function AppCollectionsTab() {
             Collections and sub-collections in the mobile app: names, images, order, and which products each one shows.
           </p>
         </div>
-        <Btn primary onClick={() => openCreate('')}>Add Collection</Btn>
+        <div className="flex items-center gap-3">
+          {/* Filter tabs */}
+          <div className="inline-flex rounded-xl p-1 bg-stone-100 border border-stone-200 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setFilterTab('all')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                filterTab === 'all'
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : 'text-stone-500 hover:text-stone-800'
+              }`}
+            >
+              All ({rows.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterTab('nav')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                filterTab === 'nav'
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : 'text-stone-500 hover:text-stone-800'
+              }`}
+            >
+              In Navigation ({rows.filter((r) => r.is_nav_visible !== false).length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterTab('cta_only')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                filterTab === 'cta_only'
+                  ? 'bg-amber-500 text-white shadow-sm'
+                  : 'text-stone-500 hover:text-stone-800'
+              }`}
+            >
+              🔒 CTA Only / Hidden ({rows.filter((r) => r.is_nav_visible === false).length})
+            </button>
+          </div>
+          <Btn primary onClick={() => openCreate('')}>Add Collection</Btn>
+        </div>
       </div>
 
       {loading ? (
@@ -406,8 +486,62 @@ export default function AppCollectionsTab() {
 
                 <div className="flex flex-wrap gap-4 text-xs font-semibold" style={{ color: '#4e4636' }}>
                   <label className="inline-flex items-center gap-2"><input type="checkbox" checked={form.is_active} onChange={(e) => setField('is_active', e.target.checked)} className="accent-amber-500" />Active</label>
-                  <label className="inline-flex items-center gap-2"><input type="checkbox" checked={form.is_nav_visible} onChange={(e) => setField('is_nav_visible', e.target.checked)} className="accent-amber-500" />Show in app navigation</label>
                   <label className="inline-flex items-center gap-2"><input type="checkbox" checked={form.is_featured} onChange={(e) => setField('is_featured', e.target.checked)} className="accent-amber-500" />Featured</label>
+                </div>
+
+                {/* Hide Collection (CTA Only) Card */}
+                <div
+                  className={`p-3.5 rounded-2xl border transition-all ${
+                    !form.is_nav_visible
+                      ? 'bg-amber-50/80 border-amber-300 shadow-sm'
+                      : 'bg-stone-50 border-stone-200'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-stone-900">
+                          Hide Collection (CTA Only)
+                        </span>
+                        {!form.is_nav_visible ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-white">
+                            Hidden from Navigation
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-200 text-stone-700">
+                            Visible in Navigation
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-stone-600 leading-relaxed">
+                        When enabled, this collection will <b>not</b> appear anywhere in the Collections page or category menus.
+                        Shoppers can only reach it via custom banners, campaign CTAs, or direct links.
+                      </p>
+                      {form.handle && (
+                        <div className="pt-1 flex items-center gap-2 text-[11px]">
+                          <span className="font-mono bg-white px-2 py-0.5 rounded border border-stone-200 text-stone-700">
+                            collection:{slugify(form.handle)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => copyCtaLink(slugify(form.handle))}
+                            className="text-amber-700 hover:text-amber-900 font-bold"
+                          >
+                            Copy CTA Target
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                      <input
+                        type="checkbox"
+                        checked={!form.is_nav_visible}
+                        onChange={(e) => setField('is_nav_visible', !e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-10 h-5 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t space-y-4" style={{ borderColor: C.borderLight }}>

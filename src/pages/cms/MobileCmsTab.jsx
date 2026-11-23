@@ -119,11 +119,13 @@ export default function MobileCmsTab() {
   const [selectedProductsMap, setSelectedProductsMap] = useState({})
   const [imageUrl, setImageUrl] = useState('')
   const [mobileImageUrl, setMobileImageUrl] = useState('')
+  const [linkType, setLinkType] = useState('none')
   const [linkValue, setLinkValue] = useState('')
   const [sortOrder, setSortOrder] = useState('0')
   const [active, setActive] = useState(true)
   const [rawFetchedTitle, setRawFetchedTitle] = useState('')
   const [fetchingMeta, setFetchingMeta] = useState(false)
+  const [availableCollections, setAvailableCollections] = useState([])
 
   // Image data passed into croppers
   const [cropperImageSrc, setCropperImageSrc] = useState('')
@@ -137,13 +139,16 @@ export default function MobileCmsTab() {
   const fetchBanners = useCallback(async () => {
     setLoading(true)
     try {
-      const { data, error } = await supa
-        .from('cms_banners')
-        .select('*')
-        .order('sort_order', { ascending: true })
+      const [bannersRes, collectionsRes] = await Promise.all([
+        supa.from('cms_banners').select('*').order('sort_order', { ascending: true }),
+        supa.from('catalogue_collections').select('id, title, handle, is_nav_visible, is_active').order('title', { ascending: true }),
+      ])
 
-      if (error) throw error
-      setBanners(data || [])
+      if (bannersRes.error) throw bannersRes.error
+      setBanners(bannersRes.data || [])
+      if (!collectionsRes.error && collectionsRes.data) {
+        setAvailableCollections(collectionsRes.data.filter((c) => c.is_active !== false))
+      }
     } catch (e) {
       console.error('[HILO] Failed to fetch CMS banners:', e)
       toast(false, 'Failed to fetch CMS banners: ' + e.message)
@@ -205,6 +210,7 @@ export default function MobileCmsTab() {
     setSubtitle('Discover designer looks styled around you.')
     setImageUrl('')
     setMobileImageUrl('')
+    setLinkType('none')
     setLinkValue('')
     setSortOrder('0')
     setActive(true)
@@ -217,6 +223,7 @@ export default function MobileCmsTab() {
     setSubtitle('Hilo Design Studio')
     setImageUrl('')
     setMobileImageUrl('')
+    setLinkType('none')
     setLinkValue('')
     setSortOrder('0')
     setActive(true)
@@ -230,6 +237,7 @@ export default function MobileCmsTab() {
     setSubtitle('Hilo Styling')
     setImageUrl('')
     setMobileImageUrl('')
+    setLinkType('none')
     setLinkValue('')
     setSortOrder('0')
     setActive(true)
@@ -247,6 +255,7 @@ export default function MobileCmsTab() {
     setSelectedProductsMap({})
     setImageUrl('')
     setMobileImageUrl('')
+    setLinkType('none')
     setLinkValue('[]')
     setSortOrder('0')
     setActive(true)
@@ -267,6 +276,7 @@ export default function MobileCmsTab() {
     setSubtitle(b.subtitle || '')
     setImageUrl(b.image_url || '')
     setMobileImageUrl(b.mobile_image_url || '')
+    setLinkType(b.link_type || 'none')
     setLinkValue(b.link_value || '')
     setSortOrder(String(b.sort_order || 0))
     setActive(b.active ?? true)
@@ -492,7 +502,7 @@ export default function MobileCmsTab() {
       type: itemType,
       image_url: imageUrl || null,
       mobile_image_url: mobileImageUrl || imageUrl || null,
-      link_type: 'none',
+      link_type: linkType || 'none',
       link_value: linkValue || null,
       sort_order: parseInt(sortOrder) || 0,
       active,
@@ -728,9 +738,21 @@ export default function MobileCmsTab() {
                               </span>
                             </div>
                           ) : item.link_value ? (
-                            <p className="text-[10px] text-stone-400 font-mono truncate mt-0.5" title={item.link_value}>
-                              {item.link_value}
-                            </p>
+                            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                              {item.link_type === 'collection' ? (
+                                <span className="text-[10px] font-semibold text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                  📁 Collection: {item.link_value}
+                                </span>
+                              ) : item.link_type === 'product' ? (
+                                <span className="text-[10px] font-semibold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                                  🏷️ Product: {item.link_value}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-mono text-stone-500 bg-stone-100 px-2 py-0.5 rounded border border-stone-200 truncate max-w-[200px]" title={item.link_value}>
+                                  🔗 {item.link_value}
+                                </span>
+                              )}
+                            </div>
                           ) : null}
                         </div>
                       </div>
@@ -1039,6 +1061,76 @@ export default function MobileCmsTab() {
                   </div>
                 )}
               </Field>
+
+              {/* CTA Navigation Destination */}
+              <div className="pt-2 border-t border-stone-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-stone-900 block">
+                    Banner CTA Destination
+                  </label>
+                  <span className="text-[11px] text-stone-500">
+                    What happens when user taps slide
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Link Type">
+                    <Select
+                      value={linkType}
+                      onChange={e => {
+                        const next = e.target.value
+                        setLinkType(next)
+                        if (next === 'none') setLinkValue('')
+                      }}
+                    >
+                      <option value="none">None (No navigation)</option>
+                      <option value="collection">Collection (Custom / Hidden / Nav)</option>
+                      <option value="product">Product (Handle / ID)</option>
+                      <option value="url">External / Custom URL</option>
+                    </Select>
+                  </Field>
+
+                  {linkType === 'collection' ? (
+                    <Field label="Target Collection">
+                      <Select
+                        value={linkValue}
+                        onChange={e => setLinkValue(e.target.value)}
+                      >
+                        <option value="">— Select Collection —</option>
+                        {availableCollections.map(c => (
+                          <option key={c.id} value={c.handle}>
+                            {c.title} ({c.handle}) {c.is_nav_visible === false ? '🔒 [CTA Only]' : ''}
+                          </option>
+                        ))}
+                      </Select>
+                    </Field>
+                  ) : linkType === 'product' ? (
+                    <Field label="Product Handle or ID">
+                      <Input
+                        value={linkValue}
+                        onChange={e => setLinkValue(e.target.value)}
+                        placeholder="e.g. varna-kanjivaram"
+                      />
+                    </Field>
+                  ) : linkType === 'url' ? (
+                    <Field label="URL">
+                      <Input
+                        value={linkValue}
+                        onChange={e => setLinkValue(e.target.value)}
+                        placeholder="https://... or /path"
+                      />
+                    </Field>
+                  ) : (
+                    <div className="flex items-center text-xs text-stone-400 italic pt-6">
+                      Slide only displays photo
+                    </div>
+                  )}
+                </div>
+                {linkType === 'collection' && linkValue && (
+                  <p className="text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                    🎯 Navigates to collection <b>{linkValue}</b>. If this is a hidden/CTA-only collection, users will directly view its product catalog upon tapping!
+                  </p>
+                )}
+              </div>
 
               <div className="grid grid-cols-2 gap-3 items-center pt-1">
                 <Field label="Sort Order">
